@@ -15,7 +15,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <!-- Chart.js & Zoom Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
 
@@ -40,150 +45,38 @@
         }
 
         /* Compact Header Layout */
-        .header-container {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border-dark);
-            padding-bottom: 15px;
-        }
-        .header-logo {
-            height: 90px; 
-            width: auto;
-            object-fit: contain;
-        }
-        .header-text h1 {
-            margin: 0 0 5px 0;
-            color: var(--text-color);
-            font-size: 1.6rem;
-            font-weight: 500;
-        }
-        .header-text p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
+        .header-container { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 15px; }
+        .header-logo { height: 90px; width: auto; object-fit: contain; }
+        .header-text h1 { margin: 0 0 5px 0; color: var(--text-color); font-size: 1.6rem; font-weight: 500; }
+        .header-text p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
         
         /* Controls & Filters */
-        .controls { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-        }
-        input[type="text"], select { 
-            padding: 8px 12px; 
-            font-family: var(--font-mono); 
-            font-size: 0.85rem; 
-            border: 1px solid var(--border-dark); 
-            border-radius: 2px;
-            outline: none;
-        }
-        input[type="text"]:focus, select:focus {
-            border-color: var(--accent-cyan);
-        }
-        .checkbox-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: var(--text-muted);
-        }
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        input[type="text"], select { padding: 8px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--border-dark); border-radius: 2px; outline: none; }
+        input[type="text"]:focus, select:focus { border-color: var(--accent-cyan); }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
         
         /* Tabs */
-        .tabs { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 20px; 
-        }
-        .tab-btn { 
-            background: transparent; 
-            border: 1px solid var(--border-light); 
-            padding: 8px 16px; 
-            font-size: 0.85rem; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-            transition: 0.2s; 
-            border-radius: 2px;
-        }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
         .tab-btn:hover { border-color: var(--border-dark); }
-        .tab-btn.active { 
-            background: var(--border-dark); 
-            color: #ffffff; 
-            border-color: var(--border-dark); 
-        }
+        .tab-btn.active { background: var(--border-dark); color: #ffffff; border-color: var(--border-dark); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
         /* Tables */
         .dataTables_wrapper .dataTables_filter { display: none !important; }
-        table.dataTable { 
-            font-family: var(--font-mono) !important; 
-            font-size: 0.85rem !important; 
-            border-collapse: collapse !important;
-            width: 100% !important;
-        }
-        table.dataTable thead th { 
-            background-color: #ffffff !important; 
-            border-bottom: 2px solid var(--border-dark) !important; 
-            padding: 10px !important;
-        }
-        table.dataTable tbody td { 
-            border-bottom: 1px solid var(--border-light) !important; 
-            padding: 10px !important; 
-        }
-        .author-link { 
-            color: var(--accent-cyan); 
-            cursor: pointer; 
-            text-decoration: underline; 
-            font-weight: 500; 
-        }
-        .btn-small { 
-            padding: 4px 10px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            background: #ffffff; 
-            color: var(--text-color); 
-            border: 1px solid var(--border-light); 
-            border-radius: 2px; 
-            font-family: var(--font-mono);
-        }
-        .btn-small:hover { 
-            border-color: var(--border-dark); 
-            background: var(--border-dark); 
-            color: #ffffff; 
-        }
+        table.dataTable { font-family: var(--font-mono) !important; font-size: 0.85rem !important; border-collapse: collapse !important; width: 100% !important; }
+        table.dataTable thead th { background-color: #ffffff !important; border-bottom: 2px solid var(--border-dark) !important; padding: 10px !important; }
+        table.dataTable tbody td { border-bottom: 1px solid var(--border-light) !important; padding: 10px !important; }
+        .author-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; font-weight: 500; }
+        .btn-small { padding: 4px 10px; font-size: 0.75rem; cursor: pointer; background: #ffffff; color: var(--text-color); border: 1px solid var(--border-light); border-radius: 2px; font-family: var(--font-mono); }
+        .btn-small:hover { border-color: var(--border-dark); background: var(--border-dark); color: #ffffff; }
         
         /* Modals */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(255,255,255,0.95); 
-            z-index: 1000; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .modal-content { 
-            background: white; 
-            padding: 30px; 
-            border: 1px solid var(--border-dark); 
-            max-width: 800px; 
-            max-height: 90vh; 
-            overflow-y: auto; 
-            width: 90%; 
-            position: relative; 
-        }
-        .close-btn { 
-            position: absolute; 
-            top: 15px; right: 20px; 
-            font-size: 20px; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono);
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border: 1px solid var(--border-dark); max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); }
         #scanImage { max-width: 100%; display: block; margin: 0 auto; border: 1px solid var(--border-light); }
         
         /* Data Viz Containers */
@@ -199,7 +92,7 @@
         .dual-chart-container { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; margin-bottom: 40px; }
         .split-row { display: flex; flex-direction: row; gap: 40px; }
         .split-item { flex: 1; }
-        .section-header { margin-top: 40px; margin-bottom: 15px; font-size: 1.4rem; font-weight: 600; color: var(--text-color); border-bottom: 2px solid var(--border-dark); padding-bottom: 5px; }
+        .section-header { margin-top: 40px; margin-bottom: 10px; font-size: 1.4rem; font-weight: 600; color: var(--text-color); border-bottom: 2px solid var(--border-dark); padding-bottom: 5px; }
         
         /* Top Contributors List */
         .top-list { list-style: none; padding: 0; margin: 0; }
@@ -209,6 +102,7 @@
         
         /* About Tab Text */
         #aboutTab p { margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem; }
+        .local-controls { display: flex; gap: 15px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -232,7 +126,7 @@
         <button class="tab-btn" onclick="openTab('aboutTab', this)">7. About</button>
     </div>
 
-    <!-- Global Filters -->
+    <!-- Global Filters (Only for Tab 1 and 2 now) -->
     <div class="controls" id="tableControls">
         <input type="text" id="globalSearch" placeholder="Fuzzy search titles, authors..." style="width: 300px;">
         <select id="filterYearPubs"><option value="">All Publication Years</option></select>
@@ -289,9 +183,13 @@
 
     <!-- TAB 4: Visual Analytics -->
     <div id="analyticsTab" class="tab-content">
-        <p style="color: var(--text-muted);">Comprehensive breakdown of society output. All charts and lists react dynamically to the Search, Year, and Discipline filters above.</p>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Comprehensive breakdown of society output. The modules below are decoupled and feature their own dedicated controls.</p>
         
         <div class="section-header">1. Top Contributors</div>
+        <div class="local-controls">
+            <select id="localTopPubYear"><option value="">All Journal Years</option></select>
+            <select id="localTopLecYear"><option value="">All Lecture Years</option></select>
+        </div>
         <div class="split-row">
             <div class="split-item">
                 <div class="chart-title">Most Published Authors (Journal)</div>
@@ -303,8 +201,12 @@
             </div>
         </div>
 
-        <div class="section-header">2. Thematic Breakdown</div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Click any slice to view all items in that discipline.</p>
+        <div class="section-header" style="margin-top: 60px;">2. Thematic Breakdown</div>
+        <div class="local-controls">
+            <select id="localPiePubYear"><option value="">All Journal Years</option></select>
+            <select id="localPieLecYear"><option value="">All Lecture Years</option></select>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Showing Top 12 categories by default. Click categories in the legend to toggle them on or off. Click any pie slice to view items.</p>
         <div class="split-row">
             <div class="split-item chart-wrapper" style="height: 350px;">
                 <div class="chart-title">Journal Publications by Discipline</div>
@@ -316,20 +218,21 @@
             </div>
         </div>
 
-        <div class="section-header">3. Disciplinary Output Over Time</div>
+        <div class="section-header" style="margin-top: 60px;">3. Disciplinary Output Over Time</div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;"><strong>Interactive:</strong> Click and drag horizontally inside the graph to zoom into a specific year range. Double click to reset zoom.</p>
         <div class="dual-chart-container">
-            <div class="chart-wrapper">
-                <div class="chart-title">Journal Publications (Top 12 Disciplines)</div>
-                <canvas id="stackedChartPubs"></canvas>
+            <div class="chart-wrapper" style="height: 450px;">
+                <div class="chart-title">Journal Publications Over Time</div>
+                <canvas id="lineChartPubs"></canvas>
             </div>
-            <div class="chart-wrapper">
-                <div class="chart-title">Public Lectures (Top 12 Disciplines)</div>
-                <canvas id="stackedChartLecs"></canvas>
+            <div class="chart-wrapper" style="height: 450px;">
+                <div class="chart-title">Public Lectures Over Time</div>
+                <canvas id="lineChartLecs"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- TAB 5: Network Graph with Interactive Sidebar -->
+    <!-- TAB 5: Network Graph -->
     <div id="networkTab" class="tab-content">
         <div id="networkContainer"></div>
         <div id="networkSidebar">
@@ -360,11 +263,11 @@
     </div>
 
     <!-- TAB 7: About -->
-    <div id="aboutTab" class="tab-content" style="max-width: 900px; display: none;">
+    <div id="aboutTab" class="tab-content" style="max-width: 900px;">
         <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
         <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
         <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
-        <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://medusa.libver.gr/iguana/www.main.cls?surl=medusa" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
+        <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%BD_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
         <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
         <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
         <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
@@ -406,7 +309,6 @@
         }
     });
 
-    // Helper: Parse specific chronological anomalies
     function getCleanYear(row) {
         let rawYear = row.volume_or_year_greek || "";
         let subYear = row.subsection_greek || "";
@@ -452,21 +354,25 @@
         
         buildTimeline(journalData, 'timelineChartPubs', '#111827');
         buildTimeline(lectureData, 'timelineChartLecs', '#0284c7');
-        refreshVisualAnalytics();
+        
+        // Initialize Analytics modules
+        updateTopContributorsAnalytics();
+        updatePieChartsAnalytics();
+        buildInteractiveLineCharts();
+        
         buildNetwork();
         setupCustomFilters();
     }
 
+    // --- Table Logic ---
     function buildTables(journal, lecture) {
         const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
         const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
-        
         const renderAuthor = (data, type, row) => {
             const authorTop = (row.author_english || row.normalized_author || row.author_greek || "Anonymous").trim().replace(/\.+$/, '');
             const authorBottom = (row.author_english || row.normalized_author) ? (row.author_greek || "") : "";
             return `<span class="author-link" onclick="openProfile('${escapeQuote(authorTop)}', 'All')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
         };
-        
         const renderTitle = (data, type, row) => {
             const titleTop = row.title_english || row.title_greek || '';
             const titleBottom = row.title_english ? (row.title_greek || '') : '';
@@ -476,27 +382,18 @@
         window.jt = $('#journalTable').DataTable({
             data: journal, pageLength: 25, scrollX: true,
             columns: [
-                { data: 'volume_or_year_greek' },
-                { data: null, render: renderAuthor },
-                { data: null, render: renderTitle },
-                { data: 'subsection_greek' },
-                { data: 'page_numbers' },
-                { data: 'disciplines' },
-                { data: null, render: renderScanBtn, orderable: false },
-                { data: null, render: renderCiteBtn, orderable: false }
+                { data: 'volume_or_year_greek' }, { data: null, render: renderAuthor }, { data: null, render: renderTitle },
+                { data: 'subsection_greek' }, { data: 'page_numbers' }, { data: 'disciplines' },
+                { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
 
         window.lt = $('#lectureTable').DataTable({
             data: lecture, pageLength: 25, scrollX: true,
             columns: [
-                { data: 'volume_or_year_greek' },
-                { data: null, render: renderAuthor },
-                { data: null, render: renderTitle },
-                { data: 'lecture_count' },
-                { data: 'disciplines' },
-                { data: null, render: renderScanBtn, orderable: false },
-                { data: null, render: renderCiteBtn, orderable: false }
+                { data: 'volume_or_year_greek' }, { data: null, render: renderAuthor }, { data: null, render: renderTitle },
+                { data: 'lecture_count' }, { data: 'disciplines' },
+                { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
     }
@@ -517,58 +414,57 @@
                 let normAuth = (rowObj.normalized_author || "").toLowerCase();
                 if (!(normAuth === "anonymous" || normAuth === "ανώνυμος" || normAuth === "unknown")) return false;
             }
-            
             if (discFilter && (!rowObj.disciplines || !rowObj.disciplines.includes(discFilter))) return false;
             if (query && !rowObj.search_text.toLowerCase().includes(query.toLowerCase())) return false;
-            
             return true;
         });
 
         $('#globalSearch, #anonFilter, #filterDiscipline, #filterYearPubs, #filterYearLecs').on('keyup change', function() {
-            if ($('#analyticsTab').hasClass('active')) refreshVisualAnalytics();
             window.jt.draw();
             window.lt.draw();
         });
+        
+        // Bind local analytics dropdowns
+        $('#localTopPubYear, #localTopLecYear').on('change', updateTopContributorsAnalytics);
+        $('#localPiePubYear, #localPieLecYear').on('change', updatePieChartsAnalytics);
     }
 
     function populateDropdowns(yearsPubs, yearsLecs, disciplines) {
-        let yrPSelect = document.getElementById("filterYearPubs");
-        Array.from(yearsPubs).sort().forEach(y => yrPSelect.add(new Option(y, y)));
+        let yp = document.getElementById("filterYearPubs");
+        let yl = document.getElementById("filterYearLecs");
+        let d = document.getElementById("filterDiscipline");
         
-        let yrLSelect = document.getElementById("filterYearLecs");
-        Array.from(yearsLecs).sort().forEach(y => yrLSelect.add(new Option(y, y)));
+        let localTopP = document.getElementById("localTopPubYear");
+        let localTopL = document.getElementById("localTopLecYear");
+        let localPieP = document.getElementById("localPiePubYear");
+        let localPieL = document.getElementById("localPieLecYear");
         
-        let discSelect = document.getElementById("filterDiscipline");
-        Array.from(disciplines).sort().forEach(d => discSelect.add(new Option(d, d)));
+        Array.from(yearsPubs).sort().forEach(y => { yp.add(new Option(y, y)); localTopP.add(new Option(y, y)); localPieP.add(new Option(y, y)); });
+        Array.from(yearsLecs).sort().forEach(y => { yl.add(new Option(y, y)); localTopL.add(new Option(y, y)); localPieL.add(new Option(y, y)); });
+        Array.from(disciplines).sort().forEach(y => d.add(new Option(y, y)));
     }
 
-    // Comprehensive Visual Analytics Refresh
-    function refreshVisualAnalytics() {
-        let yearPub = $('#filterYearPubs').val();
-        let yearLec = $('#filterYearLecs').val();
-        let search = $('#globalSearch').val();
-        let anon = $('#anonFilter').is(':checked');
-        let disc = $('#filterDiscipline').val();
-        
-        // 1. Update Top Contributors Lists
-        let authCounts = {}, speakCounts = {};
-        masterData.forEach(row => {
-            if (search && !row.search_text.toLowerCase().includes(search.toLowerCase())) return;
-            if (anon) {
-                let n = (row.normalized_author||"").toLowerCase();
-                if (!(n==="anonymous"||n==="ανώνυμος"||n==="unknown")) return;
-            }
-            if (disc && (!row.disciplines || !row.disciplines.includes(disc))) return;
+    // --- Tab 4: Visual Analytics (Decoupled Modules) ---
+    function renderChart(canvasId, type, configData, options) {
+        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { type: type, data: configData, options: options });
+    }
 
+    function updateTopContributorsAnalytics() {
+        let yrPub = $('#localTopPubYear').val();
+        let yrLec = $('#localTopLecYear').val();
+        let authCounts = {}, speakCounts = {};
+        
+        masterData.forEach(row => {
             let author = (row.author_english || row.normalized_author || row.author_greek || "Anonymous").trim().replace(/\.+$/, '');
             let norm = author.toLowerCase();
             if (norm === "anonymous" || norm === "ανώνυμος" || norm === "unknown" || norm === "various") return;
 
             if (row.entry_type === "Public Lecture") {
-                if (yearLec && row.volume_or_year_greek !== yearLec) return;
+                if (yrLec && row.volume_or_year_greek !== yrLec) return;
                 speakCounts[author] = (speakCounts[author] || 0) + 1;
             } else {
-                if (yearPub && row.volume_or_year_greek !== yearPub) return;
+                if (yrPub && row.volume_or_year_greek !== yrPub) return;
                 authCounts[author] = (authCounts[author] || 0) + 1;
             }
         });
@@ -581,33 +477,20 @@
         };
         sortAndRender(authCounts, 'topAuthorsList', 'Journal');
         sortAndRender(speakCounts, 'topSpeakersList', 'Lecture');
+    }
 
-        // 2. Filter data for charts
-        let chartData = masterData.filter(r => {
-            if (search && !r.search_text.toLowerCase().includes(search.toLowerCase())) return false;
-            if (anon) { let n = (r.normalized_author||"").toLowerCase(); if(!(n==="anonymous"||n==="ανώνυμος"||n==="unknown")) return false; }
-            if (disc && (!r.disciplines || !r.disciplines.includes(disc))) return false;
-            return true;
-        });
-
-        let pubsChartData = chartData.filter(r => r.entry_type !== "Public Lecture");
-        if(yearPub) pubsChartData = pubsChartData.filter(r => r.volume_or_year_greek === yearPub);
+    function updatePieChartsAnalytics() {
+        let yrPub = $('#localPiePubYear').val();
+        let yrLec = $('#localPieLecYear').val();
         
-        let lecsChartData = chartData.filter(r => r.entry_type === "Public Lecture");
-        if(yearLec) lecsChartData = lecsChartData.filter(r => r.volume_or_year_greek === yearLec);
+        let pubsData = masterData.filter(r => r.entry_type !== "Public Lecture" && (!yrPub || r.volume_or_year_greek === yrPub));
+        let lecsData = masterData.filter(r => r.entry_type === "Public Lecture" && (!yrLec || r.volume_or_year_greek === yrLec));
 
-        buildPieChart(pubsChartData, 'pieChartPubs');
-        buildPieChart(lecsChartData, 'pieChartLecs');
-        buildStackedBarChart(pubsChartData, 'stackedChartPubs');
-        buildStackedBarChart(lecsChartData, 'stackedChartLecs');
+        buildSmartPieChart(pubsData, 'pieChartPubs');
+        buildSmartPieChart(lecsData, 'pieChartLecs');
     }
 
-    function renderChart(canvasId, type, configData, options) {
-        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
-        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { type: type, data: configData, options: options });
-    }
-
-    function buildPieChart(dataset, canvasId) {
+    function buildSmartPieChart(dataset, canvasId) {
         let counts = {};
         dataset.forEach(row => {
             let dStr = row.disciplines;
@@ -618,59 +501,114 @@
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
+        
         let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
         
-        renderChart(canvasId, 'pie', {
-            labels: sorted.map(i => i[0]),
-            datasets: [{ data: sorted.map(i => i[1]), backgroundColor: colors, borderWidth: 1 }]
-        }, {
-            responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } },
-            onClick: (event, elements, chart) => {
-                if(elements.length > 0) openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture');
+        let chartObj = new Chart(document.getElementById(canvasId), {
+            type: 'pie',
+            data: {
+                labels: sorted.map(i => i[0]),
+                datasets: [{ data: sorted.map(i => i[1]), backgroundColor: colors, borderWidth: 1 }]
+            },
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                plugins: { legend: { position: 'right' } },
+                onClick: (event, elements, chart) => {
+                    if(elements.length > 0) openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture');
+                }
             }
         });
+
+        // Hide slices beyond the Top 12 by default
+        sorted.forEach((item, index) => {
+            if (index > 11) chartObj.toggleDataVisibility(index);
+        });
+        chartObj.update();
+        
+        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+        chartInstances[canvasId] = chartObj;
     }
 
-    function buildStackedBarChart(dataset, canvasId) {
+    function buildInteractiveLineCharts() {
+        let pubsData = masterData.filter(r => r.entry_type !== "Public Lecture");
+        let lecsData = masterData.filter(r => r.entry_type === "Public Lecture");
+        
+        renderInteractiveLineChart(pubsData, 'lineChartPubs');
+        renderInteractiveLineChart(lecsData, 'lineChartLecs');
+    }
+
+    function renderInteractiveLineChart(dataset, canvasId) {
         let discCounts = {};
         dataset.forEach(row => {
             let dStr = row.disciplines;
-            if(!dStr || dStr === "N/A") return;
-            dStr.split(',').forEach(d => {
-                let dName = d.trim();
-                if(!dName || dName.toLowerCase() === 'null') return;
-                discCounts[dName] = (discCounts[dName] || 0) + 1;
-            });
+            if(dStr && dStr !== "N/A") {
+                dStr.split(',').forEach(d => {
+                    let dName = d.trim();
+                    if(dName && dName.toLowerCase() !== 'null') discCounts[dName] = (discCounts[dName] || 0) + 1;
+                });
+            }
         });
         
-        let top12 = Object.entries(discCounts).sort((a,b)=>b[1]-a[1]).slice(0, 12).map(x => x[0]);
+        let allDiscs = Object.entries(discCounts).sort((a,b)=>b[1]-a[1]).map(x => x[0]);
         let yearCounts = {};
         
         dataset.forEach(row => {
             let yr = getCleanYear(row);
             if(!yr) return;
-            if(!yearCounts[yr]) { yearCounts[yr] = { "Other": 0 }; top12.forEach(d => yearCounts[yr][d] = 0); }
-            let dStr = row.disciplines;
-            if(dStr && dStr !== "N/A") {
-                dStr.split(',').forEach(d => {
+            if(!yearCounts[yr]) { 
+                yearCounts[yr] = { "Total Output": 0 }; 
+                allDiscs.forEach(d => yearCounts[yr][d] = 0); 
+            }
+            yearCounts[yr]["Total Output"]++;
+            
+            if(row.disciplines && row.disciplines !== "N/A") {
+                row.disciplines.split(',').forEach(d => {
                     let dName = d.trim();
-                    if(!dName || dName.toLowerCase() === 'null') return;
-                    if(top12.includes(dName)) yearCounts[yr][dName]++;
-                    else yearCounts[yr]["Other"]++;
+                    if(dName && yearCounts[yr][dName] !== undefined) yearCounts[yr][dName]++;
                 });
-            } else { yearCounts[yr]["Other"]++; }
+            }
         });
         
         let years = Object.keys(yearCounts).sort();
-        let datasets = top12.map((dName, idx) => ({ label: dName, data: years.map(y => yearCounts[y][dName]), backgroundColor: colors[idx % colors.length] }));
-        datasets.push({ label: "Other", data: years.map(y => yearCounts[y]["Other"]), backgroundColor: '#e5e7eb' });
+        let datasets = [];
         
-        renderChart(canvasId, 'bar', { labels: years, datasets: datasets }, {
-            responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } },
-            scales: { x: { stacked: true }, y: { stacked: true } }
+        // Total Output Line
+        datasets.push({
+            label: "TOTAL OUTPUT",
+            data: years.map(y => yearCounts[y]["Total Output"]),
+            borderColor: '#000000', backgroundColor: '#000000',
+            borderWidth: 3, borderDash: [5, 5], fill: false, tension: 0.3
         });
+        
+        // Discipline Lines
+        allDiscs.forEach((dName, idx) => {
+            datasets.push({
+                label: dName,
+                data: years.map(y => yearCounts[y][dName]),
+                borderColor: colors[idx % colors.length], backgroundColor: colors[idx % colors.length],
+                borderWidth: 2, fill: false, tension: 0.3,
+                hidden: idx >= 12 // Hide beyond top 12 initially
+            });
+        });
+        
+        renderChart(canvasId, 'line', { labels: years, datasets: datasets }, {
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'right' },
+                zoom: {
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { drag: { enabled: true, backgroundColor: 'rgba(2,132,199,0.2)' }, wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                }
+            }
+        });
+        
+        // Double click to reset zoom
+        document.getElementById(canvasId).ondblclick = function() {
+            chartInstances[canvasId].resetZoom();
+        };
     }
 
+    // --- Tab 6: Timeline Bar Charts ---
     function buildTimeline(dataset, canvasId, colorHex) {
         let counts = {};
         dataset.forEach(row => { let yr = getCleanYear(row); if(yr) counts[yr] = (counts[yr] || 0) + 1; });
@@ -686,7 +624,7 @@
         });
     }
 
-    // Stabilized & Interactive Click-to-Jump Network Graph
+    // --- Tab 5: Stabilized Network Graph ---
     function buildNetwork() {
         let edgesArr = [];
         windowNodesMap = new Map();
@@ -695,7 +633,6 @@
             let author = (row.normalized_author || row.author_greek || "").trim().replace(/\.+$/, '');
             let disc = row.disciplines;
             if(!author || author === "N/A" || !disc || disc === "N/A") return;
-            
             let n = author.toLowerCase();
             if (n === "anonymous" || n === "ανώνυμος" || n === "various" || n === "unknown") return;
 
@@ -727,19 +664,15 @@
             if (params.nodes.length > 0) {
                 let nodeId = params.nodes[0];
                 let neighbors = network.getConnectedNodes(nodeId);
-                
-                // Dim/Reset all, highlight neighbors
                 let updateArray = Array.from(windowNodesMap.values()).map(n => ({ id: n.id, font: {bold: false, size: n.group==='author'?11:12} }));
                 networkNodesData.update(updateArray);
                 let highlightArray = neighbors.map(nId => ({ id: nId, font: {bold: true, size: 14} }));
                 highlightArray.push({ id: nodeId, font: {bold: true, size: 16} });
                 networkNodesData.update(highlightArray);
-                
                 updateSidebar(nodeId, neighbors);
             }
         });
         
-        // Network Search bind
         $('#networkSearch').on('input', function() {
             let val = $(this).val().toLowerCase().trim();
             if(!val) return;
@@ -758,7 +691,6 @@
     function updateSidebar(nodeId, neighbors) {
         document.getElementById('sidebarTitle').innerText = nodeId;
         document.getElementById('sidebarDesc').innerText = `Connected nodes (${neighbors.length}): Click any link below to jump directly to it on the map.`;
-        
         let sidebar = document.getElementById('sidebarLinks');
         sidebar.innerHTML = '';
         
@@ -788,32 +720,30 @@
         });
     }
 
+    // --- Tab Switching ---
     function openTab(tabId, element) {
         $('.tab-content').removeClass('active');
         $('.tab-btn').removeClass('active');
         $('#' + tabId).addClass('active');
         $(element).addClass('active');
 
-        if(tabId === 'aboutTab' || tabId === 'networkTab' || tabId === 'timelineTab' || tabId === 'semanticTab') {
-            $('#tableControls').hide(); 
-        } else {
+        if(tabId === 'journalTab' || tabId === 'lectureTab') {
             $('#tableControls').show();
-            $('#filterYearPubs').toggle(tabId === 'journalTab' || tabId === 'analyticsTab');
-            $('#filterYearLecs').toggle(tabId === 'lectureTab' || tabId === 'analyticsTab');
-            $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'analyticsTab');
+            $('#filterYearPubs').toggle(tabId === 'journalTab');
+            $('#filterYearLecs').toggle(tabId === 'lectureTab');
+            $('#anonFilterGroup').toggle(tabId === 'journalTab');
+        } else {
+            $('#tableControls').hide(); 
         }
-        
-        if (tabId === 'analyticsTab') refreshVisualAnalytics();
     }
 
-    // Modal Dynamic List & Search Handlers
+    // --- Modal Logic ---
     let currentModalData = { type: '', title: '', subtitle: '', items: [] };
 
     function renderFlatList(items, query = "") {
         let list = document.getElementById('profItems');
         list.innerHTML = '';
         let filtered = items.filter(i => (i.search_text || "").toLowerCase().includes(query.toLowerCase()));
-        
         if (filtered.length === 0) { list.innerHTML = "<li>No matching records found.</li>"; return; }
         filtered.forEach(item => {
             let li = document.createElement('li');
@@ -828,15 +758,12 @@
         let list = document.getElementById('profItems');
         list.innerHTML = '';
         let filtered = items.filter(i => (i.search_text || "").toLowerCase().includes(query.toLowerCase()));
-        
         if (filtered.length === 0) { list.innerHTML = "<li>No matching records found.</li>"; return; }
+        
         let grouped = {};
         filtered.forEach(item => {
             let discs = item.disciplines && item.disciplines !== "N/A" ? item.disciplines.split(',').map(d => d.trim()) : ["Uncategorized"];
-            discs.forEach(d => {
-                if(!grouped[d]) grouped[d] = [];
-                grouped[d].push(item);
-            });
+            discs.forEach(d => { if(!grouped[d]) grouped[d] = []; grouped[d].push(item); });
         });
 
         for (const [disc, works] of Object.entries(grouped).sort()) {
