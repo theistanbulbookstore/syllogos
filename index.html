@@ -544,18 +544,30 @@
         document.getElementById('scanModal').style.display = 'flex';
     }
 
-    function openProfile(authorName) {
-        const items = masterData.filter(r => (r.normalized_author || r.author_greek || "Anonymous") === authorName);
+function openProfile(authorName) {
+        const query = authorName.toLowerCase().trim();
+        const items = masterData.filter(r => {
+            const eng = (r.author_english || r.normalized_author || "").toLowerCase().trim();
+            const gr = (r.author_greek || "").toLowerCase().trim();
+            return eng === query || gr === query;
+        });
+
         document.getElementById('profName').innerText = authorName;
         document.getElementById('profStats').innerText = `Total Contributions: ${items.length}`;
         
         const list = document.getElementById('profItems');
         list.innerHTML = '';
-        items.forEach(item => {
+        if (items.length === 0) {
             let li = document.createElement('li');
-            li.innerHTML = `<strong>${item.volume_or_year_greek}</strong>: ${item.title_greek} <em>(${item.entry_type})</em>`;
+            li.innerText = "No matching records found.";
             list.appendChild(li);
-        });
+        } else {
+            items.forEach(item => {
+                let li = document.createElement('li');
+                li.innerHTML = `<strong>${item.volume_or_year_greek || ''}</strong>: ${item.title_english || item.title_greek || ''} <em>(${item.entry_type || ''})</em>`;
+                list.appendChild(li);
+            });
+        }
         document.getElementById('profileModal').style.display = 'flex';
     }
 
