@@ -35,28 +35,17 @@
             --font-mono: 'Fira Code', 'Consolas', monospace;
         }
         
-        body { 
-            font-family: var(--font-mono); 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 20px 40px; 
-            font-size: 0.85rem;
-        }
-
-        /* Compact Header Layout */
+        body { font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px 40px; font-size: 0.85rem; }
         .header-container { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 15px; }
         .header-logo { height: 90px; width: auto; object-fit: contain; }
         .header-text h1 { margin: 0 0 5px 0; color: var(--text-color); font-size: 1.6rem; font-weight: 500; }
         .header-text p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
         
-        /* Controls & Filters */
         .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         input[type="text"], select { padding: 8px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--border-dark); border-radius: 2px; outline: none; }
         input[type="text"]:focus, select:focus { border-color: var(--accent-cyan); }
         .checkbox-group { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
         
-        /* Tabs */
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
         .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
         .tab-btn:hover { border-color: var(--border-dark); }
@@ -64,7 +53,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /* Tables */
         .dataTables_wrapper .dataTables_filter { display: none !important; }
         table.dataTable { font-family: var(--font-mono) !important; font-size: 0.85rem !important; border-collapse: collapse !important; width: 100% !important; }
         table.dataTable thead th { background-color: #ffffff !important; border-bottom: 2px solid var(--border-dark) !important; padding: 10px !important; }
@@ -73,13 +61,11 @@
         .btn-small { padding: 4px 10px; font-size: 0.75rem; cursor: pointer; background: #ffffff; color: var(--text-color); border: 1px solid var(--border-light); border-radius: 2px; font-family: var(--font-mono); }
         .btn-small:hover { border-color: var(--border-dark); background: var(--border-dark); color: #ffffff; }
         
-        /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border: 1px solid var(--border-dark); max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); }
         #scanImage { max-width: 100%; display: block; margin: 0 auto; border: 1px solid var(--border-light); }
         
-        /* Data Viz Containers */
         #networkTab.active { display: flex; gap: 20px; }
         #networkContainer { flex: 3; height: 650px; border: 1px solid var(--border-light); background: #ffffff; }
         #networkSidebar { flex: 1; border-left: 2px solid var(--border-dark); padding-left: 20px; overflow-y: auto; height: 650px; }
@@ -94,15 +80,13 @@
         .split-item { flex: 1; }
         .section-header { margin-top: 40px; margin-bottom: 10px; font-size: 1.4rem; font-weight: 600; color: var(--text-color); border-bottom: 2px solid var(--border-dark); padding-bottom: 5px; }
         
-        /* Top Contributors List */
         .top-list { list-style: none; padding: 0; margin: 0; }
         .top-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
         .top-list li span:first-child { font-weight: 500; cursor: pointer; color: var(--accent-cyan); text-decoration: underline; }
         .top-list li span:last-child { color: var(--text-muted); }
         
-        /* About Tab Text */
         #aboutTab p { margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem; }
-        .local-controls { display: flex; gap: 15px; margin-bottom: 15px; }
+        .local-controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -126,7 +110,7 @@
         <button class="tab-btn" onclick="openTab('aboutTab', this)">7. About</button>
     </div>
 
-    <!-- Global Filters (Only for Tab 1 and 2 now) -->
+    <!-- Global Filters -->
     <div class="controls" id="tableControls">
         <input type="text" id="globalSearch" placeholder="Fuzzy search titles, authors..." style="width: 300px;">
         <select id="filterYearPubs"><option value="">All Publication Years</option></select>
@@ -189,6 +173,7 @@
         <div class="local-controls">
             <select id="localTopPubYear"><option value="">All Journal Years</option></select>
             <select id="localTopLecYear"><option value="">All Lecture Years</option></select>
+            <select id="localTopDiscipline"><option value="">All Disciplines</option></select>
         </div>
         <div class="split-row">
             <div class="split-item">
@@ -281,7 +266,7 @@
         </div>
     </div>
 
-    <!-- Reusable List Modal (Profiles, Years, Disciplines) -->
+    <!-- Reusable List Modal -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('profileModal')">[X]</span>
@@ -299,12 +284,98 @@
     let networkNodesData;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
+    // --- Entity Resolution Engine (Automated Name Standardizer) ---
+    const authorAliases = {
+        "m. paranika": "M. Paranikas",
+        "m paranika": "M. Paranikas",
+        "paranika, m.": "M. Paranikas",
+        "paranikas, m.": "M. Paranikas",
+        "paranikas, matthaios": "M. Paranikas",
+        "matthaios paranikas": "M. Paranikas",
+        "μ. παρανίκα": "M. Paranikas",
+        "μ. παρανίκας": "M. Paranikas",
+        
+        "k. makre": "K. Makris",
+        "k. makri": "K. Makris",
+        "makri, k.": "K. Makris",
+        "makris, k.": "K. Makris",
+        "κ. μακρῆ": "K. Makris",
+        "κ. μακρής": "K. Makris",
+        "κ. μακρῆς": "K. Makris",
+        "κωνσταντίνος μακρῆς": "K. Makris",
+        
+        "gedeon, m.": "M. Gedeon",
+        "μ. γεδεών": "M. Gedeon",
+        "μανουήλ γεδεών": "M. Gedeon",
+        "manouil gedeon": "M. Gedeon",
+        
+        "ioannis aristoklis": "I. Aristoklis",
+        "aristoklis, i.": "I. Aristoklis",
+        "ι. αριστοκλής": "I. Aristoklis",
+        
+        "paspatis, a.": "A. Paspatis",
+        "paspati, a.": "A. Paspatis",
+        "paspati, a. g.": "A. Paspatis",
+        "αλέξανδρος πασπάτης": "A. Paspatis",
+        
+        "papadopoulos kerameus, a.": "A. Papadopoulos Kerameus",
+        "a. papadopoulou kerameos": "A. Papadopoulos Kerameus",
+        "ἀ. παπαδόπουλος κεραμεύς": "A. Papadopoulos Kerameus",
+        
+        "pantazidis, chr.": "Chr. Pantazidis",
+        "χ. πανταζίδης": "Chr. Pantazidis",
+        
+        "chatzichristou, chr.": "Chr. Chatzichristou",
+        
+        "karolidou, i.": "I. Karolidis",
+        "karolidis, i.": "I. Karolidis",
+        "karolidis, pavlos": "P. Karolidis",
+        
+        "stamatiadou, d.": "D. Stamatiadis",
+        "stamatiadis, d.": "D. Stamatiadis",
+        "δημήτριος σταματιάδης": "D. Stamatiadis",
+
+        "kalliadis, k.": "K. Kalliadis",
+        "oikonomidis, d.": "D. Oikonomidis",
+        "vasiadis, ir.": "Ir. Vasiadis",
+        "ιωάννης ζίφος": "I. Zifos",
+        "zifos, i.": "I. Zifos"
+    };
+
+    function getStandardAuthor(row) {
+        let rawName = row.normalized_author || row.author_english || row.author_greek || "Anonymous";
+        rawName = rawName.trim().replace(/\.+$/, '');
+        
+        if (rawName.toLowerCase() === "anonymous" || rawName.toLowerCase() === "ανώνυμος" || rawName.toLowerCase() === "various" || rawName.toLowerCase() === "unknown") {
+            return "Anonymous";
+        }
+        
+        let lowerName = rawName.toLowerCase();
+        
+        // Return mapped standard alias if it exists
+        if (authorAliases[lowerName]) return authorAliases[lowerName];
+        
+        // Automatically flip "Lastname, Firstname" to "Firstname Lastname"
+        let commaMatch = rawName.match(/^([^,]+),\s*(.+)$/);
+        if (commaMatch) {
+            let reversed = `${commaMatch[2]} ${commaMatch[1]}`;
+            if (authorAliases[reversed.toLowerCase()]) return authorAliases[reversed.toLowerCase()];
+            return reversed;
+        }
+        
+        return rawName;
+    }
+
     Papa.parse("philological_society_master.csv", {
         download: true,
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-            masterData = results.data;
+            // Apply standardized author name to dataset on load
+            masterData = results.data.map(row => {
+                row.standard_author = getStandardAuthor(row);
+                return row;
+            });
             initPortal();
         }
     });
@@ -335,7 +406,7 @@
 
         masterData.forEach(row => {
             if (!row.title_greek) return;
-            row.search_text = `${row.author_greek || ''} ${row.title_greek} ${row.title_english || ''} ${row.normalized_author || ''}`;
+            row.search_text = `${row.author_greek || ''} ${row.title_greek} ${row.title_english || ''} ${row.standard_author || ''}`;
 
             if (row.volume_or_year_greek && row.volume_or_year_greek !== "N/A") {
                 if(row.entry_type === "Public Lecture") yearsLecs.add(row.volume_or_year_greek);
@@ -355,7 +426,6 @@
         buildTimeline(journalData, 'timelineChartPubs', '#111827');
         buildTimeline(lectureData, 'timelineChartLecs', '#0284c7');
         
-        // Initialize Analytics modules
         updateTopContributorsAnalytics();
         updatePieChartsAnalytics();
         buildInteractiveLineCharts();
@@ -369,8 +439,8 @@
         const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
         const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
         const renderAuthor = (data, type, row) => {
-            const authorTop = (row.author_english || row.normalized_author || row.author_greek || "Anonymous").trim().replace(/\.+$/, '');
-            const authorBottom = (row.author_english || row.normalized_author) ? (row.author_greek || "") : "";
+            const authorTop = row.standard_author;
+            const authorBottom = row.author_greek && row.author_greek !== "N/A" ? row.author_greek : "";
             return `<span class="author-link" onclick="openProfile('${escapeQuote(authorTop)}', 'All')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
         };
         const renderTitle = (data, type, row) => {
@@ -411,8 +481,7 @@
             if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             
             if (tableId === 'journalTable' && anonChecked) {
-                let normAuth = (rowObj.normalized_author || "").toLowerCase();
-                if (!(normAuth === "anonymous" || normAuth === "ανώνυμος" || normAuth === "unknown")) return false;
+                if (rowObj.standard_author !== "Anonymous") return false;
             }
             if (discFilter && (!rowObj.disciplines || !rowObj.disciplines.includes(discFilter))) return false;
             if (query && !rowObj.search_text.toLowerCase().includes(query.toLowerCase())) return false;
@@ -424,8 +493,7 @@
             window.lt.draw();
         });
         
-        // Bind local analytics dropdowns
-        $('#localTopPubYear, #localTopLecYear').on('change', updateTopContributorsAnalytics);
+        $('#localTopPubYear, #localTopLecYear, #localTopDiscipline').on('change', updateTopContributorsAnalytics);
         $('#localPiePubYear, #localPieLecYear').on('change', updatePieChartsAnalytics);
     }
 
@@ -436,12 +504,13 @@
         
         let localTopP = document.getElementById("localTopPubYear");
         let localTopL = document.getElementById("localTopLecYear");
+        let localTopD = document.getElementById("localTopDiscipline");
         let localPieP = document.getElementById("localPiePubYear");
         let localPieL = document.getElementById("localPieLecYear");
         
         Array.from(yearsPubs).sort().forEach(y => { yp.add(new Option(y, y)); localTopP.add(new Option(y, y)); localPieP.add(new Option(y, y)); });
         Array.from(yearsLecs).sort().forEach(y => { yl.add(new Option(y, y)); localTopL.add(new Option(y, y)); localPieL.add(new Option(y, y)); });
-        Array.from(disciplines).sort().forEach(y => d.add(new Option(y, y)));
+        Array.from(disciplines).sort().forEach(y => { d.add(new Option(y, y)); localTopD.add(new Option(y, y)); });
     }
 
     // --- Tab 4: Visual Analytics (Decoupled Modules) ---
@@ -453,12 +522,14 @@
     function updateTopContributorsAnalytics() {
         let yrPub = $('#localTopPubYear').val();
         let yrLec = $('#localTopLecYear').val();
+        let discFilter = $('#localTopDiscipline').val();
         let authCounts = {}, speakCounts = {};
         
         masterData.forEach(row => {
-            let author = (row.author_english || row.normalized_author || row.author_greek || "Anonymous").trim().replace(/\.+$/, '');
-            let norm = author.toLowerCase();
-            if (norm === "anonymous" || norm === "ανώνυμος" || norm === "unknown" || norm === "various") return;
+            let author = row.standard_author;
+            if (author === "Anonymous") return;
+
+            if (discFilter && (!row.disciplines || !row.disciplines.includes(discFilter))) return;
 
             if (row.entry_type === "Public Lecture") {
                 if (yrLec && row.volume_or_year_greek !== yrLec) return;
@@ -587,7 +658,7 @@
                 data: years.map(y => yearCounts[y][dName]),
                 borderColor: colors[idx % colors.length], backgroundColor: colors[idx % colors.length],
                 borderWidth: 2, fill: false, tension: 0.3,
-                hidden: idx >= 12 // Hide beyond top 12 initially
+                hidden: idx >= 12 
             });
         });
         
@@ -602,7 +673,6 @@
             }
         });
         
-        // Double click to reset zoom
         document.getElementById(canvasId).ondblclick = function() {
             chartInstances[canvasId].resetZoom();
         };
@@ -630,11 +700,9 @@
         windowNodesMap = new Map();
         
         masterData.forEach(row => {
-            let author = (row.normalized_author || row.author_greek || "").trim().replace(/\.+$/, '');
+            let author = row.standard_author;
             let disc = row.disciplines;
-            if(!author || author === "N/A" || !disc || disc === "N/A") return;
-            let n = author.toLowerCase();
-            if (n === "anonymous" || n === "ανώνυμος" || n === "various" || n === "unknown") return;
+            if(!author || author === "N/A" || !disc || disc === "N/A" || author === "Anonymous") return;
 
             if(!windowNodesMap.has(author)) windowNodesMap.set(author, {id: author, label: author, group: 'author'});
             disc.split(',').forEach(d => {
@@ -749,7 +817,7 @@
             let li = document.createElement('li');
             li.style.marginBottom = '8px';
             let typeTag = item.entry_type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
-            li.innerHTML = `<strong>${getCleanYear(item) || 'n.d.'}</strong>: ${item.title_english || item.title_greek || ''} - <em>${(item.author_english || item.normalized_author || item.author_greek || 'Anonymous').replace(/\.+$/, '')}</em>${typeTag}`;
+            li.innerHTML = `<strong>${getCleanYear(item) || 'n.d.'}</strong>: ${item.title_english || item.title_greek || ''} - <em>${item.standard_author}</em>${typeTag}`;
             list.appendChild(li);
         });
     }
@@ -803,13 +871,7 @@
     }
 
     function openProfile(authorName, entryTypeFilter = "All") {
-        const query = (authorName || "").replace(/[\.\,]/g, '').toLowerCase().trim();
-        let items = masterData.filter(r => {
-            const eng = (r.author_english || "").replace(/[\.\,]/g, '').toLowerCase().trim();
-            const norm = (r.normalized_author || "").replace(/[\.\,]/g, '').toLowerCase().trim();
-            const gr = (r.author_greek || "").replace(/[\.\,]/g, '').toLowerCase().trim();
-            return eng === query || norm === query || gr === query;
-        });
+        let items = masterData.filter(r => r.standard_author === authorName);
         if (entryTypeFilter === "Journal") items = items.filter(r => r.entry_type !== "Public Lecture");
         if (entryTypeFilter === "Lecture") items = items.filter(r => r.entry_type === "Public Lecture");
         
