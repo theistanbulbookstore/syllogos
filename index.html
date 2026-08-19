@@ -187,7 +187,13 @@
         #scanImage { max-width: 100%; display: block; margin: 0 auto; border: 1px solid var(--border-light); }
         
         /* Data Viz Containers */
-        #networkContainer { width: 100%; height: 650px; border: 1px solid var(--border-light); background: #fafafa; }
+        #networkTab.active { display: flex; gap: 20px; }
+        #networkContainer { flex: 3; height: 650px; border: 1px solid var(--border-light); background: #ffffff; }
+        #networkSidebar { flex: 1; border-left: 2px solid var(--border-dark); padding-left: 20px; overflow-y: auto; height: 650px; }
+        .sidebar-header { font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; color: var(--accent-cyan); }
+        .sidebar-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; display: block; margin-bottom: 6px; font-weight: 500; }
+        .sidebar-link:hover { color: var(--border-dark); }
+
         .chart-wrapper { width: 100%; height: 400px; margin-bottom: 20px; }
         .chart-title { text-align: center; font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-light);}
         .dual-chart-container { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; margin-bottom: 40px; }
@@ -318,10 +324,14 @@
         </div>
     </div>
 
-    <!-- TAB 5: Network Graph -->
+    <!-- TAB 5: Network Graph with Interactive Sidebar -->
     <div id="networkTab" class="tab-content">
-        <p style="color: var(--text-muted);">Mapping the connections between prominent authors and academic disciplines. The layout stabilizes automatically on load.</p>
         <div id="networkContainer"></div>
+        <div id="networkSidebar">
+            <div class="sidebar-header" id="sidebarTitle">Intellectual Hub</div>
+            <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any author or discipline node on the map to inspect connections, view related fields, and jump across nodes.</p>
+            <div id="sidebarLinks"></div>
+        </div>
     </div>
 
     <!-- TAB 6: Timeline -->
@@ -369,6 +379,7 @@
 <script>
     let masterData = [];
     let fuse;
+    let network;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
     // Load the final dataset
@@ -509,7 +520,6 @@
             window.jt.column(0).search(reg, true, false).draw();
             window.lt.column(0).search(reg, true, false).draw();
             
-            // Dynamically update Top Contributors list based on year filter
             updateTopContributors(val);
         });
 
@@ -528,7 +538,6 @@
         Array.from(disciplines).sort().forEach(d => discSelect.add(new Option(d, d)));
     }
 
-    // Update Top Contributors List (Dynamic)
     function updateTopContributors(yearFilter) {
         let authCounts = {};
         let speakCounts = {};
@@ -566,7 +575,6 @@
         sortAndRender(speakCounts, 'topSpeakersList');
     }
 
-    // Pie Charts
     function buildPieChart(dataset, canvasId) {
         const counts = {};
         dataset.forEach(row => {
@@ -601,7 +609,6 @@
         });
     }
 
-    // Peaks Chart
     function buildPeaksChart(dataset, canvasId) {
         const decades = ['1860s', '1870s', '1880s', '1890s', '1900s', '1910s'];
         const counts = {};
@@ -651,7 +658,6 @@
         });
     }
 
-    // Split Timeline Generator
     function buildTimeline(dataset, canvasId, colorHex) {
         const counts = {};
         dataset.forEach(row => {
@@ -672,7 +678,7 @@
         });
     }
 
-    // Stabilized Network Graph
+    // Stabilized & Interactive Click-to-Jump Network Graph
     function buildNetwork() {
         let nodesMap = new Map();
         let edgesArr = [];
@@ -694,9 +700,10 @@
 
         let data = { nodes: Array.from(nodesMap.values()), edges: edgesArr };
         let options = {
+            nodes: { font: { face: 'Fira Code' } },
             groups: {
-                author: { color: {background: '#e5e7eb', border: '#6b7280'}, shape: 'dot', size: 8, font: {face: 'Fira Code', size: 12} },
-                discipline: { color: {background: '#111827', border: '#000'}, shape: 'box', font: {color: 'white', face: 'Fira Code'} }
+                author: { color: {background: '#e0f2fe', border: '#0284c7'}, shape: 'dot', size: 9, font: {size: 11} },
+                discipline: { color: {background: '#111827', border: '#000'}, shape: 'box', font: {color: 'white', size: 12} }
             },
             physics: { 
                 enabled: true,
@@ -705,11 +712,40 @@
             }
         };
         
-        let network = new vis.Network(document.getElementById('networkContainer'), data, options);
+        network = new vis.Network(document.getElementById('networkContainer'), data, options);
         
-        // Turn off physics after stabilization
         network.on("stabilizationIterationsDone", function () {
             network.setOptions( { physics: false } );
+        });
+
+        network.on("click", function (params) {
+            if (params.nodes.length > 0) {
+                let nodeId = params.nodes[0];
+                let neighbors = network.getConnectedNodes(nodeId);
+                updateSidebar(nodeId, neighbors);
+            }
+        });
+    }
+
+    function updateSidebar(nodeId, neighbors) {
+        document.getElementById('sidebarTitleinnerText', nodeId);
+        document.getElementById('sidebarTitle').innerText = nodeId;
+        let desc = document.getElementById('sidebarDesc');
+        desc.innerText = `Connected nodes (${neighbors.length}): Click any link below to jump directly to it on the map.`;
+        
+        let sidebar = document.getElementById('sidebarLinks');
+        sidebar.innerHTML = '';
+        
+        neighbors.forEach(n => {
+            let link = document.createElement('span');
+            link.className = 'sidebar-link';
+            link.innerText = n;
+            link.onclick = () => {
+                network.selectNodes([n]);
+                network.focus(n, { scale: 1.2, animation: true });
+                updateSidebar(n, network.getConnectedNodes(n));
+            };
+            sidebar.appendChild(link);
         });
     }
 
@@ -719,7 +755,6 @@
         $('#' + tabId).addClass('active');
         $(element).addClass('active');
 
-        // Always show controls so the year dropdown is available for analytics
         if(tabId === 'journalTab' || tabId === 'lectureTab' || tabId === 'analyticsTab') {
             $('#tableControls').show();
         } else {
