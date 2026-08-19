@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hellenic Philological Society of Constantinople</title>
+    
+    <!-- Fira Code Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
+
+    <style>
+        :root { 
+            --bg-color: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --accent-cyan: #0284c7;
+            --border-light: #e5e7eb;
+            --border-dark: #111827;
+            --font-mono: 'Fira Code', 'Consolas', monospace;
+        }
+        
+        body { 
+            font-family: var(--font-mono); 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 20px 40px; 
+            font-size: 0.85rem;
+        }
+
+        /* Compact Header Layout */
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-dark);
+            padding-bottom: 15px;
+        }
+        .header-logo {
+            height: 90px; 
+            width: auto;
+            object-fit: contain;
+        }
+        .header-text h1 {
+            margin: 0 0 5px 0;
+            color: var(--text-color);
+            font-size: 1.6rem;
+            font-weight: 500;
+        }
+        .header-text p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* Controls & Filters */
+        .controls { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
+        input[type="text"], select { 
+            padding: 8px 12px; 
+            font-family: var(--font-mono); 
+            font-size: 0.85rem; 
+            border: 1px solid var(--border-dark); 
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent-cyan);
+        }
+        .checkbox-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: var(--text-muted);
+        }
+        
+        /* Tabs */
+        .tabs { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 20px; 
+        }
+        .tab-btn { 
+            background: transparent; 
+            border: 1px solid var(--border-light); 
+            padding: 8px 16px; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            color: var(--text-color); 
+            font-family: var(--font-mono); 
+            transition: 0.2s; 
+            border-radius: 2px;
+        }
+        .tab-btn:hover { border-color: var(--border-dark); }
+        .tab-btn.active { 
+            background: var(--border-dark); 
+            color: #ffffff; 
+            border-color: var(--border-dark); 
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Tables */
+        .dataTables_wrapper .dataTables_filter { display: none !important; }
+        table.dataTable { 
+            font-family: var(--font-mono) !important; 
+            font-size: 0.85rem !important; 
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+        table.dataTable thead th { 
+            background-color: #ffffff !important; 
+            border-bottom: 2px solid var(--border-dark) !important; 
+            padding: 10px !important;
+        }
+        table.dataTable tbody td { 
+            border-bottom: 1px solid var(--border-light) !important; 
+            padding: 10px !important; 
+        }
+        .author-link { 
+            color: var(--accent-cyan); 
+            cursor: pointer; 
+            text-decoration: underline; 
+            font-weight: 500; 
+        }
+        .btn-small { 
+            padding: 4px 10px; 
+            font-size: 0.75rem; 
+            cursor: pointer; 
+            background: #ffffff; 
+            color: var(--text-color); 
+            border: 1px solid var(--border-light); 
+            border-radius: 2px; 
+            font-family: var(--font-mono);
+        }
+        .btn-small:hover { 
+            border-color: var(--border-dark); 
+            background: var(--border-dark); 
+            color: #ffffff; 
+        }
+        
+        /* Modals */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.95); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border: 1px solid var(--border-dark); 
+            max-width: 800px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            width: 90%; 
+            position: relative; 
+        }
+        .close-btn { 
+            position: absolute; 
+            top: 15px; right: 20px; 
+            font-size: 20px; 
+            cursor: pointer; 
+            color: var(--text-color); 
+            font-family: var(--font-mono);
+        }
+        #scanImage { max-width: 100%; display: block; margin: 0 auto; border: 1px solid var(--border-light); }
+        
+        /* Data Viz Containers */
+        #networkContainer { width: 100%; height: 650px; border: 1px solid var(--border-light); background: #fafafa; }
+        .chart-wrapper { width: 100%; max-width: 1000px; margin: 0 auto; height: 500px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <img src="syllogos.jpg" alt="Syllogos Logo" class="header-logo">
+        <div class="header-text">
+            <h1>Ελληνικός Φιλολογικός Σύλλογος Κωνσταντινουπόλεως</h1>
+            <p>Digital Catalog of Publications and Public Lectures (1861 - 1920)</p>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('journalTab', this)">1. Journal & Special Pubs</button>
+        <button class="tab-btn" onclick="openTab('lectureTab', this)">2. Public Lectures</button>
+        <button class="tab-btn" onclick="openTab('semanticTab', this)">3. Semantic Search</button>
+        <button class="tab-btn" onclick="openTab('networkTab', this)">4. Intellectual Network</button>
+        <button class="tab-btn" onclick="openTab('peaksTab', this)">5. Disciplinary Peaks</button>
+        <button class="tab-btn" onclick="openTab('timelineTab', this)">6. Timeline</button>
+        <button class="tab-btn" onclick="openTab('reviewTab', this)">7. Needs Review</button>
+    </div>
+
+    <!-- Global Filters (Visible on Data Table Tabs) -->
+    <div class="controls" id="tableControls">
+        <input type="text" id="globalSearch" placeholder="Fuzzy search titles, authors..." style="width: 300px;">
+        <select id="filterYear"><option value="">All Volumes / Years</option></select>
+        <select id="filterDiscipline"><option value="">All Disciplines</option></select>
+        <div class="checkbox-group">
+            <input type="checkbox" id="anonFilter"> <label for="anonFilter">Anonymous / Folklore Only</label>
+        </div>
+    </div>
+
+    <!-- TAB 1: Journal -->
+    <div id="journalTab" class="tab-content active">
+        <table id="journalTable" class="display nowrap" style="width:100%">
+            <thead><tr>
+                <th>Year</th>
+                <th>Author</th>
+                <th>Title</th>
+                <th>Subsection</th>
+                <th>Pages</th>
+                <th>Disciplines</th>
+                <th>Scan</th>
+                <th>Action</th>
+            </tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- TAB 2: Lectures -->
+    <div id="lectureTab" class="tab-content">
+        <table id="lectureTable" class="display nowrap" style="width:100%">
+            <thead><tr>
+                <th>Year</th>
+                <th>Speaker</th>
+                <th>Title</th>
+                <th>Lectures</th>
+                <th>Disciplines</th>
+                <th>Scan</th>
+                <th>Action</th>
+            </tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- TAB 3: Semantic Search -->
+    <div id="semanticTab" class="tab-content">
+        <h2 style="font-weight: 500;">AI Semantic Concept Search</h2>
+        <p style="color: var(--text-muted);">Search by concept or theme (e.g., "public health", "ancient philosophy") rather than exact keywords. This module requires the generation of vector embeddings.</p>
+        <input type="text" placeholder="Enter a conceptual search..." style="width: 400px;">
+        <button class="btn-small" style="padding: 8px 16px;">Search Concept</button>
+        <div style="margin-top: 20px; padding: 20px; border: 1px dashed var(--border-light); text-align: center; color: var(--text-muted);">
+            [ Semantic Vector Results will appear here ]
+        </div>
+    </div>
+
+    <!-- TAB 4: Network Graph -->
+    <div id="networkTab" class="tab-content">
+        <p style="color: var(--text-muted);">Mapping the connections between prominent authors and academic disciplines.</p>
+        <div id="networkContainer"></div>
+    </div>
+
+    <!-- TAB 5: Disciplinary Peaks (Ridgeline) -->
+    <div id="peaksTab" class="tab-content">
+        <p style="color: var(--text-muted);">Visualizing the volume of specific academic disciplines across time.</p>
+        <div class="chart-wrapper"><canvas id="peaksChart"></canvas></div>
+    </div>
+
+    <!-- TAB 6: Timeline -->
+    <div id="timelineTab" class="tab-content">
+        <p style="color: var(--text-muted);">Total output of publications and public lectures per year.</p>
+        <div class="chart-wrapper"><canvas id="timelineChart"></canvas></div>
+    </div>
+
+    <!-- TAB 7: Needs Review -->
+    <div id="reviewTab" class="tab-content">
+        <p style="color: var(--text-muted);">Records flagged by the extraction pipeline for manual verification.</p>
+        <table id="reviewTable" class="display nowrap" style="width:100%">
+            <thead><tr><th>Scan</th><th>Type</th><th>Author</th><th>Title</th><th>Flag Reason</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Scan Lightbox Modal -->
+    <div id="scanModal" class="modal">
+        <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
+            <span class="close-btn" onclick="closeModal('scanModal')" style="color: #111827; font-size: 30px; font-weight: bold;">[X]</span>
+            <img id="scanImage" src="" alt="Page Scan">
+        </div>
+    </div>
+
+    <!-- Scholar Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('profileModal')">[X]</span>
+            <h2 id="profName" style="color: var(--text-color); font-weight: 600; margin-bottom: 5px;">Author Name</h2>
+            <p id="profStats" style="color: var(--text-muted); margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;"></p>
+            <ul id="profItems" style="line-height: 1.8; list-style-type: square; padding-left: 20px;"></ul>
+        </div>
+    </div>
+
+<script>
+    let masterData = [];
+    let fuse; // Typo-tolerant search engine
+
+    // Initialize PapaParse
+    Papa.parse("philological_society_master.csv", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            masterData = results.data;
+            initPortal();
+        }
+    });
+
+    function initPortal() {
+        const journalData = [];
+        const lectureData = [];
+        const reviewData = [];
+        const years = new Set();
+        const disciplines = new Set();
+
+        masterData.forEach(row => {
+            if (!row.title_greek) return;
+
+            row.search_text = `${row.author_greek || ''} ${row.title_greek} ${row.title_english || ''} ${row.normalized_author || ''}`;
+
+            if (row.volume_or_year_greek && row.volume_or_year_greek !== "N/A") years.add(row.volume_or_year_greek);
+            if (row.disciplines && row.disciplines !== "N/A" && row.disciplines.toLowerCase() !== "null") {
+                row.disciplines.split(',').forEach(d => disciplines.add(d.trim()));
+            }
+
+            if (row.needs_review && row.needs_review.toLowerCase() === 'true') reviewData.push(row);
+            if (row.entry_type === "Public Lecture") lectureData.push(row);
+            else journalData.push(row);
+        });
+
+        fuse = new Fuse(masterData, {
+            keys: ['search_text', 'disciplines'],
+            threshold: 0.3,
+            ignoreLocation: true
+        });
+
+        populateDropdowns(years, disciplines);
+        buildTables(journalData, lectureData, reviewData);
+        buildTimeline();
+        buildPeaksChart();
+        buildNetwork();
+        setupCustomFilters();
+    }
+
+    function buildTables(journal, lecture, review) {
+        const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
+        const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
+        
+        // English/Transcribed author top, Greek bottom
+        const renderAuthor = (data, type, row) => {
+            const authorTop = row.author_english || row.normalized_author || "Anonymous";
+            const authorBottom = row.author_greek || "";
+            return `<span class="author-link" onclick="openProfile('${escapeQuote(authorTop)}')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
+        };
+        
+        // English title top, Greek bottom, no bolds
+        const renderTitle = (data, type, row) => {
+            const titleTop = row.title_english || '';
+            const titleBottom = row.title_greek || '';
+            return `<span>${titleTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${titleBottom}</span>`;
+        };
+
+        window.jt = $('#journalTable').DataTable({
+            data: journal, pageLength: 25, scrollX: true,
+            columns: [
+                { data: 'volume_or_year_greek' },
+                { data: null, render: renderAuthor },
+                { data: null, render: renderTitle },
+                { data: 'subsection_greek' },
+                { data: 'page_numbers' },
+                { data: 'disciplines' },
+                { data: null, render: renderScanBtn, orderable: false },
+                { data: null, render: renderCiteBtn, orderable: false }
+            ]
+        });
+
+        window.lt = $('#lectureTable').DataTable({
+            data: lecture, pageLength: 25, scrollX: true,
+            columns: [
+                { data: 'volume_or_year_greek' },
+                { data: null, render: renderAuthor },
+                { data: null, render: renderTitle },
+                { data: 'lecture_count' },
+                { data: 'disciplines' },
+                { data: null, render: renderScanBtn, orderable: false },
+                { data: null, render: renderCiteBtn, orderable: false }
+            ]
+        });
+
+        $('#reviewTable').DataTable({
+            data: review, scrollX: true,
+            columns: [
+                { data: null, render: renderScanBtn, orderable: false },
+                { data: 'entry_type' },
+                { data: 'author_greek' },
+                { data: 'title_greek' },
+                { data: null, defaultContent: "Flagged by AI" }
+            ]
+        });
+    }
+
+    function setupCustomFilters() {
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            const query = $('#globalSearch').val();
+            const isAnon = $('#anonFilter').is(':checked');
+            const rowObj = settings.aoData[dataIndex]._aData;
+            
+            let normAuth = (rowObj.normalized_author || "").toLowerCase();
+            if (isAnon && !(normAuth === "anonymous" || normAuth === "ανώνυμος" || normAuth === "unknown")) {
+                return false;
+            }
+
+            if (!query) return true;
+            
+            const rowFuse = new Fuse([rowObj], { keys: ['search_text'], threshold: 0.3, ignoreLocation: true });
+            const result = rowFuse.search(query);
+            return result.length > 0;
+        });
+
+        $('#globalSearch, #anonFilter').on('keyup change', function() {
+            window.jt.draw();
+            window.lt.draw();
+        });
+
+        $('#filterYear').on('change', function() {
+            let val = $.fn.dataTable.util.escapeRegex($(this).val());
+            let reg = val ? '^' + val + '$' : '';
+            window.jt.column(0).search(reg, true, false).draw();
+            window.lt.column(0).search(reg, true, false).draw();
+        });
+
+        $('#filterDiscipline').on('change', function() {
+            let val = $(this).val();
+            window.jt.column(5).search(val).draw();
+            window.lt.column(4).search(val).draw();
+        });
+    }
+
+    function populateDropdowns(years, disciplines) {
+        let yrSelect = document.getElementById("filterYear");
+        Array.from(years).sort().forEach(y => yrSelect.add(new Option(y, y)));
+        
+        let discSelect = document.getElementById("filterDiscipline");
+        Array.from(disciplines).sort().forEach(d => discSelect.add(new Option(d, d)));
+    }
+
+    function buildTimeline() {
+        const counts = {};
+        masterData.forEach(row => {
+            let yr = row.volume_or_year_greek;
+            if(!yr || yr === "N/A") return;
+            let cleanYr = yr.match(/\d{4}/) ? yr.match(/\d{4}/)[0] : yr; 
+            counts[cleanYr] = (counts[cleanYr] || 0) + 1;
+        });
+
+        const labels = Object.keys(counts).sort();
+        new Chart(document.getElementById('timelineChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Total Records', data: labels.map(l => counts[l]), backgroundColor: '#111827' }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function buildPeaksChart() {
+        const ctx = document.getElementById('peaksChart');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1860s', '1870s', '1880s', '1890s', '1900s', '1910s'],
+                datasets: [
+                    { label: 'Medicine', data: [2, 8, 15, 5, 2, 1], fill: true, backgroundColor: 'rgba(2, 132, 199, 0.4)', borderColor: '#0284c7', tension: 0.4 },
+                    { label: 'History', data: [0, 2, 6, 20, 12, 4], fill: true, backgroundColor: 'rgba(17, 24, 39, 0.4)', borderColor: '#111827', tension: 0.4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { stacked: true } } }
+        });
+    }
+
+    function buildNetwork() {
+        let nodesMap = new Map();
+        let edgesArr = [];
+        masterData.forEach(row => {
+            let author = row.normalized_author || row.author_greek;
+            let disc = row.disciplines;
+            if(!author || author === "N/A" || !disc || disc === "N/A" || author.toLowerCase() === "anonymous") return;
+            
+            if(!nodesMap.has(author)) nodesMap.set(author, {id: author, label: author, group: 'author'});
+            disc.split(',').forEach(d => {
+                let dName = d.trim();
+                if(!nodesMap.has(dName)) nodesMap.set(dName, {id: dName, label: dName, group: 'discipline'});
+                edgesArr.push({from: author, to: dName});
+            });
+        });
+
+        let data = { nodes: Array.from(nodesMap.values()), edges: edgesArr };
+        let options = {
+            groups: {
+                author: { color: {background: '#e5e7eb', border: '#6b7280'}, shape: 'dot', size: 8, font: {face: 'Fira Code', size: 12} },
+                discipline: { color: {background: '#111827', border: '#000'}, shape: 'box', font: {color: 'white', face: 'Fira Code'} }
+            },
+            physics: { stabilization: true }
+        };
+        new vis.Network(document.getElementById('networkContainer'), data, options);
+    }
+
+    function openTab(tabId, element) {
+        $('.tab-content').removeClass('active');
+        $('.tab-btn').removeClass('active');
+        $('#' + tabId).addClass('active');
+        $(element).addClass('active');
+
+        if(tabId === 'journalTab' || tabId === 'lectureTab') {
+            $('#tableControls').show();
+        } else {
+            $('#tableControls').hide();
+        }
+    }
+
+    function viewScan(imageName) {
+        document.getElementById('scanImage').src = "split_pages/" + imageName;
+        document.getElementById('scanModal').style.display = 'flex';
+    }
+
+    function openProfile(authorName) {
+        const items = masterData.filter(r => (r.normalized_author || r.author_greek || "Anonymous") === authorName);
+        document.getElementById('profName').innerText = authorName;
+        document.getElementById('profStats').innerText = `Total Contributions: ${items.length}`;
+        
+        const list = document.getElementById('profItems');
+        list.innerHTML = '';
+        items.forEach(item => {
+            let li = document.createElement('li');
+            li.innerHTML = `<strong>${item.volume_or_year_greek}</strong>: ${item.title_greek} <em>(${item.entry_type})</em>`;
+            list.appendChild(li);
+        });
+        document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function generateCitation(author, title, year) {
+        const authClean = author && author !== "N/A" ? author : "Ανώνυμος";
+        const yrClean = year && year !== "N/A" ? year : "n.d.";
+        const citation = `${authClean}. "${title}". Εν Κωνσταντινουπόλει Ελληνικός Φιλολογικός Σύλλογος, ${yrClean}.`;
+        navigator.clipboard.writeText(citation).then(() => alert("Citation copied:\n\n" + citation));
+    }
+
+    function escapeQuote(str) { return str ? str.replace(/'/g, "\\'").replace(/"/g, "&quot;") : ""; }
+</script>
+</body>
+</html>
