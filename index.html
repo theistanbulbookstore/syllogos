@@ -206,6 +206,9 @@
         .top-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
         .top-list li span:first-child { font-weight: 500; cursor: pointer; color: var(--accent-cyan); text-decoration: underline; }
         .top-list li span:last-child { color: var(--text-muted); }
+        
+        /* About Tab Text */
+        #aboutTab p { margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem; }
     </style>
 </head>
 <body>
@@ -214,7 +217,7 @@
         <img src="syllogos.jpg" alt="Syllogos Logo" class="header-logo">
         <div class="header-text">
             <h1>Ελληνικός Φιλολογικός Σύλλογος Κωνσταντινουπόλεως</h1>
-            <p>Digital Catalog of Publications and Public Lectures (1861 - 1920)</p>
+            <p>Digital Catalog of Publications and Public Lectures (1861 - 1915)</p>
         </div>
     </div>
 
@@ -226,15 +229,16 @@
         <button class="tab-btn" onclick="openTab('analyticsTab', this)">4. Visual Analytics</button>
         <button class="tab-btn" onclick="openTab('networkTab', this)">5. Intellectual Network</button>
         <button class="tab-btn" onclick="openTab('timelineTab', this)">6. Timeline</button>
-        <button class="tab-btn" onclick="openTab('reviewTab', this)">7. Needs Review</button>
+        <button class="tab-btn" onclick="openTab('aboutTab', this)">7. About</button>
     </div>
 
     <!-- Global Filters -->
     <div class="controls" id="tableControls">
         <input type="text" id="globalSearch" placeholder="Fuzzy search titles, authors..." style="width: 300px;">
-        <select id="filterYear"><option value="">All Volumes / Years</option></select>
+        <select id="filterYearPubs"><option value="">All Publication Years</option></select>
+        <select id="filterYearLecs" style="display:none;"><option value="">All Lecture Years</option></select>
         <select id="filterDiscipline"><option value="">All Disciplines</option></select>
-        <div class="checkbox-group">
+        <div class="checkbox-group" id="anonFilterGroup">
             <input type="checkbox" id="anonFilter"> <label for="anonFilter">Anonymous / Folklore Only</label>
         </div>
     </div>
@@ -285,9 +289,9 @@
 
     <!-- TAB 4: Visual Analytics -->
     <div id="analyticsTab" class="tab-content">
-        <p style="color: var(--text-muted);">Comprehensive breakdown of society output. <em>Note: The Top Contributors lists react to the Global Year Filter dropdown at the top of the page.</em></p>
+        <p style="color: var(--text-muted);">Comprehensive breakdown of society output. All charts and lists react dynamically to the Search, Year, and Discipline filters above.</p>
         
-        <div class="section-header">1. Top Contributors <span id="contributorScope" style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">(Overall)</span></div>
+        <div class="section-header">1. Top Contributors</div>
         <div class="split-row">
             <div class="split-item">
                 <div class="chart-title">Most Published Authors (Journal)</div>
@@ -300,6 +304,7 @@
         </div>
 
         <div class="section-header">2. Thematic Breakdown</div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Click any slice to view all items in that discipline.</p>
         <div class="split-row">
             <div class="split-item chart-wrapper" style="height: 350px;">
                 <div class="chart-title">Journal Publications by Discipline</div>
@@ -311,15 +316,15 @@
             </div>
         </div>
 
-        <div class="section-header">3. Disciplinary Peaks</div>
+        <div class="section-header">3. Disciplinary Output Over Time</div>
         <div class="dual-chart-container">
             <div class="chart-wrapper">
-                <div class="chart-title">Journal Publications (Over Time)</div>
-                <canvas id="peaksChartPubs"></canvas>
+                <div class="chart-title">Journal Publications (Top 12 Disciplines)</div>
+                <canvas id="stackedChartPubs"></canvas>
             </div>
             <div class="chart-wrapper">
-                <div class="chart-title">Public Lectures (Over Time)</div>
-                <canvas id="peaksChartLecs"></canvas>
+                <div class="chart-title">Public Lectures (Top 12 Disciplines)</div>
+                <canvas id="stackedChartLecs"></canvas>
             </div>
         </div>
     </div>
@@ -328,15 +333,20 @@
     <div id="networkTab" class="tab-content">
         <div id="networkContainer"></div>
         <div id="networkSidebar">
-            <div class="sidebar-header" id="sidebarTitle">Intellectual Hub</div>
-            <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any author or discipline node on the map to inspect connections, view related fields, and jump across nodes.</p>
-            <div id="sidebarLinks"></div>
+            <div class="sidebar-header" style="position: sticky; top: 0; background: white; z-index: 10; padding-bottom: 10px;">
+                <div id="sidebarTitle" style="font-size: 1.2rem; margin-bottom: 5px;">Intellectual Hub</div>
+                <input type="text" id="networkSearch" placeholder="Find author or field..." style="width: 100%; padding: 6px; box-sizing: border-box; font-family: var(--font-mono); border: 1px solid var(--border-dark); outline: none;">
+            </div>
+            <div id="sidebarContent" style="margin-top: 5px;">
+                <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any node on the map, or use the search bar, to inspect connections.</p>
+                <div id="sidebarLinks"></div>
+            </div>
         </div>
     </div>
 
     <!-- TAB 6: Timeline -->
     <div id="timelineTab" class="tab-content">
-        <p style="color: var(--text-muted);">Total output of publications and public lectures per year.</p>
+        <p style="color: var(--text-muted);">Total output of publications and public lectures per year. Click any bar to view the records.</p>
         <div class="dual-chart-container">
             <div class="chart-wrapper">
                 <div class="chart-title">Journal Publications Output</div>
@@ -349,13 +359,15 @@
         </div>
     </div>
 
-    <!-- TAB 7: Needs Review -->
-    <div id="reviewTab" class="tab-content">
-        <p style="color: var(--text-muted);">Records flagged by the extraction pipeline for manual verification.</p>
-        <table id="reviewTable" class="display nowrap" style="width:100%">
-            <thead><tr><th>Scan</th><th>Type</th><th>Author</th><th>Title</th><th>Flag Reason</th></tr></thead>
-            <tbody></tbody>
-        </table>
+    <!-- TAB 7: About -->
+    <div id="aboutTab" class="tab-content" style="max-width: 900px; display: none;">
+        <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
+        <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
+        <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
+        <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://medusa.libver.gr/iguana/www.main.cls?surl=medusa" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
+        <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
+        <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
+        <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
     </div>
 
     <!-- Scan Lightbox Modal -->
@@ -366,23 +378,24 @@
         </div>
     </div>
 
-    <!-- Scholar Profile Modal -->
+    <!-- Reusable List Modal (Profiles, Years, Disciplines) -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('profileModal')">[X]</span>
-            <h2 id="profName" style="color: var(--text-color); font-weight: 600; margin-bottom: 5px;">Author Name</h2>
+            <h2 id="profName" style="color: var(--text-color); font-weight: 600; margin-bottom: 5px;">Title</h2>
             <p id="profStats" style="color: var(--text-muted); margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;"></p>
-            <ul id="profItems" style="line-height: 1.8; list-style-type: square; padding-left: 20px;"></ul>
+            <ul id="profItems" style="line-height: 1.8; list-style-type: none; padding-left: 0;"></ul>
         </div>
     </div>
 
 <script>
     let masterData = [];
-    let fuse;
+    let chartInstances = {};
     let network;
+    let windowNodesMap = new Map();
+    let networkNodesData;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
-    // Load the final dataset
     Papa.parse("philological_society_master.csv", {
         download: true,
         header: true,
@@ -393,58 +406,65 @@
         }
     });
 
+    // Helper: Parse specific chronological anomalies
+    function getCleanYear(row) {
+        let rawYear = row.volume_or_year_greek || "";
+        let subYear = row.subsection_greek || "";
+        
+        if (rawYear.includes("ΕΙΚΟΣΙΠΕΝΤΑΕΤΗΡΙΣ")) return "1888";
+        if (rawYear.includes("Παράρτημα")) return "1888";
+        if (rawYear.includes("ΖΩΓΡΑΦΕΙΟΣ ΑΓΩΝ")) {
+            if (subYear.includes("Α'")) return "1891";
+            if (subYear.includes("Β'")) return "1896";
+            return "1891";
+        }
+        if (rawYear.includes("ΖΩΓΡΑΦΕΙΟΣ ΕΛΛΗΝΙΚΗ ΒΙΒΛΙΟΘΗΚΗ")) return "ΖΩΓΡΑΦΕΙΟΣ ΕΛΛΗΝΙΚΗ ΒΙΒΛΙΟΘΗΚΗ";
+        
+        let m = rawYear.match(/\d{4}/);
+        return m ? m[0] : rawYear;
+    }
+
     function initPortal() {
         const journalData = [];
         const lectureData = [];
-        const reviewData = [];
-        const years = new Set();
+        const yearsPubs = new Set();
+        const yearsLecs = new Set();
         const disciplines = new Set();
 
         masterData.forEach(row => {
             if (!row.title_greek) return;
-
             row.search_text = `${row.author_greek || ''} ${row.title_greek} ${row.title_english || ''} ${row.normalized_author || ''}`;
 
-            if (row.volume_or_year_greek && row.volume_or_year_greek !== "N/A") years.add(row.volume_or_year_greek);
+            if (row.volume_or_year_greek && row.volume_or_year_greek !== "N/A") {
+                if(row.entry_type === "Public Lecture") yearsLecs.add(row.volume_or_year_greek);
+                else yearsPubs.add(row.volume_or_year_greek);
+            }
             if (row.disciplines && row.disciplines !== "N/A" && row.disciplines.toLowerCase() !== "null") {
                 row.disciplines.split(',').forEach(d => disciplines.add(d.trim()));
             }
 
-            if (row.needs_review && row.needs_review.toLowerCase() === 'true') reviewData.push(row);
             if (row.entry_type === "Public Lecture") lectureData.push(row);
             else journalData.push(row);
         });
 
-        fuse = new Fuse(masterData, { keys: ['search_text', 'disciplines'], threshold: 0.3, ignoreLocation: true });
-
-        populateDropdowns(years, disciplines);
-        buildTables(journalData, lectureData, reviewData);
+        populateDropdowns(yearsPubs, yearsLecs, disciplines);
+        buildTables(journalData, lectureData);
         
-        // Build dual charts
         buildTimeline(journalData, 'timelineChartPubs', '#111827');
         buildTimeline(lectureData, 'timelineChartLecs', '#0284c7');
-        buildPeaksChart(journalData, 'peaksChartPubs');
-        buildPeaksChart(lectureData, 'peaksChartLecs');
-        
-        // Build Pie Charts
-        buildPieChart(journalData, 'pieChartPubs');
-        buildPieChart(lectureData, 'pieChartLecs');
-        
-        // Initialize Top Contributors (Overall)
-        updateTopContributors("");
-        
+        refreshVisualAnalytics();
         buildNetwork();
         setupCustomFilters();
     }
 
-    function buildTables(journal, lecture, review) {
+    function buildTables(journal, lecture) {
         const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
         const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
         
         const renderAuthor = (data, type, row) => {
-            const authorTop = row.author_english || row.normalized_author || row.author_greek || "Anonymous";
+            const authorTop = (row.author_english || row.normalized_author || row.author_greek || "Anonymous").trim().replace(/\.+$/, '');
             const authorBottom = (row.author_english || row.normalized_author) ? (row.author_greek || "") : "";
-            return `<span class="author-link" onclick="openProfile('${escapeQuote(authorTop)}')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
+            return `<span class="author-link" onclick="openProfile('${escapeQuote(authorTop)}', 'All')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
         };
         
         const renderTitle = (data, type, row) => {
@@ -479,104 +499,116 @@
                 { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
-
-        $('#reviewTable').DataTable({
-            data: review, scrollX: true,
-            columns: [
-                { data: null, render: renderScanBtn, orderable: false },
-                { data: 'entry_type' },
-                { data: 'author_greek' },
-                { data: 'title_greek' },
-                { data: null, defaultContent: "Flagged by AI" }
-            ]
-        });
     }
 
     function setupCustomFilters() {
         $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-            const query = $('#globalSearch').val();
-            const isAnon = $('#anonFilter').is(':checked');
             const rowObj = settings.aoData[dataIndex]._aData;
+            const tableId = settings.nTable.id;
             
-            let normAuth = (rowObj.normalized_author || "").toLowerCase();
-            if (isAnon && !(normAuth === "anonymous" || normAuth === "ανώνυμος" || normAuth === "unknown")) {
-                return false;
+            const query = $('#globalSearch').val();
+            const anonChecked = $('#anonFilter').is(':checked');
+            const discFilter = $('#filterDiscipline').val();
+            
+            let yrFilter = tableId === 'journalTable' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
+            if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
+            
+            if (tableId === 'journalTable' && anonChecked) {
+                let normAuth = (rowObj.normalized_author || "").toLowerCase();
+                if (!(normAuth === "anonymous" || normAuth === "ανώνυμος" || normAuth === "unknown")) return false;
             }
-
-            if (!query) return true;
-            const rowFuse = new Fuse([rowObj], { keys: ['search_text'], threshold: 0.3, ignoreLocation: true });
-            return rowFuse.search(query).length > 0;
+            
+            if (discFilter && (!rowObj.disciplines || !rowObj.disciplines.includes(discFilter))) return false;
+            if (query && !rowObj.search_text.toLowerCase().includes(query.toLowerCase())) return false;
+            
+            return true;
         });
 
-        $('#globalSearch, #anonFilter').on('keyup change', function() {
+        $('#globalSearch, #anonFilter, #filterDiscipline, #filterYearPubs, #filterYearLecs').on('keyup change', function() {
+            if ($('#analyticsTab').hasClass('active')) refreshVisualAnalytics();
             window.jt.draw();
             window.lt.draw();
         });
-
-        $('#filterYear').on('change', function() {
-            let val = $(this).val();
-            let regexVal = $.fn.dataTable.util.escapeRegex(val);
-            let reg = regexVal ? '^' + regexVal + '$' : '';
-            window.jt.column(0).search(reg, true, false).draw();
-            window.lt.column(0).search(reg, true, false).draw();
-            
-            updateTopContributors(val);
-        });
-
-        $('#filterDiscipline').on('change', function() {
-            let val = $(this).val();
-            window.jt.column(5).search(val).draw();
-            window.lt.column(4).search(val).draw();
-        });
     }
 
-    function populateDropdowns(years, disciplines) {
-        let yrSelect = document.getElementById("filterYear");
-        Array.from(years).sort().forEach(y => yrSelect.add(new Option(y, y)));
+    function populateDropdowns(yearsPubs, yearsLecs, disciplines) {
+        let yrPSelect = document.getElementById("filterYearPubs");
+        Array.from(yearsPubs).sort().forEach(y => yrPSelect.add(new Option(y, y)));
+        
+        let yrLSelect = document.getElementById("filterYearLecs");
+        Array.from(yearsLecs).sort().forEach(y => yrLSelect.add(new Option(y, y)));
         
         let discSelect = document.getElementById("filterDiscipline");
         Array.from(disciplines).sort().forEach(d => discSelect.add(new Option(d, d)));
     }
 
-    function updateTopContributors(yearFilter) {
-        let authCounts = {};
-        let speakCounts = {};
+    // Comprehensive Visual Analytics Refresh
+    function refreshVisualAnalytics() {
+        let yearPub = $('#filterYearPubs').val();
+        let yearLec = $('#filterYearLecs').val();
+        let search = $('#globalSearch').val();
+        let anon = $('#anonFilter').is(':checked');
+        let disc = $('#filterDiscipline').val();
         
-        document.getElementById('contributorScope').innerText = yearFilter ? `(${yearFilter})` : `(Overall)`;
-
+        // 1. Update Top Contributors Lists
+        let authCounts = {}, speakCounts = {};
         masterData.forEach(row => {
-            if (yearFilter && row.volume_or_year_greek !== yearFilter) return;
-            
-            let author = row.author_english || row.normalized_author || row.author_greek || "Anonymous";
-            let norm = author.toLowerCase().trim();
-            if (norm === "anonymous" || norm === "ανώνυμος" || norm === "unknown" || norm === "various" || norm === "διαφόρων") return;
+            if (search && !row.search_text.toLowerCase().includes(search.toLowerCase())) return;
+            if (anon) {
+                let n = (row.normalized_author||"").toLowerCase();
+                if (!(n==="anonymous"||n==="ανώνυμος"||n==="unknown")) return;
+            }
+            if (disc && (!row.disciplines || !row.disciplines.includes(disc))) return;
+
+            let author = (row.author_english || row.normalized_author || row.author_greek || "Anonymous").trim().replace(/\.+$/, '');
+            let norm = author.toLowerCase();
+            if (norm === "anonymous" || norm === "ανώνυμος" || norm === "unknown" || norm === "various") return;
 
             if (row.entry_type === "Public Lecture") {
+                if (yearLec && row.volume_or_year_greek !== yearLec) return;
                 speakCounts[author] = (speakCounts[author] || 0) + 1;
             } else {
+                if (yearPub && row.volume_or_year_greek !== yearPub) return;
                 authCounts[author] = (authCounts[author] || 0) + 1;
             }
         });
 
-        const sortAndRender = (countsObj, elementId) => {
-            const sorted = Object.entries(countsObj).sort((a, b) => b[1] - a[1]).slice(0, 10);
-            const listEl = document.getElementById(elementId);
-            listEl.innerHTML = '';
-            if (sorted.length === 0) {
-                listEl.innerHTML = `<li><span>No records found</span><span>-</span></li>`;
-            } else {
-                sorted.forEach(([name, count]) => {
-                    listEl.innerHTML += `<li><span onclick="openProfile('${escapeQuote(name)}')">${name}</span><span>${count} entries</span></li>`;
-                });
-            }
+        const sortAndRender = (cObj, eId, tFilter) => {
+            const sorted = Object.entries(cObj).sort((a,b)=>b[1]-a[1]).slice(0, 10);
+            const listEl = document.getElementById(eId);
+            listEl.innerHTML = sorted.length ? '' : `<li><span>No records found</span><span>-</span></li>`;
+            sorted.forEach(([name, count]) => listEl.innerHTML += `<li><span onclick="openProfile('${escapeQuote(name)}', '${tFilter}')">${name}</span><span>${count} entries</span></li>`);
         };
+        sortAndRender(authCounts, 'topAuthorsList', 'Journal');
+        sortAndRender(speakCounts, 'topSpeakersList', 'Lecture');
 
-        sortAndRender(authCounts, 'topAuthorsList');
-        sortAndRender(speakCounts, 'topSpeakersList');
+        // 2. Filter data for charts
+        let chartData = masterData.filter(r => {
+            if (search && !r.search_text.toLowerCase().includes(search.toLowerCase())) return false;
+            if (anon) { let n = (r.normalized_author||"").toLowerCase(); if(!(n==="anonymous"||n==="ανώνυμος"||n==="unknown")) return false; }
+            if (disc && (!r.disciplines || !r.disciplines.includes(disc))) return false;
+            return true;
+        });
+
+        let pubsChartData = chartData.filter(r => r.entry_type !== "Public Lecture");
+        if(yearPub) pubsChartData = pubsChartData.filter(r => r.volume_or_year_greek === yearPub);
+        
+        let lecsChartData = chartData.filter(r => r.entry_type === "Public Lecture");
+        if(yearLec) lecsChartData = lecsChartData.filter(r => r.volume_or_year_greek === yearLec);
+
+        buildPieChart(pubsChartData, 'pieChartPubs');
+        buildPieChart(lecsChartData, 'pieChartLecs');
+        buildStackedBarChart(pubsChartData, 'stackedChartPubs');
+        buildStackedBarChart(lecsChartData, 'stackedChartLecs');
+    }
+
+    function renderChart(canvasId, type, configData, options) {
+        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { type: type, data: configData, options: options });
     }
 
     function buildPieChart(dataset, canvasId) {
-        const counts = {};
+        let counts = {};
         dataset.forEach(row => {
             let dStr = row.disciplines;
             if(!dStr || dStr === "N/A") return;
@@ -586,155 +618,162 @@
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
-
-        const sortedData = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-        const labels = sortedData.map(item => item[0]);
-        const values = sortedData.map(item => item[1]);
-
-        new Chart(document.getElementById(canvasId), {
-            type: 'pie',
-            data: { 
-                labels: labels, 
-                datasets: [{ 
-                    data: values, 
-                    backgroundColor: colors,
-                    borderWidth: 1
-                }] 
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { position: 'right' } } 
+        let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+        
+        renderChart(canvasId, 'pie', {
+            labels: sorted.map(i => i[0]),
+            datasets: [{ data: sorted.map(i => i[1]), backgroundColor: colors, borderWidth: 1 }]
+        }, {
+            responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } },
+            onClick: (event, elements, chart) => {
+                if(elements.length > 0) openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture');
             }
         });
     }
 
-    function buildPeaksChart(dataset, canvasId) {
-        const decades = ['1860s', '1870s', '1880s', '1890s', '1900s', '1910s'];
-        const counts = {};
-        const allDisc = new Set();
-        
+    function buildStackedBarChart(dataset, canvasId) {
+        let discCounts = {};
         dataset.forEach(row => {
-            let yr = row.volume_or_year_greek;
             let dStr = row.disciplines;
-            if(!yr || yr === "N/A" || !dStr || dStr === "N/A") return;
-            
-            let m = yr.match(/\d{4}/);
-            if(!m) return;
-            let decade = Math.floor(parseInt(m[0])/10)*10 + 's';
-            if(!decades.includes(decade)) return;
-            
+            if(!dStr || dStr === "N/A") return;
             dStr.split(',').forEach(d => {
                 let dName = d.trim();
                 if(!dName || dName.toLowerCase() === 'null') return;
-                allDisc.add(dName);
-                if(!counts[dName]) counts[dName] = {};
-                counts[dName][decade] = (counts[dName][decade] || 0) + 1;
+                discCounts[dName] = (discCounts[dName] || 0) + 1;
             });
         });
         
-        let datasets = Array.from(allDisc).sort().map((dName, idx) => {
-            let color = colors[idx % colors.length];
-            return {
-                label: dName,
-                data: decades.map(dec => counts[dName][dec] || 0),
-                fill: true,
-                backgroundColor: color + '33',
-                borderColor: color,
-                tension: 0.4,
-                borderWidth: 2
-            };
+        let top12 = Object.entries(discCounts).sort((a,b)=>b[1]-a[1]).slice(0, 12).map(x => x[0]);
+        let yearCounts = {};
+        
+        dataset.forEach(row => {
+            let yr = getCleanYear(row);
+            if(!yr) return;
+            if(!yearCounts[yr]) { yearCounts[yr] = { "Other": 0 }; top12.forEach(d => yearCounts[yr][d] = 0); }
+            let dStr = row.disciplines;
+            if(dStr && dStr !== "N/A") {
+                dStr.split(',').forEach(d => {
+                    let dName = d.trim();
+                    if(!dName || dName.toLowerCase() === 'null') return;
+                    if(top12.includes(dName)) yearCounts[yr][dName]++;
+                    else yearCounts[yr]["Other"]++;
+                });
+            } else { yearCounts[yr]["Other"]++; }
         });
-
-        new Chart(document.getElementById(canvasId), {
-            type: 'line',
-            data: { labels: decades, datasets: datasets },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { position: 'right' } },
-                scales: { y: { stacked: true } } 
-            }
+        
+        let years = Object.keys(yearCounts).sort();
+        let datasets = top12.map((dName, idx) => ({ label: dName, data: years.map(y => yearCounts[y][dName]), backgroundColor: colors[idx % colors.length] }));
+        datasets.push({ label: "Other", data: years.map(y => yearCounts[y]["Other"]), backgroundColor: '#e5e7eb' });
+        
+        renderChart(canvasId, 'bar', { labels: years, datasets: datasets }, {
+            responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } },
+            scales: { x: { stacked: true }, y: { stacked: true } }
         });
     }
 
     function buildTimeline(dataset, canvasId, colorHex) {
-        const counts = {};
-        dataset.forEach(row => {
-            let yr = row.volume_or_year_greek;
-            if(!yr || yr === "N/A") return;
-            let cleanYr = yr.match(/\d{4}/) ? yr.match(/\d{4}/)[0] : yr; 
-            counts[cleanYr] = (counts[cleanYr] || 0) + 1;
-        });
-
-        const labels = Object.keys(counts).sort();
-        new Chart(document.getElementById(canvasId), {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{ label: 'Total Records', data: labels.map(l => counts[l]), backgroundColor: colorHex }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
+        let counts = {};
+        dataset.forEach(row => { let yr = getCleanYear(row); if(yr) counts[yr] = (counts[yr] || 0) + 1; });
+        let labels = Object.keys(counts).sort();
+        
+        renderChart(canvasId, 'bar', {
+            labels: labels, datasets: [{ label: 'Total Records', data: labels.map(l => counts[l]), backgroundColor: colorHex }]
+        }, {
+            responsive: true, maintainAspectRatio: false,
+            onClick: (event, elements, chart) => {
+                if(elements.length > 0) openYearModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture');
+            }
         });
     }
 
     // Stabilized & Interactive Click-to-Jump Network Graph
     function buildNetwork() {
-        let nodesMap = new Map();
         let edgesArr = [];
+        windowNodesMap = new Map();
+        
         masterData.forEach(row => {
-            let author = row.normalized_author || row.author_greek;
+            let author = (row.normalized_author || row.author_greek || "").trim().replace(/\.+$/, '');
             let disc = row.disciplines;
             if(!author || author === "N/A" || !disc || disc === "N/A") return;
             
-            let n = author.toLowerCase().trim();
+            let n = author.toLowerCase();
             if (n === "anonymous" || n === "ανώνυμος" || n === "various" || n === "unknown") return;
 
-            if(!nodesMap.has(author)) nodesMap.set(author, {id: author, label: author, group: 'author'});
+            if(!windowNodesMap.has(author)) windowNodesMap.set(author, {id: author, label: author, group: 'author'});
             disc.split(',').forEach(d => {
                 let dName = d.trim();
-                if(!nodesMap.has(dName)) nodesMap.set(dName, {id: dName, label: dName, group: 'discipline'});
+                if(!windowNodesMap.has(dName)) windowNodesMap.set(dName, {id: dName, label: dName, group: 'discipline'});
                 edgesArr.push({from: author, to: dName});
             });
         });
 
-        let data = { nodes: Array.from(nodesMap.values()), edges: edgesArr };
+        networkNodesData = new vis.DataSet(Array.from(windowNodesMap.values()));
+        let edgesData = new vis.DataSet(edgesArr);
+        
         let options = {
             nodes: { font: { face: 'Fira Code' } },
             groups: {
-                author: { color: {background: '#e0f2fe', border: '#0284c7'}, shape: 'dot', size: 9, font: {size: 11} },
-                discipline: { color: {background: '#111827', border: '#000'}, shape: 'box', font: {color: 'white', size: 12} }
+                author: { color: {background: '#e0f2fe', border: '#0284c7', highlight: {background: '#f3e8ff', border: '#7e22ce'}}, shape: 'dot', size: 9, font: {size: 11} },
+                discipline: { color: {background: '#111827', border: '#000', highlight: {background: '#581c87', border: '#3b0764'}}, shape: 'box', font: {color: 'white', size: 12} }
             },
-            physics: { 
-                enabled: true,
-                barnesHut: { gravitationalConstant: -2000, damping: 0.09 },
-                stabilization: { iterations: 150 }
-            }
+            edges: { color: { color: '#9ca3af', highlight: '#7e22ce' }, width: 1, selectionWidth: 3 },
+            physics: { enabled: true, barnesHut: { gravitationalConstant: -2000, damping: 0.09 }, stabilization: { iterations: 150 } }
         };
         
-        network = new vis.Network(document.getElementById('networkContainer'), data, options);
-        
-        network.on("stabilizationIterationsDone", function () {
-            network.setOptions( { physics: false } );
-        });
+        network = new vis.Network(document.getElementById('networkContainer'), {nodes: networkNodesData, edges: edgesData}, options);
+        network.on("stabilizationIterationsDone", function () { network.setOptions( { physics: false } ); });
 
         network.on("click", function (params) {
             if (params.nodes.length > 0) {
                 let nodeId = params.nodes[0];
                 let neighbors = network.getConnectedNodes(nodeId);
+                
+                // Dim/Reset all, highlight neighbors
+                let updateArray = Array.from(windowNodesMap.values()).map(n => ({ id: n.id, font: {bold: false, size: n.group==='author'?11:12} }));
+                networkNodesData.update(updateArray);
+                let highlightArray = neighbors.map(nId => ({ id: nId, font: {bold: true, size: 14} }));
+                highlightArray.push({ id: nodeId, font: {bold: true, size: 16} });
+                networkNodesData.update(highlightArray);
+                
                 updateSidebar(nodeId, neighbors);
+            }
+        });
+        
+        // Network Search bind
+        $('#networkSearch').on('input', function() {
+            let val = $(this).val().toLowerCase().trim();
+            if(!val) return;
+            let foundId = null;
+            for(let key of windowNodesMap.keys()) {
+                if(key.toLowerCase().includes(val)) { foundId = key; break; }
+            }
+            if(foundId) {
+                network.selectNodes([foundId]);
+                network.focus(foundId, { scale: 1.2, animation: true });
+                updateSidebar(foundId, network.getConnectedNodes(foundId));
             }
         });
     }
 
     function updateSidebar(nodeId, neighbors) {
-        document.getElementById('sidebarTitleinnerText', nodeId);
         document.getElementById('sidebarTitle').innerText = nodeId;
-        let desc = document.getElementById('sidebarDesc');
-        desc.innerText = `Connected nodes (${neighbors.length}): Click any link below to jump directly to it on the map.`;
+        document.getElementById('sidebarDesc').innerText = `Connected nodes (${neighbors.length}): Click any link below to jump directly to it on the map.`;
         
         let sidebar = document.getElementById('sidebarLinks');
         sidebar.innerHTML = '';
+        
+        let nodeObj = windowNodesMap.get(nodeId);
+        if (nodeObj && nodeObj.group === 'author') {
+            let profileLink = document.createElement('a');
+            profileLink.innerText = "[ View Publications & Lectures ]";
+            profileLink.style.display = 'block';
+            profileLink.style.marginBottom = '15px';
+            profileLink.style.cursor = 'pointer';
+            profileLink.style.color = 'var(--text-color)';
+            profileLink.style.fontWeight = 'bold';
+            profileLink.onclick = () => openProfile(nodeId, "All");
+            sidebar.appendChild(profileLink);
+        }
         
         neighbors.forEach(n => {
             let link = document.createElement('span');
@@ -755,57 +794,126 @@
         $('#' + tabId).addClass('active');
         $(element).addClass('active');
 
-        if(tabId === 'journalTab' || tabId === 'lectureTab' || tabId === 'analyticsTab') {
-            $('#tableControls').show();
+        if(tabId === 'aboutTab' || tabId === 'networkTab' || tabId === 'timelineTab' || tabId === 'semanticTab') {
+            $('#tableControls').hide(); 
         } else {
-            $('#tableControls').hide();
+            $('#tableControls').show();
+            $('#filterYearPubs').toggle(tabId === 'journalTab' || tabId === 'analyticsTab');
+            $('#filterYearLecs').toggle(tabId === 'lectureTab' || tabId === 'analyticsTab');
+            $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'analyticsTab');
         }
+        
+        if (tabId === 'analyticsTab') refreshVisualAnalytics();
+    }
+
+    // Modal Dynamic List & Search Handlers
+    let currentModalData = { type: '', title: '', subtitle: '', items: [] };
+
+    function renderFlatList(items, query = "") {
+        let list = document.getElementById('profItems');
+        list.innerHTML = '';
+        let filtered = items.filter(i => (i.search_text || "").toLowerCase().includes(query.toLowerCase()));
+        
+        if (filtered.length === 0) { list.innerHTML = "<li>No matching records found.</li>"; return; }
+        filtered.forEach(item => {
+            let li = document.createElement('li');
+            li.style.marginBottom = '8px';
+            let typeTag = item.entry_type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
+            li.innerHTML = `<strong>${getCleanYear(item) || 'n.d.'}</strong>: ${item.title_english || item.title_greek || ''} - <em>${(item.author_english || item.normalized_author || item.author_greek || 'Anonymous').replace(/\.+$/, '')}</em>${typeTag}`;
+            list.appendChild(li);
+        });
+    }
+
+    function renderGroupedList(items, query = "") {
+        let list = document.getElementById('profItems');
+        list.innerHTML = '';
+        let filtered = items.filter(i => (i.search_text || "").toLowerCase().includes(query.toLowerCase()));
+        
+        if (filtered.length === 0) { list.innerHTML = "<li>No matching records found.</li>"; return; }
+        let grouped = {};
+        filtered.forEach(item => {
+            let discs = item.disciplines && item.disciplines !== "N/A" ? item.disciplines.split(',').map(d => d.trim()) : ["Uncategorized"];
+            discs.forEach(d => {
+                if(!grouped[d]) grouped[d] = [];
+                grouped[d].push(item);
+            });
+        });
+
+        for (const [disc, works] of Object.entries(grouped).sort()) {
+            let discHeader = document.createElement('div');
+            discHeader.innerHTML = `<h3 style="color: var(--accent-cyan); margin-bottom: 5px; margin-top: 20px;">${disc}</h3>`;
+            list.appendChild(discHeader);
+            
+            works.sort((a,b) => (getCleanYear(a) || "9999").localeCompare(getCleanYear(b) || "9999"));
+            works.forEach(item => {
+                let li = document.createElement('li');
+                li.style.marginBottom = '5px';
+                li.style.listStyleType = 'square';
+                li.style.marginLeft = '20px';
+                let typeTag = item.entry_type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
+                li.innerHTML = `<strong>${getCleanYear(item) || 'n.d.'}</strong>: ${item.title_english || item.title_greek || ''}${typeTag}`;
+                list.appendChild(li);
+            });
+        }
+    }
+
+    $(document).on('input', '#modalSearch', function() {
+        let val = $(this).val();
+        if (currentModalData.type === 'profile') renderGroupedList(currentModalData.items, val);
+        else renderFlatList(currentModalData.items, val);
+    });
+
+    function setupModalHeader(title, subtitle, type, items) {
+        currentModalData = { type, title, subtitle, items };
+        document.getElementById('profName').innerText = title;
+        document.getElementById('profStats').innerHTML = `${subtitle} <br><input type="text" id="modalSearch" placeholder="Search within these results..." style="margin-top: 10px; width: 300px; padding: 6px; font-family: var(--font-mono); border: 1px solid var(--border-dark); outline: none;">`;
+        document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function openListModal(title, subtitle, items) {
+        setupModalHeader(title, subtitle, 'list', items);
+        renderFlatList(items);
+    }
+
+    function openProfile(authorName, entryTypeFilter = "All") {
+        const query = (authorName || "").replace(/[\.\,]/g, '').toLowerCase().trim();
+        let items = masterData.filter(r => {
+            const eng = (r.author_english || "").replace(/[\.\,]/g, '').toLowerCase().trim();
+            const norm = (r.normalized_author || "").replace(/[\.\,]/g, '').toLowerCase().trim();
+            const gr = (r.author_greek || "").replace(/[\.\,]/g, '').toLowerCase().trim();
+            return eng === query || norm === query || gr === query;
+        });
+        if (entryTypeFilter === "Journal") items = items.filter(r => r.entry_type !== "Public Lecture");
+        if (entryTypeFilter === "Lecture") items = items.filter(r => r.entry_type === "Public Lecture");
+        
+        setupModalHeader(authorName, `Total Contributions (${entryTypeFilter}): ${items.length}`, 'profile', items);
+        renderGroupedList(items);
+    }
+    
+    function openYearModal(year, type) {
+        let items = masterData.filter(r => getCleanYear(r) === year);
+        if(type === 'Journal') items = items.filter(r => r.entry_type !== "Public Lecture");
+        if(type === 'Lecture') items = items.filter(r => r.entry_type === "Public Lecture");
+        openListModal(`Output for Year: ${year}`, `Total Records (${type}): ${items.length}`, items);
+    }
+    
+    function openDisciplineModal(disc, type) {
+        let items = masterData.filter(r => r.disciplines && r.disciplines.split(',').map(x=>x.trim()).includes(disc));
+        if(type === 'Journal') items = items.filter(r => r.entry_type !== "Public Lecture");
+        if(type === 'Lecture') items = items.filter(r => r.entry_type === "Public Lecture");
+        items.sort((a,b) => (getCleanYear(a) || "9999").localeCompare(getCleanYear(b) || "9999"));
+        openListModal(`Discipline: ${disc}`, `Total Records (${type}): ${items.length}`, items);
     }
 
     function viewScan(imageName) {
         document.getElementById('scanImage').src = "split_pages/" + imageName;
         document.getElementById('scanModal').style.display = 'flex';
     }
-
-    function openProfile(authorName) {
-        const cleanString = (str) => (str || "").replace(/[\.\,]/g, '').toLowerCase().trim();
-        const query = cleanString(authorName);
-        
-        const items = masterData.filter(r => {
-            const eng = cleanString(r.author_english);
-            const norm = cleanString(r.normalized_author);
-            const gr = cleanString(r.author_greek);
-            
-            return eng === query || norm === query || gr === query || 
-                   (eng && eng.includes(query)) || (norm && norm.includes(query));
-        });
-
-        document.getElementById('profName').innerText = authorName;
-        document.getElementById('profStats').innerText = `Total Contributions: ${items.length}`;
-        
-        const list = document.getElementById('profItems');
-        list.innerHTML = '';
-        if (items.length === 0) {
-            list.innerHTML = "<li>No matching records found.</li>";
-        } else {
-            items.forEach(item => {
-                let li = document.createElement('li');
-                li.innerHTML = `<strong>${item.volume_or_year_greek || ''}</strong>: ${item.title_english || item.title_greek || ''} <em>(${item.entry_type || ''})</em>`;
-                list.appendChild(li);
-            });
-        }
-        document.getElementById('profileModal').style.display = 'flex';
-    }
-
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
     function generateCitation(author, title, year) {
-        const authClean = author && author !== "N/A" ? author : "Ανώνυμος";
-        const yrClean = year && year !== "N/A" ? year : "n.d.";
-        const citation = `${authClean}. "${title}". Εν Κωνσταντινουπόλει Ελληνικός Φιλολογικός Σύλλογος, ${yrClean}.`;
+        const citation = `${author && author !== "N/A" ? author : "Ανώνυμος"}. "${title}". Εν Κωνσταντινουπόλει Ελληνικός Φιλολογικός Σύλλογος, ${year && year !== "N/A" ? year : "n.d."}.`;
         navigator.clipboard.writeText(citation).then(() => alert("Citation copied:\n\n" + citation));
     }
-
     function escapeQuote(str) { return str ? str.replace(/'/g, "\\'").replace(/"/g, "&quot;") : ""; }
 </script>
 </body>
