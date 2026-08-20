@@ -284,86 +284,11 @@
     let networkNodesData;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
-    // --- Entity Resolution Engine (Automated Name Standardizer) ---
-    const authorAliases = {
-        "m. paranika": "M. Paranikas",
-        "m paranika": "M. Paranikas",
-        "paranika, m.": "M. Paranikas",
-        "paranikas, m.": "M. Paranikas",
-        "paranikas, matthaios": "M. Paranikas",
-        "matthaios paranikas": "M. Paranikas",
-        "μ. παρανίκα": "M. Paranikas",
-        "μ. παρανίκας": "M. Paranikas",
-        
-        "k. makre": "K. Makris",
-        "k. makri": "K. Makris",
-        "makri, k.": "K. Makris",
-        "makris, k.": "K. Makris",
-        "κ. μακρῆ": "K. Makris",
-        "κ. μακρής": "K. Makris",
-        "κ. μακρῆς": "K. Makris",
-        "κωνσταντίνος μακρῆς": "K. Makris",
-        
-        "gedeon, m.": "M. Gedeon",
-        "μ. γεδεών": "M. Gedeon",
-        "μανουήλ γεδεών": "M. Gedeon",
-        "manouil gedeon": "M. Gedeon",
-        
-        "ioannis aristoklis": "I. Aristoklis",
-        "aristoklis, i.": "I. Aristoklis",
-        "ι. αριστοκλής": "I. Aristoklis",
-        
-        "paspatis, a.": "A. Paspatis",
-        "paspati, a.": "A. Paspatis",
-        "paspati, a. g.": "A. Paspatis",
-        "αλέξανδρος πασπάτης": "A. Paspatis",
-        
-        "papadopoulos kerameus, a.": "A. Papadopoulos Kerameus",
-        "a. papadopoulou kerameos": "A. Papadopoulos Kerameus",
-        "ἀ. παπαδόπουλος κεραμεύς": "A. Papadopoulos Kerameus",
-        
-        "pantazidis, chr.": "Chr. Pantazidis",
-        "χ. πανταζίδης": "Chr. Pantazidis",
-        
-        "chatzichristou, chr.": "Chr. Chatzichristou",
-        
-        "karolidou, i.": "I. Karolidis",
-        "karolidis, i.": "I. Karolidis",
-        "karolidis, pavlos": "P. Karolidis",
-        
-        "stamatiadou, d.": "D. Stamatiadis",
-        "stamatiadis, d.": "D. Stamatiadis",
-        "δημήτριος σταματιάδης": "D. Stamatiadis",
-
-        "kalliadis, k.": "K. Kalliadis",
-        "oikonomidis, d.": "D. Oikonomidis",
-        "vasiadis, ir.": "Ir. Vasiadis",
-        "ιωάννης ζίφος": "I. Zifos",
-        "zifos, i.": "I. Zifos"
-    };
-
+    // --- Entity Resolution Engine (Streamlined) ---
     function getStandardAuthor(row) {
-        let rawName = row.normalized_author || row.author_english || row.author_greek || "Anonymous";
-        rawName = rawName.trim().replace(/\.+$/, '');
-        
-        if (rawName.toLowerCase() === "anonymous" || rawName.toLowerCase() === "ανώνυμος" || rawName.toLowerCase() === "various" || rawName.toLowerCase() === "unknown") {
-            return "Anonymous";
-        }
-        
-        let lowerName = rawName.toLowerCase();
-        
-        // Return mapped standard alias if it exists
-        if (authorAliases[lowerName]) return authorAliases[lowerName];
-        
-        // Automatically flip "Lastname, Firstname" to "Firstname Lastname"
-        let commaMatch = rawName.match(/^([^,]+),\s*(.+)$/);
-        if (commaMatch) {
-            let reversed = `${commaMatch[2]} ${commaMatch[1]}`;
-            if (authorAliases[reversed.toLowerCase()]) return authorAliases[reversed.toLowerCase()];
-            return reversed;
-        }
-        
-        return rawName;
+        // Since the backend Python script now handles all aliases, 
+        // punctuation cleaning, and standardizing, we just pull the normalized author.
+        return row.normalized_author || "Anonymous";
     }
 
     Papa.parse("philological_society_master.csv", {
