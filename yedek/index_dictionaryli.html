@@ -107,8 +107,7 @@
         <button class="tab-btn" onclick="openTab('analyticsTab', this)">4. Visual Analytics</button>
         <button class="tab-btn" onclick="openTab('networkTab', this)">5. Intellectual Network</button>
         <button class="tab-btn" onclick="openTab('timelineTab', this)">6. Timeline</button>
-        <button class="tab-btn" onclick="openTab('allTab', this)">7. All Entries (Review)</button>
-        <button class="tab-btn" onclick="openTab('aboutTab', this)">8. About</button>
+        <button class="tab-btn" onclick="openTab('aboutTab', this)">7. About</button>
     </div>
 
     <!-- Global Filters -->
@@ -147,23 +146,6 @@
                 <th>Speaker</th>
                 <th>Title</th>
                 <th>Lectures</th>
-                <th>Disciplines</th>
-                <th>Scan</th>
-                <th>Action</th>
-            </tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <!-- TAB 7: All Entries (Review) -->
-    <div id="allTab" class="tab-content">
-        <p style="color: var(--text-muted); margin-bottom: 15px;">This tab combines all Journal and Lecture entries. Authors are formatted as "Last Name, First Name" to assist with alphabetized sorting and deduplication review.</p>
-        <table id="allTable" class="display nowrap" style="width:100%">
-            <thead><tr>
-                <th>Year</th>
-                <th>Author (Last, First)</th>
-                <th>Title</th>
-                <th>Type</th>
                 <th>Disciplines</th>
                 <th>Scan</th>
                 <th>Action</th>
@@ -265,7 +247,7 @@
         </div>
     </div>
 
-    <!-- TAB 8: About -->
+    <!-- TAB 7: About -->
     <div id="aboutTab" class="tab-content" style="max-width: 900px;">
         <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
         <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
@@ -302,30 +284,94 @@
     let networkNodesData;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
-    // --- Entity Resolution Engine (Streamlined) ---
+    // --- Entity Resolution Engine (Automated Name Standardizer) ---
+    const authorAliases = {
+        "m. paranika": "M. Paranikas",
+        "m paranika": "M. Paranikas",
+        "paranika, m.": "M. Paranikas",
+        "paranikas, m.": "M. Paranikas",
+        "paranikas, matthaios": "M. Paranikas",
+        "matthaios paranikas": "M. Paranikas",
+        "μ. παρανίκα": "M. Paranikas",
+        "μ. παρανίκας": "M. Paranikas",
+        
+        "k. makre": "K. Makris",
+        "k. makri": "K. Makris",
+        "makri, k.": "K. Makris",
+        "makris, k.": "K. Makris",
+        "κ. μακρῆ": "K. Makris",
+        "κ. μακρής": "K. Makris",
+        "κ. μακρῆς": "K. Makris",
+        "κωνσταντίνος μακρῆς": "K. Makris",
+        
+        "gedeon, m.": "M. Gedeon",
+        "μ. γεδεών": "M. Gedeon",
+        "μανουήλ γεδεών": "M. Gedeon",
+        "manouil gedeon": "M. Gedeon",
+        
+        "ioannis aristoklis": "I. Aristoklis",
+        "aristoklis, i.": "I. Aristoklis",
+        "ι. αριστοκλής": "I. Aristoklis",
+        
+        "paspatis, a.": "A. Paspatis",
+        "paspati, a.": "A. Paspatis",
+        "paspati, a. g.": "A. Paspatis",
+        "αλέξανδρος πασπάτης": "A. Paspatis",
+        
+        "papadopoulos kerameus, a.": "A. Papadopoulos Kerameus",
+        "a. papadopoulou kerameos": "A. Papadopoulos Kerameus",
+        "ἀ. παπαδόπουλος κεραμεύς": "A. Papadopoulos Kerameus",
+        
+        "pantazidis, chr.": "Chr. Pantazidis",
+        "χ. πανταζίδης": "Chr. Pantazidis",
+        
+        "chatzichristou, chr.": "Chr. Chatzichristou",
+        
+        "karolidou, i.": "I. Karolidis",
+        "karolidis, i.": "I. Karolidis",
+        "karolidis, pavlos": "P. Karolidis",
+        
+        "stamatiadou, d.": "D. Stamatiadis",
+        "stamatiadis, d.": "D. Stamatiadis",
+        "δημήτριος σταματιάδης": "D. Stamatiadis",
+
+        "kalliadis, k.": "K. Kalliadis",
+        "oikonomidis, d.": "D. Oikonomidis",
+        "vasiadis, ir.": "Ir. Vasiadis",
+        "ιωάννης ζίφος": "I. Zifos",
+        "zifos, i.": "I. Zifos"
+    };
+
     function getStandardAuthor(row) {
-        return row.normalized_author || "Anonymous";
+        let rawName = row.normalized_author || row.author_english || row.author_greek || "Anonymous";
+        rawName = rawName.trim().replace(/\.+$/, '');
+        
+        if (rawName.toLowerCase() === "anonymous" || rawName.toLowerCase() === "ανώνυμος" || rawName.toLowerCase() === "various" || rawName.toLowerCase() === "unknown") {
+            return "Anonymous";
+        }
+        
+        let lowerName = rawName.toLowerCase();
+        
+        // Return mapped standard alias if it exists
+        if (authorAliases[lowerName]) return authorAliases[lowerName];
+        
+        // Automatically flip "Lastname, Firstname" to "Firstname Lastname"
+        let commaMatch = rawName.match(/^([^,]+),\s*(.+)$/);
+        if (commaMatch) {
+            let reversed = `${commaMatch[2]} ${commaMatch[1]}`;
+            if (authorAliases[reversed.toLowerCase()]) return authorAliases[reversed.toLowerCase()];
+            return reversed;
+        }
+        
+        return rawName;
     }
 
-    // Flips a name from "First Last" to "Last, First" safely
-    function flipName(name) {
-        if (!name || name === "Anonymous" || name === "N/A" || name.trim() === "") return name;
-        let cleanName = name.trim();
-        // Ignore dual authors connected by 'and' or 'καὶ'
-        if (cleanName.toLowerCase().includes(' and ') || cleanName.toLowerCase().includes(' καὶ ')) return cleanName;
-        
-        let parts = cleanName.split(' ');
-        if (parts.length <= 1) return cleanName;
-        
-        let surname = parts.pop().replace(/,$/, '');
-        return surname + ", " + parts.join(' ');
-    }
-
-    Papa.parse("philological_society_deduped.csv", {
+    Papa.parse("philological_society_master.csv", {
         download: true,
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
+            // Apply standardized author name to dataset on load
             masterData = results.data.map(row => {
                 row.standard_author = getStandardAuthor(row);
                 return row;
@@ -354,7 +400,6 @@
     function initPortal() {
         const journalData = [];
         const lectureData = [];
-        const allData = masterData.slice(); // For the new review tab
         const yearsPubs = new Set();
         const yearsLecs = new Set();
         const disciplines = new Set();
@@ -376,7 +421,7 @@
         });
 
         populateDropdowns(yearsPubs, yearsLecs, disciplines);
-        buildTables(journalData, lectureData, allData);
+        buildTables(journalData, lectureData);
         
         buildTimeline(journalData, 'timelineChartPubs', '#111827');
         buildTimeline(lectureData, 'timelineChartLecs', '#0284c7');
@@ -390,22 +435,14 @@
     }
 
     // --- Table Logic ---
-    function buildTables(journal, lecture, all) {
+    function buildTables(journal, lecture) {
         const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
         const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
-        
         const renderAuthor = (data, type, row) => {
             const authorTop = row.standard_author;
             const authorBottom = row.author_greek && row.author_greek !== "N/A" ? row.author_greek : "";
             return `<span class="author-link" onclick="openProfile('${escapeQuote(authorTop)}', 'All')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
         };
-        
-        const renderFlippedAuthor = (data, type, row) => {
-            const authorTop = flipName(row.standard_author);
-            const authorBottom = flipName(row.author_greek && row.author_greek !== "N/A" ? row.author_greek : "");
-            return `<span class="author-link" onclick="openProfile('${escapeQuote(row.standard_author)}', 'All')">${authorTop}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${authorBottom}</span>`;
-        };
-
         const renderTitle = (data, type, row) => {
             const titleTop = row.title_english || row.title_greek || '';
             const titleBottom = row.title_english ? (row.title_greek || '') : '';
@@ -429,15 +466,6 @@
                 { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
-
-        window.at = $('#allTable').DataTable({
-            data: all, pageLength: 50, scrollX: true,
-            columns: [
-                { data: 'volume_or_year_greek' }, { data: null, render: renderFlippedAuthor }, { data: null, render: renderTitle },
-                { data: 'entry_type' }, { data: 'disciplines' },
-                { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
-            ]
-        });
     }
 
     function setupCustomFilters() {
@@ -449,15 +477,12 @@
             const anonChecked = $('#anonFilter').is(':checked');
             const discFilter = $('#filterDiscipline').val();
             
-            if (tableId === 'journalTable' || tableId === 'lectureTable') {
-                let yrFilter = tableId === 'journalTable' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
-                if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
-            }
+            let yrFilter = tableId === 'journalTable' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
+            if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             
-            if ((tableId === 'journalTable' || tableId === 'allTable') && anonChecked) {
+            if (tableId === 'journalTable' && anonChecked) {
                 if (rowObj.standard_author !== "Anonymous") return false;
             }
-            
             if (discFilter && (!rowObj.disciplines || !rowObj.disciplines.includes(discFilter))) return false;
             if (query && !rowObj.search_text.toLowerCase().includes(query.toLowerCase())) return false;
             return true;
@@ -466,7 +491,6 @@
         $('#globalSearch, #anonFilter, #filterDiscipline, #filterYearPubs, #filterYearLecs').on('keyup change', function() {
             window.jt.draw();
             window.lt.draw();
-            window.at.draw();
         });
         
         $('#localTopPubYear, #localTopLecYear, #localTopDiscipline').on('change', updateTopContributorsAnalytics);
@@ -771,11 +795,11 @@
         $('#' + tabId).addClass('active');
         $(element).addClass('active');
 
-        if(tabId === 'journalTab' || tabId === 'lectureTab' || tabId === 'allTab') {
+        if(tabId === 'journalTab' || tabId === 'lectureTab') {
             $('#tableControls').show();
             $('#filterYearPubs').toggle(tabId === 'journalTab');
             $('#filterYearLecs').toggle(tabId === 'lectureTab');
-            $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'allTab');
+            $('#anonFilterGroup').toggle(tabId === 'journalTab');
         } else {
             $('#tableControls').hide(); 
         }
