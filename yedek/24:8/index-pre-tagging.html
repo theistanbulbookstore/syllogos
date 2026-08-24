@@ -41,17 +41,11 @@
         .header-text h1 { margin: 0 0 5px 0; color: var(--text-color); font-size: 1.6rem; font-weight: 500; }
         .header-text p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
         
-        .controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         input[type="text"], select { padding: 8px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--border-dark); border-radius: 2px; outline: none; }
         input[type="text"]:focus, select:focus { border-color: var(--accent-cyan); }
         .checkbox-group { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
         
-        /* Keyword Suggestion Bar */
-        .suggestion-bar { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .suggestion-btn { background: var(--border-dark); color: #ffffff; border: 1px solid var(--border-dark); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; font-family: var(--font-mono); border-radius: 2px; display: flex; align-items: center; gap: 5px; }
-        .suggestion-pill { background: #ffffff; border: 1px solid var(--border-light); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); border-radius: 2px; transition: 0.2s; }
-        .suggestion-pill:hover { border-color: var(--border-dark); background: #f9fafb; }
-
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
         .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
         .tab-btn:hover { border-color: var(--border-dark); }
@@ -62,16 +56,10 @@
         .dataTables_wrapper .dataTables_filter { display: none !important; }
         table.dataTable { font-family: var(--font-mono) !important; font-size: 0.85rem !important; border-collapse: collapse !important; width: 100% !important; }
         table.dataTable thead th { background-color: #ffffff !important; border-bottom: 2px solid var(--border-dark) !important; padding: 10px !important; }
-        table.dataTable tbody td { border-bottom: 1px solid var(--border-light) !important; padding: 10px !important; vertical-align: top !important; }
+        table.dataTable tbody td { border-bottom: 1px solid var(--border-light) !important; padding: 10px !important; }
         .author-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; font-weight: 500; }
         .btn-small { padding: 4px 10px; font-size: 0.75rem; cursor: pointer; background: #ffffff; color: var(--text-color); border: 1px solid var(--border-light); border-radius: 2px; font-family: var(--font-mono); }
         .btn-small:hover { border-color: var(--border-dark); background: var(--border-dark); color: #ffffff; }
-
-        /* Tag Pill UI Enhancements */
-        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; max-width: 250px; }
-        .tag-pill { background-color: #f3f4f6; border: 1px solid var(--border-light); padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; color: var(--text-color); white-space: nowrap; }
-        .tag-pill.parent-tag { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
-        .tag-more-btn { background: none; border: none; color: var(--accent-cyan); font-size: 0.7rem; cursor: pointer; padding: 2px 4px; font-family: var(--font-mono); text-decoration: underline; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border: 1px solid var(--border-dark); max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%; position: relative; }
@@ -132,12 +120,6 @@
         <div class="checkbox-group" id="anonFilterGroup">
             <input type="checkbox" id="anonFilter"> <label for="anonFilter">Anonymous / Folklore Only</label>
         </div>
-    </div>
-
-    <!-- Suggestion Bar for Tabs 1 & 2 (8 Gerardos-style pills) -->
-    <div class="suggestion-bar" id="suggestionBar">
-        <button class="suggestion-btn" onclick="refreshSuggestions()">🎲 Suggest Keywords</button>
-        <div id="suggestionPills" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
     </div>
 
     <!-- TAB 1: Journal -->
@@ -314,28 +296,22 @@
 
 <script>
     let masterData = [];
-    let journalDataGlobal = [];
-    let lectureDataGlobal = [];
     let chartInstances = {};
     let network;
     let windowNodesMap = new Map();
     let networkNodesData;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
-    // --- Accent Agnostic Normalizer Helper for Greek & English ---
-    function removeGreekAccents(str) {
-        if (!str) return "";
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
-
     // --- Entity Resolution Engine (Streamlined) ---
     function getStandardAuthor(row) {
         return row.normalized_author || "Anonymous";
     }
 
+    // Flips a name from "First Last" to "Last, First" safely
     function flipName(name) {
         if (!name || name === "Anonymous" || name === "N/A" || name.trim() === "") return name;
         let cleanName = name.trim();
+        // Ignore dual authors connected by 'and' or 'καὶ'
         if (cleanName.toLowerCase().includes(' and ') || cleanName.toLowerCase().includes(' καὶ ')) return cleanName;
         
         let parts = cleanName.split(' ');
@@ -376,9 +352,9 @@
     }
 
     function initPortal() {
-        journalDataGlobal = [];
-        lectureDataGlobal = [];
-        const allData = masterData.slice();
+        const journalData = [];
+        const lectureData = [];
+        const allData = masterData.slice(); // For the new review tab
         const yearsPubs = new Set();
         const yearsLecs = new Set();
         const disciplines = new Set();
@@ -395,15 +371,15 @@
                 row.disciplines.split(',').forEach(d => disciplines.add(d.trim()));
             }
 
-            if (row.entry_type === "Public Lecture") lectureDataGlobal.push(row);
-            else journalDataGlobal.push(row);
+            if (row.entry_type === "Public Lecture") lectureData.push(row);
+            else journalData.push(row);
         });
 
         populateDropdowns(yearsPubs, yearsLecs, disciplines);
-        buildTables(journalDataGlobal, lectureDataGlobal, allData);
+        buildTables(journalData, lectureData, allData);
         
-        buildTimeline(journalDataGlobal, 'timelineChartPubs', '#111827');
-        buildTimeline(lectureDataGlobal, 'timelineChartLecs', '#0284c7');
+        buildTimeline(journalData, 'timelineChartPubs', '#111827');
+        buildTimeline(lectureData, 'timelineChartLecs', '#0284c7');
         
         updateTopContributorsAnalytics();
         updatePieChartsAnalytics();
@@ -411,111 +387,9 @@
         
         buildNetwork();
         setupCustomFilters();
-        
-        refreshSuggestions();
     }
 
-    // --- Keyword Suggestions Engine (8 pills, monotonized Greek pills, tab-specific) ---
-    function refreshSuggestions() {
-        let activeTab = $('.tab-content.active').attr('id');
-        let poolSource = (activeTab === 'lectureTab') ? lectureDataGlobal : journalDataGlobal;
-        if (!poolSource || poolSource.length === 0) poolSource = masterData;
-
-        let candidateTerms = new Set();
-        poolSource.forEach(row => {
-            if (row.disciplines && row.disciplines !== "N/A") {
-                row.disciplines.split(',').forEach(d => {
-                    let cleanD = d.trim();
-                    if (cleanD) candidateTerms.add(cleanD);
-                });
-            }
-            if (row.title_english) {
-                row.title_english.replace(/[^a-zA-Z\s]/g, "").split(/\s+/).forEach(w => {
-                    if (w.length > 4 && !['about', 'their', 'which', 'other', 'these', 'first', 'study'].includes(w.toLowerCase())) {
-                        candidateTerms.add(w);
-                    }
-                });
-            }
-            if (row.title_greek) {
-                row.title_greek.replace(/[^α-ωΑ-Ωἀ-ὗἈ-Ἇᾀ-ᾏḀ-ỿ\s]/g, "").split(/\s+/).forEach(w => {
-                    if (w.length > 3) {
-                        let monotonizedOnlyForPills = removeGreekAccents(w);
-                        candidateTerms.add(monotonizedOnlyForPills);
-                    }
-                });
-            }
-        });
-
-        let termsArray = Array.from(candidateTerms);
-        let shuffled = termsArray.sort(() => 0.5 - Math.random()).slice(0, 8); // 8 pills matching Gerardos
-
-        let container = document.getElementById('suggestionPills');
-        container.innerHTML = '';
-        shuffled.forEach(term => {
-            let pill = document.createElement('div');
-            pill.className = 'suggestion-pill';
-            pill.innerText = term;
-            pill.onclick = () => {
-                $('#globalSearch').val(term).trigger('keyup');
-            };
-            container.appendChild(pill);
-        });
-    }
-
-    // --- Table & Tag Renderer Logic ---
-    function renderDisciplines(data, type, row) {
-        if (!data || data === "N/A" || data.toLowerCase() === "null") return "N/A";
-        
-        let tags = data.split(',').map(t => t.trim()).filter(t => t);
-        if (tags.length === 0) return "N/A";
-        
-        let maxVisible = 3;
-        let visibleTags = tags.slice(0, maxVisible);
-        let hiddenTags = tags.slice(maxVisible);
-        
-        // The definitive list of all 26 top-level parent domains
-        const parentDomains = [
-            'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
-            'Cultural Studies', 'Economics', 'Education', 'Folklore', 'Geography', 
-            'History', 'Law', 'Library Science', 'Literature', 'Medicine', 'Music', 
-            'Philology', 'Philosophy', 'Physical Education', 'Political Science', 
-            'Psychology', 'Publishing', 'Religion', 'Science', 'Sociology', 'Sports Science'
-        ];
-        
-        let html = `<div class="tag-container">`;
-        visibleTags.forEach(tag => {
-            let isParent = parentDomains.includes(tag);
-            let pillClass = isParent ? "tag-pill parent-tag" : "tag-pill";
-            html += `<span class="${pillClass}">${tag}</span>`;
-        });
-        
-        if (hiddenTags.length > 0) {
-            let uniqueId = 'tags_' + Math.random().toString(36).substr(2, 9);
-            html += `<span id="${uniqueId}_extra" style="display:none; display:contents;">`;
-            hiddenTags.forEach(tag => {
-                let isParent = parentDomains.includes(tag);
-                let pillClass = isParent ? "tag-pill parent-tag" : "tag-pill";
-                html += `<span class="${pillClass}">${tag}</span>`;
-            });
-            html += `</span>`;
-            html += `<button class="tag-more-btn" onclick="toggleTags('${uniqueId}', this)">+${hiddenTags.length} more</button>`;
-        }
-        
-        html += `</div>`;
-        return html;
-    }
-
-    function toggleTags(id, btn) {
-        let extraSpan = document.getElementById(id + '_extra');
-        if (extraSpan.style.display === 'none' || extraSpan.style.display === '') {
-            extraSpan.style.display = 'inline';
-            btn.innerText = 'show less';
-        } else {
-            extraSpan.style.display = 'none';
-            btn.innerText = `+ more`;
-        }
-    }
-
+    // --- Table Logic ---
     function buildTables(journal, lecture, all) {
         const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
         const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
@@ -542,7 +416,7 @@
             data: journal, pageLength: 25, scrollX: true,
             columns: [
                 { data: 'volume_or_year_greek' }, { data: null, render: renderAuthor }, { data: null, render: renderTitle },
-                { data: 'subsection_greek' }, { data: 'page_numbers' }, { data: 'disciplines', render: renderDisciplines },
+                { data: 'subsection_greek' }, { data: 'page_numbers' }, { data: 'disciplines' },
                 { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
@@ -551,7 +425,7 @@
             data: lecture, pageLength: 25, scrollX: true,
             columns: [
                 { data: 'volume_or_year_greek' }, { data: null, render: renderAuthor }, { data: null, render: renderTitle },
-                { data: 'lecture_count' }, { data: 'disciplines', render: renderDisciplines },
+                { data: 'lecture_count' }, { data: 'disciplines' },
                 { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
@@ -560,37 +434,32 @@
             data: all, pageLength: 50, scrollX: true,
             columns: [
                 { data: 'volume_or_year_greek' }, { data: null, render: renderFlippedAuthor }, { data: null, render: renderTitle },
-                { data: 'entry_type' }, { data: 'disciplines', render: renderDisciplines },
+                { data: 'entry_type' }, { data: 'disciplines' },
                 { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false }
             ]
         });
     }
 
-    // --- Accent-Agnostic Global Search Filter ---
     function setupCustomFilters() {
         $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
             const rowObj = settings.aoData[dataIndex]._aData;
             const tableId = settings.nTable.id;
             
-            const query = removeGreekAccents($('#globalSearch').val());
+            const query = $('#globalSearch').val();
             const anonChecked = $('#anonFilter').is(':checked');
             const discFilter = $('#filterDiscipline').val();
             
-            if (tableId === 'journalTab' || tableId === 'lectureTab') {
-                let yrFilter = tableId === 'journalTab' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
+            if (tableId === 'journalTable' || tableId === 'lectureTable') {
+                let yrFilter = tableId === 'journalTable' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
                 if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             }
             
-            if ((tableId === 'journalTab' || tableId === 'allTab') && anonChecked) {
+            if ((tableId === 'journalTable' || tableId === 'allTable') && anonChecked) {
                 if (rowObj.standard_author !== "Anonymous") return false;
             }
             
             if (discFilter && (!rowObj.disciplines || !rowObj.disciplines.includes(discFilter))) return false;
-            
-            if (query) {
-                const targetText = removeGreekAccents(rowObj.search_text || "");
-                if (!targetText.includes(query)) return false;
-            }
+            if (query && !rowObj.search_text.toLowerCase().includes(query.toLowerCase())) return false;
             return true;
         });
 
@@ -697,6 +566,7 @@
             }
         });
 
+        // Hide slices beyond the Top 12 by default
         sorted.forEach((item, index) => {
             if (index > 11) chartObj.toggleDataVisibility(index);
         });
@@ -749,6 +619,7 @@
         let years = Object.keys(yearCounts).sort();
         let datasets = [];
         
+        // Total Output Line
         datasets.push({
             label: "TOTAL OUTPUT",
             data: years.map(y => yearCounts[y]["Total Output"]),
@@ -756,6 +627,7 @@
             borderWidth: 3, borderDash: [5, 5], fill: false, tension: 0.3
         });
         
+        // Discipline Lines
         allDiscs.forEach((dName, idx) => {
             datasets.push({
                 label: dName,
@@ -798,7 +670,7 @@
         });
     }
 
-    // --- Tab 5: Stabilized Network Graph (Accent Cyan Highlighting & Toggle Deselect) ---
+    // --- Tab 5: Stabilized Network Graph ---
     function buildNetwork() {
         let edgesArr = [];
         windowNodesMap = new Map();
@@ -822,11 +694,11 @@
         let options = {
             nodes: { font: { face: 'Fira Code' } },
             groups: {
-                author: { color: {background: '#e0f2fe', border: '#0284c7', highlight: {background: '#e0f2fe', border: '#0284c7'}}, shape: 'dot', size: 9, font: {size: 11} },
-                discipline: { color: {background: '#111827', border: '#000', highlight: {background: '#0284c7', border: '#0284c7'}}, shape: 'box', font: {color: 'white', size: 12} }
+                author: { color: {background: '#e0f2fe', border: '#0284c7', highlight: {background: '#f3e8ff', border: '#7e22ce'}}, shape: 'dot', size: 9, font: {size: 11} },
+                discipline: { color: {background: '#111827', border: '#000', highlight: {background: '#581c87', border: '#3b0764'}}, shape: 'box', font: {color: 'white', size: 12} }
             },
-            edges: { color: { color: '#9ca3af', highlight: '#0284c7' }, width: 1, selectionWidth: 3 },
-            physics: { enabled: true, barnesHut: { gravitationalConstant: -1800, centralGravity: 0.3, springLength: 95, damping: 0.09 }, stabilization: { iterations: 180 } }
+            edges: { color: { color: '#9ca3af', highlight: '#7e22ce' }, width: 1, selectionWidth: 3 },
+            physics: { enabled: true, barnesHut: { gravitationalConstant: -2000, damping: 0.09 }, stabilization: { iterations: 150 } }
         };
         
         network = new vis.Network(document.getElementById('networkContainer'), {nodes: networkNodesData, edges: edgesData}, options);
@@ -834,54 +706,14 @@
 
         network.on("click", function (params) {
             if (params.nodes.length > 0) {
-                let clickedNodeId = params.nodes[0];
-                let currentSelection = network.getSelectedNodes();
-                
-                if (currentSelection.length === 1 && currentSelection[0] === clickedNodeId && network.getSelectedEdges().length === 0) {
-                    network.unselectAll();
-                    let resetArray = Array.from(windowNodesMap.values()).map(n => ({ 
-                        id: n.id, 
-                        font: { bold: false, size: n.group==='author'?11:12, color: n.group==='discipline'?'#ffffff':'#111827' },
-                        color: n.group==='author' ? {background: '#e0f2fe', border: '#0284c7'} : {background: '#111827', border: '#000'}
-                    }));
-                    networkNodesData.update(resetArray);
-                    document.getElementById('sidebarTitle').innerText = "Intellectual Hub";
-                    document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections.";
-                    document.getElementById('sidebarLinks').innerHTML = '';
-                    return;
-                }
-                
-                let neighbors = network.getConnectedNodes(clickedNodeId);
-                let updateArray = Array.from(windowNodesMap.values()).map(n => ({ 
-                    id: n.id, 
-                    font: { bold: false, size: n.group==='author'?11:12, color: n.group==='discipline'?'#ffffff':'#111827' },
-                    color: n.group==='author' ? {background: '#e0f2fe', border: '#0284c7'} : {background: '#111827', border: '#000'}
-                }));
+                let nodeId = params.nodes[0];
+                let neighbors = network.getConnectedNodes(nodeId);
+                let updateArray = Array.from(windowNodesMap.values()).map(n => ({ id: n.id, font: {bold: false, size: n.group==='author'?11:12} }));
                 networkNodesData.update(updateArray);
-
-                let highlightArray = neighbors.map(nId => ({ 
-                    id: nId, 
-                    font: { bold: true, size: 13, color: '#0284c7' },
-                    color: { background: '#bae6fd', border: '#0284c7' }
-                }));
-                highlightArray.push({ 
-                    id: clickedNodeId, 
-                    font: { bold: true, size: 16, color: '#0284c7' },
-                    color: { background: '#0284c7', border: '#000' }
-                });
+                let highlightArray = neighbors.map(nId => ({ id: nId, font: {bold: true, size: 14} }));
+                highlightArray.push({ id: nodeId, font: {bold: true, size: 16} });
                 networkNodesData.update(highlightArray);
-                updateSidebar(clickedNodeId, neighbors);
-            } else {
-                network.unselectAll();
-                let resetArray = Array.from(windowNodesMap.values()).map(n => ({ 
-                    id: n.id, 
-                    font: { bold: false, size: n.group==='author'?11:12, color: n.group==='discipline'?'#ffffff':'#111827' },
-                    color: n.group==='author' ? {background: '#e0f2fe', border: '#0284c7'} : {background: '#111827', border: '#000'}
-                }));
-                networkNodesData.update(resetArray);
-                document.getElementById('sidebarTitle').innerText = "Intellectual Hub";
-                document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections.";
-                document.getElementById('sidebarLinks').innerHTML = '';
+                updateSidebar(nodeId, neighbors);
             }
         });
         
@@ -932,7 +764,7 @@
         });
     }
 
-    // --- Tab Switching & Suggestion Bar Controller ---
+    // --- Tab Switching ---
     function openTab(tabId, element) {
         $('.tab-content').removeClass('active');
         $('.tab-btn').removeClass('active');
@@ -946,13 +778,6 @@
             $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'allTab');
         } else {
             $('#tableControls').hide(); 
-        }
-
-        if(tabId === 'journalTab' || tabId === 'lectureTab') {
-            $('#suggestionBar').css('display', 'flex');
-            refreshSuggestions();
-        } else {
-            $('#suggestionBar').hide();
         }
     }
 
