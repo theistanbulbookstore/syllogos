@@ -53,7 +53,7 @@
         .suggestion-pill:hover { border-color: var(--border-dark); background: #f9fafb; }
 
         /* Catalog Note */
-        #catalogNote { background-color: #f9fafb; border-left: 4px solid var(--accent-cyan); padding: 12px 16px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-color); display: none; line-height: 1.6; max-width: 1200px; }
+        #catalogNote { background-color: #f9fafb; border-left: 4px solid var(--accent-cyan); padding: 10px 16px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-color); display: none; line-height: 1.5; width: 100%; box-sizing: border-box; }
 
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
         .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
@@ -145,8 +145,8 @@
 
     <!-- Archival Notes -->
     <div id="catalogNote">
-        <p style="margin-top: 0; margin-bottom: 8px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em>, the scholarly periodical of the Hellenic Philological Society of Constantinople, gives author names primarily in the genitive form (Ζωγράφου/Zografou rather than Ζωγράφος/Zografos). The index for the Society's public lectures, on the other hand, largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both the nominative and the genitive across the two indices. If looking for Zografos/Ζωγράφος, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
-        <p style="margin: 0;">Also note that the <em>Syngramma Periodikon</em> frequently published documents pertaining to the internal workings of the Society (meeting reports, updates on donations, etc.) and book excerpts. These are included only selectively in the 1922 cumulative index of scholarly publications this project is based on. If researching such material, please refer to the actual volumes.</p>
+        <p style="margin-top: 0; margin-bottom: 6px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em>, the scholarly periodical of the Hellenic Philological Society of Constantinople, gives author names primarily in the genitive form (Ζωγράφου/Zografou rather than Ζωγράφος/Zografos). The index for the Society's public lectures, on the other hand, largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both the nominative and the genitive across the two indices. If looking for Zografos/Ζωγράφος, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
+        <p style="margin: 0;">Also note that the <em>Syngramma Periodikon</em> frequently published documents pertaining to the internal workings of the Society (meeting reports, updates on donations, etc.) and book excerpts. These are included only selectively in the 1922 cumulative index this project is based on. If researching such material, please refer to the actual volumes.</p>
     </div>
 
     <!-- TAB 1: Journal -->
@@ -294,7 +294,7 @@
 
     <!-- TAB 8: About -->
     <div id="aboutTab" class="tab-content">
-        <div style="display: flex; gap: 40px; flex-wrap: wrap; max-width: 1100px;">
+        <div style="display: flex; align-items: center; gap: 40px; flex-wrap: wrap; max-width: 1100px;">
             <div style="flex: 1; min-width: 400px;">
                 <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
                 <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
@@ -305,7 +305,7 @@
                 <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
             </div>
             <div style="flex: 0 0 350px;">
-                <img src="about1.png" alt="Syllogos Building" style="width: 100%; border: 1px solid var(--border-light); padding: 5px; background: white;">
+                <img src="about1.png" alt="Syllogos Building" style="width: 100%; border-radius: 2px;">
             </div>
         </div>
     </div>
@@ -347,7 +347,6 @@
     // --- UI Helper (Converts Polytonic to clean Monotonic with Tonos) ---
     function toMonotonic(str) {
         if (!str) return "";
-        // Removes breathings (0313, 0314), circumflex (0342), grave (0300), diaeresis (0308) but preserves acute accents
         return str.normalize("NFD").replace(/[\u0313\u0314\u0342\u0300\u0308]/g, "").normalize("NFC");
     }
 
@@ -435,7 +434,6 @@
         buildNetwork();
         setupCustomFilters();
         
-        // Ensure suggestion bar and note are visible immediately if on Tab 1 or 2
         if ($('.tab-content.active').attr('id') === 'journalTab' || $('.tab-content.active').attr('id') === 'lectureTab') {
             $('#suggestionBar').css('display', 'flex');
             $('#catalogNote').show();
@@ -443,11 +441,9 @@
         }
     }
 
-    // --- Dynamic Keyword Suggestions Engine (Draws strictly from the Active Tab to ensure results) ---
+    // --- Dynamic Keyword Suggestions Engine ---
     function refreshSuggestions() {
-        // Master Expanded Dictionary of Top Dataset Concepts
         const conceptDict = {
-            // Disciplines
             "History": "Ιστορία", "Philology": "Φιλολογία", "Classics": "Κλασικές Σπουδές",
             "Medicine": "Ιατρική", "Literature": "Λογοτεχνία", "Science": "Επιστήμη",
             "Archaeology": "Αρχαιολογία", "Philosophy": "Φιλοσοφία", "Natural Sciences": "Φυσικές Επιστήμες",
@@ -457,14 +453,12 @@
             "Anthropology": "Ανθρωπολογία", "Epigraphy": "Επιγραφική", "Paleography": "Παλαιογραφία",
             "Topography": "Τοπογραφία", "Biology": "Βιολογία", "Chemistry": "Χημεία", "Physics": "Φυσική",
             
-            // Geography & Places
             "Constantinople": "Κωνσταντινούπολη", "Athens": "Αθήνα", "Macedonia": "Μακεδονία",
             "Thrace": "Θράκη", "Epirus": "Ήπειρος", "Cyprus": "Κύπρος", "Crete": "Κρήτη",
             "Bosphorus": "Βόσπορος", "Smyrna": "Σμύρνη", "Chios": "Χίος", "Asia Minor": "Μικρά Ασία",
             "Lesbos": "Λέσβος", "Pontus": "Πόντος", "Greece": "Ελλάδα", "Europe": "Ευρώπη",
             "Orient": "Ανατολή", "Rome": "Ρώμη", "Byzantium": "Βυζάντιο", "Ottoman": "Οθωμανικός",
             
-            // High-Frequency Academic Concepts
             "Ancient": "Αρχαίος", "Modern": "Νεότερος", "Inscriptions": "Επιγραφές",
             "Language": "Γλώσσα", "Greeks": "Έλληνες", "Poetry": "Ποίηση", "Songs": "Τραγούδια",
             "Schools": "Σχολεία", "Century": "Αιώνας", "Hygiene": "Υγιεινή", "Woman": "Γυναίκα",
@@ -477,12 +471,10 @@
             "Cholera": "Χολέρα", "Health": "Υγεία", "Youth": "Νεολαία", "Public": "Δημόσιος",
             "Teachers": "Δάσκαλοι", "Competition": "Διαγωνισμός", "Report": "Έκθεση", "Address": "Λόγος",
             
-            // Core Historical Figures
             "Homer": "Όμηρος", "Sophocles": "Σοφοκλής", "Euripides": "Ευριπίδης", 
             "Plato": "Πλάτων", "Aristotle": "Αριστοτέλης", "Socrates": "Σωκράτης"
         };
         
-        // Target ONLY the data currently visible to the user
         let activeTab = $('.tab-content.active').attr('id');
         let poolSource = (activeTab === 'lectureTab') ? lectureDataGlobal : journalDataGlobal;
         if (!poolSource || poolSource.length === 0) poolSource = masterData;
@@ -490,7 +482,6 @@
         let candidateMap = new Map();
 
         poolSource.forEach(row => {
-            // 1. Safe Mapping: Disciplines
             if (row.disciplines && row.disciplines !== "N/A") {
                 row.disciplines.split(',').forEach(d => {
                     let cleanD = d.trim();
@@ -498,25 +489,22 @@
                 });
             }
             
-            // 2. Safe Mapping: Authors (Dynamically extract last name and pair English/Greek perfectly)
             if (row.author_english && row.author_greek && row.author_english !== "N/A" && row.author_greek !== "N/A" && row.standard_author !== "Anonymous") {
                 let enParts = row.author_english.replace(/[^a-zA-Z\s]/g, "").trim().split(/\s+/);
                 let grParts = row.author_greek.trim().split(/\s+/);
                 if (enParts.length > 0 && grParts.length > 0) {
                     let enLast = enParts[enParts.length - 1];
                     let grLast = grParts[grParts.length - 1].replace(/[,.]/g, "");
-                    grLast = toMonotonic(grLast); // Convert Polytonic to Monotonic
+                    grLast = toMonotonic(grLast);
                     if (enLast.length > 3 && grLast.length > 3 && !enLast.includes('.') && !grLast.includes('.')) {
                         candidateMap.set(`auth_${enLast}`, { en: enLast, gr: grLast, search: enLast });
                     }
                 }
             }
 
-            // 3. Safe Mapping: Title Concepts
             if (row.title_english && row.title_english !== "N/A") {
                 let enTitleLower = row.title_english.toLowerCase();
                 for (let key in conceptDict) {
-                    // Check if the concept exists in the English title text
                     if (enTitleLower.includes(key.toLowerCase())) {
                         candidateMap.set(`title_${key}`, { en: key, gr: conceptDict[key], search: key });
                     }
@@ -524,7 +512,6 @@
             }
         });
 
-        // Pull 8 random, guaranteed-to-match suggestions
         let termsArray = Array.from(candidateMap.values());
         let shuffled = termsArray.sort(() => 0.5 - Math.random()).slice(0, 8);
         
@@ -560,7 +547,7 @@
             'Psychology', 'Publishing', 'Religion', 'Science', 'Sociology', 'Sports Science'
         ];
         
-        let html = `<div class="tag-container">`;
+        let html = `<div class="tag-container" style="max-width: 320px;">`;
         visibleTags.forEach(tag => {
             let isParent = parentDomains.includes(tag);
             let pillClass = isParent ? "tag-pill parent-tag" : "tag-pill";
