@@ -1,7 +1,5 @@
 import pandas as pd
 
-# Exhaustive Taxonomy Map for all 119 tags present in the dataset.
-# Format: "Specific Subfield": ["Parent Field 1", "Parent Field 2"]
 DISCIPLINE_MAP = {
     # --- HISTORY BRANCHES ---
     "Ottoman History": ["History"],
@@ -18,19 +16,19 @@ DISCIPLINE_MAP = {
     # --- HISTORY OF [X] ---
     "History of Architecture": ["History", "Architecture"],
     "History of Education": ["History", "Education"],
-    "History of Geography": ["History", "Geography"],
+    "History of Geography": ["History", "Geography & Earth Sciences"],
     "History of Medicine": ["History", "Medicine"],
     "History of Philosophy": ["History", "Philosophy"],
-    "History of Science": ["History", "Science"],
+    "History of Science": ["History", "Natural & Exact Science"],
     "Art History": ["History", "Art"],
 
     # --- MEDICINE & HEALTH ---
+    "Health": ["Medicine"],
+    "Nutrition": ["Medicine", "Health"],
     "Cardiology": ["Medicine"],
     "Epidemiology": ["Medicine", "Public Health"],
-    "Health": ["Medicine"],
     "Neuroscience": ["Medicine", "Psychology"],
     "Nursing": ["Medicine"],
-    "Nutrition": ["Medicine", "Health"],
     "Obstetrics": ["Medicine"],
     "Ophthalmology": ["Medicine"],
     "Pediatrics": ["Medicine"],
@@ -40,29 +38,23 @@ DISCIPLINE_MAP = {
     "Eugenics": ["Medicine", "Sociology"], 
 
     # --- SCIENCE, NATURE & MATH ---
-    "Agriculture": ["Science"],
-    "Astronomy": ["Science", "Natural Sciences"],
-    "Biology": ["Science", "Natural Sciences"],
-    "Botany": ["Science", "Natural Sciences"],
-    "Chemistry": ["Science", "Natural Sciences"],
-    "Climatology": ["Science", "Geography"],
-    "Cosmology": ["Science", "Astronomy"],
-    "Earth Sciences": ["Science", "Geology"],
-    "Environmental Science": ["Science"],
-    "Geology": ["Science", "Natural Sciences"],
-    "Meteorology": ["Science", "Geography"],
-    "Mineralogy": ["Science", "Natural Sciences"],
-    "Natural History": ["Science", "Natural Sciences"],
-    "Natural Sciences": ["Science"],
-    "Physics": ["Science", "Natural Sciences"],
-    "Physiology": ["Science", "Biology"],
-    "Seismology": ["Science", "Geology"],
-    "Zoology": ["Science", "Natural Sciences"],
-    "Mathematics": ["Science"],
-    "Statistics": ["Science", "Mathematics"],
-    "Metrology": ["Science"],
-    "Engineering": ["Science"],
-    "Mining": ["Science", "Engineering"],
+    "Science": ["Natural & Exact Science"],
+    "Natural Sciences": ["Natural & Exact Science"],
+    "Agriculture": ["Natural & Exact Science"],
+    "Astronomy": ["Natural & Exact Science"],
+    "Cosmology": ["Natural & Exact Science", "Astronomy"],
+    "Biology": ["Natural & Exact Science"],
+    "Physiology": ["Natural & Exact Science", "Biology"],
+    "Botany": ["Natural & Exact Science"],
+    "Chemistry": ["Natural & Exact Science"],
+    "Environmental Science": ["Natural & Exact Science"],
+    "Natural History": ["Natural & Exact Science"],
+    "Physics": ["Natural & Exact Science"],
+    "Zoology": ["Natural & Exact Science"],
+    "Mathematics": ["Natural & Exact Science"],
+    "Statistics": ["Natural & Exact Science", "Mathematics"],
+    "Engineering": ["Natural & Exact Science"],
+    "Mining": ["Natural & Exact Science", "Engineering"],
 
     # --- LITERATURE & TEXTS ---
     "Comparative Literature": ["Literature"],
@@ -85,16 +77,24 @@ DISCIPLINE_MAP = {
     "Sigillography": ["Archaeology", "History"],
 
     # --- GEOGRAPHY & PLACE ---
-    "Topography": ["Geography"],
-    "Toponymy": ["Geography", "Linguistics"],
-    "Exploration": ["Geography", "History"],
-    "Travel": ["Geography"],
+    "Geography": ["Geography & Earth Sciences"],
+    "Earth Sciences": ["Geography & Earth Sciences"],
+    "Topography": ["Geography & Earth Sciences"],
+    "Toponymy": ["Geography & Earth Sciences", "Linguistics"],
+    "Exploration": ["Geography & Earth Sciences", "History"],
+    "Travel": ["Geography & Earth Sciences"],
+    "Geology": ["Natural & Exact Science", "Geography & Earth Sciences"],
+    "Mineralogy": ["Natural & Exact Science", "Geography & Earth Sciences"],
+    "Seismology": ["Natural & Exact Science", "Geography & Earth Sciences"],
+    "Climatology": ["Natural & Exact Science", "Geography & Earth Sciences"],
+    "Meteorology": ["Natural & Exact Science", "Geography & Earth Sciences"],
+    "Urban Studies": ["Sociology", "Geography & Earth Sciences"],
 
     # --- PHILOSOPHY & RELIGION ---
     "Ethics": ["Philosophy"],
     "Logic": ["Philosophy"],
     "Aesthetics": ["Philosophy", "Art"],
-    "Philosophy of Science": ["Philosophy", "Science"],
+    "Philosophy of Science": ["Philosophy", "Natural & Exact Science"],
     "Theology": ["Religion"],
     "Mythology": ["Religion", "Folklore"],
     "Islamic Studies": ["Religion", "History"],
@@ -106,17 +106,28 @@ DISCIPLINE_MAP = {
     "Museology": ["Art", "History"],
 
     # --- SOCIAL SCIENCES & HUMANITIES ---
+    "Folklore": ["Anthropology"],
     "Ethnology": ["Anthropology"],
     "Ethnography": ["Anthropology"],
     "Demography": ["Sociology"],
-    "Criminology": ["Sociology", "Law"],
+    "Criminology": ["Sociology", "Law & Political Science"],
     "Labor Studies": ["Sociology", "Economics"],
-    "Urban Studies": ["Sociology", "Geography"],
     "Women's Studies": ["Sociology", "Cultural Studies"],
     "Gender Studies": ["Sociology", "Cultural Studies"],
-    "International Relations": ["Political Science"],
     
+    # --- LAW & POLITICAL SCIENCE (Administration removed) ---
+    "Law": ["Law & Political Science"],
+    "Political Science": ["Law & Political Science"],
+    "International Relations": ["Law & Political Science"],
+
+    # --- EDUCATION ---
+    "Physical Education": ["Education"],
+
+    # --- ECONOMICS ---
+    "Metrology": ["Natural & Exact Science", "Economics"],
+
     # --- PUBLISHING / INFO ---
+    "Library Science": ["Publishing"],
     "Bibliography": ["Library Science", "Publishing"],
     "Journalism": ["Publishing"]
 }
@@ -136,7 +147,10 @@ def expand_disciplines(discipline_str):
     return ", ".join(sorted(list(expanded_tags)))
 
 def apply_taxonomy():
-    input_csv = 'philological_society_deduped_ai_additive.csv'
+    # Read from the yedek folder
+    input_csv = 'yedek/philological_society_deduped_ai_additive-beforestep2-taxonomymapping.csv'
+    
+    # Save the output to the main folder (one level up from yedek)
     output_csv = 'philological_society_deduped_final.csv'
     
     print(f"Loading {input_csv}...")
@@ -145,7 +159,7 @@ def apply_taxonomy():
     df['disciplines'] = df['disciplines'].apply(expand_disciplines)
     
     df.to_csv(output_csv, index=False, encoding='utf-8-sig')
-    print(f"✅ Success! Taxonomy applied. Master dataset saved to '{output_csv}'.")
+    print(f"✅ Success! Taxonomy applied. Master dataset saved to root folder as '{output_csv}'.")
 
 if __name__ == "__main__":
     apply_taxonomy()

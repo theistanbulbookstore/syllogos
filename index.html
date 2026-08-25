@@ -299,7 +299,7 @@
                 <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
                 <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
                 <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
-                <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%BD_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
+                <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
                 <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
                 <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
                 <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
@@ -436,7 +436,7 @@
         
         if ($('.tab-content.active').attr('id') === 'journalTab' || $('.tab-content.active').attr('id') === 'lectureTab') {
             $('#suggestionBar').css('display', 'flex');
-            $('#catalogNote').show();
+            if($('.tab-content.active').attr('id') === 'journalTab') { $('#catalogNote').show(); } else { $('#catalogNote').hide(); }
             refreshSuggestions();
         }
     }
@@ -541,10 +541,12 @@
         
         const parentDomains = [
             'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
-            'Cultural Studies', 'Economics', 'Education', 'Folklore', 'Geography', 
-            'History', 'Law', 'Library Science', 'Literature', 'Medicine', 'Music', 
-            'Philology', 'Philosophy', 'Physical Education', 'Political Science', 
-            'Psychology', 'Publishing', 'Religion', 'Science', 'Sociology', 'Sports Science'
+            'Astronomy', 'Biology', 'Cultural Studies', 'Economics', 'Education', 
+            'Engineering', 'Folklore', 'Geography & Earth Sciences', 'Health', 
+            'History', 'Law & Political Science', 'Library Science', 'Linguistics', 
+            'Literature', 'Mathematics', 'Medicine', 'Music', 'Natural & Exact Science', 
+            'Philology', 'Philosophy', 'Psychology', 'Public Health', 'Publishing', 
+            'Religion', 'Sociology', 'Sports Science', 'Theater Studies'
         ];
         
         let html = `<div class="tag-container" style="max-width: 320px;">`;
@@ -972,7 +974,7 @@
 
         if(tabId === 'journalTab' || tabId === 'lectureTab' || tabId === 'allTab') {
             $('#tableControls').show();
-            $('#catalogNote').show();
+            if(tabId === 'journalTab') { $('#catalogNote').show(); } else { $('#catalogNote').hide(); }
             $('#filterYearPubs').toggle(tabId === 'journalTab');
             $('#filterYearLecs').toggle(tabId === 'lectureTab');
             $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'allTab');
