@@ -737,8 +737,8 @@
                     yearsPubs.add(row.volume_or_year_greek);
                 }
             }
-            if (row.disciplines && row.disciplines !== "N/A" && row.disciplines.toLowerCase() !== "null") {
-                row.disciplines.split(',').forEach(d => disciplines.add(d.trim()));
+            if (row.primary_disciplines && row.primary_disciplines !== "N/A" && row.primary_disciplines.toLowerCase() !== "uncategorized") {
+                row.primary_disciplines.split(',').forEach(d => disciplines.add(d.trim()));
             }
 
             if (row.entry_type === "Public Lecture") {
@@ -881,6 +881,13 @@
             return `<span>${row.title_english || row.title_greek || ''}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${row.title_english ? (row.title_greek || '') : ''}</span>`;
         };
 
+        const renderCombinedDisciplines = (data, type, row) => {
+            let base = row.disciplines && row.disciplines !== "N/A" ? row.disciplines.split(',').map(t=>t.trim()) : [];
+            let prim = row.primary_disciplines && row.primary_disciplines !== "N/A" ? row.primary_disciplines.split(',').map(t=>t.trim()) : [];
+            let combined = [...new Set([...base, ...prim])].filter(t=>t).join(', ');
+            return renderDisciplines(combined, type, row);
+        };
+
         window.jt = $('#journalTable').DataTable({ 
             data: journal, 
             pageLength: 25, 
@@ -891,7 +898,7 @@
                 { data: null, render: renderTitle }, 
                 { data: 'subsection_greek' }, 
                 { data: 'page_numbers' }, 
-                { data: 'disciplines', render: renderDisciplines }, 
+                { data: null, render: renderCombinedDisciplines }, 
                 { data: null, render: renderScanBtn, orderable: false }, 
                 { data: null, render: renderCiteBtn, orderable: false } 
             ] 
@@ -906,7 +913,7 @@
                 { data: null, render: renderAuthor }, 
                 { data: null, render: renderTitle }, 
                 { data: 'lecture_count' }, 
-                { data: 'disciplines', render: renderDisciplines }, 
+                { data: null, render: renderCombinedDisciplines }, 
                 { data: null, render: renderScanBtn, orderable: false }, 
                 { data: null, render: renderCiteBtn, orderable: false } 
             ] 
@@ -921,7 +928,7 @@
                 { data: null, render: renderFlippedAuthor }, 
                 { data: null, render: renderTitle }, 
                 { data: 'entry_type' }, 
-                { data: 'disciplines', render: renderDisciplines }, 
+                { data: null, render: renderCombinedDisciplines }, 
                 { data: null, render: renderScanBtn, orderable: false }, 
                 { data: null, render: renderCiteBtn, orderable: false } 
             ] 
@@ -941,7 +948,7 @@
                 if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             }
             if ((tableId === 'journalTab' || tableId === 'allTab') && anonChecked && rowObj.standard_author !== "Anonymous") return false;
-            if (discFilter && (!rowObj.disciplines || !rowObj.disciplines.includes(discFilter))) return false;
+            if (discFilter && (!rowObj.primary_disciplines || !rowObj.primary_disciplines.includes(discFilter))) return false;
             if (query && !removeGreekAccents(rowObj.search_text || "").includes(query)) return false;
             return true;
         });
@@ -1005,7 +1012,7 @@
         
         masterData.forEach(row => {
             if (row.standard_author === "Anonymous") return;
-            if (discFilter && (!row.disciplines || !row.disciplines.includes(discFilter))) return;
+            if (discFilter && (!row.primary_disciplines || !row.primary_disciplines.includes(discFilter))) return;
             
             if (row.entry_type === "Public Lecture") {
                 if (!yrLec || row.volume_or_year_greek === yrLec) {
@@ -1046,12 +1053,11 @@
     function buildSmartPieChart(dataset, canvasId) {
         let counts = {};
         dataset.forEach(row => {
-            if(!row.disciplines || row.disciplines === "N/A") return;
-            row.disciplines.split(',').forEach(d => {
+            if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
+            row.primary_disciplines.split(',').forEach(d => {
                 let dName = d.trim();
                 if(!dName || dName.toLowerCase() === 'null') return;
                 
-                // STATISTICAL FIX: Only count Top Level Mothers for the pie chart
                 if (!topLevelDomains.includes(dName)) return; 
                 
                 counts[dName] = (counts[dName] || 0) + 1;
@@ -1102,14 +1108,12 @@
                 let dName = d.trim();
                 if(!dName || dName.toLowerCase() === 'null') return;
                 
-                // Exclude the Top Level Mothers from this granular frequency count
                 if (topLevelDomains.includes(dName)) return; 
                 
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
         
-        // Show Top 15 specific/granular tags
         let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 15);
         if(chartInstances[canvasId]) { 
             chartInstances[canvasId].destroy(); 
@@ -1151,10 +1155,9 @@
     function renderInteractiveLineChart(dataset, canvasId) {
         let discCounts = {};
         dataset.forEach(row => {
-            if(row.disciplines && row.disciplines !== "N/A") {
-                row.disciplines.split(',').forEach(d => {
+            if(row.primary_disciplines && row.primary_disciplines !== "N/A") {
+                row.primary_disciplines.split(',').forEach(d => {
                     let dName = d.trim();
-                    // STATISTICAL FIX: Line charts strictly track the 20 Top-Level Mothers
                     if(dName && dName.toLowerCase() !== 'null' && topLevelDomains.includes(dName)) { 
                         discCounts[dName] = (discCounts[dName] || 0) + 1; 
                     }
@@ -1174,8 +1177,8 @@
             }
             yearCounts[yr]["Total Output"]++;
             
-            if(row.disciplines && row.disciplines !== "N/A") {
-                row.disciplines.split(',').forEach(d => {
+            if(row.primary_disciplines && row.primary_disciplines !== "N/A") {
+                row.primary_disciplines.split(',').forEach(d => {
                     let dName = d.trim();
                     if(dName && yearCounts[yr][dName] !== undefined) {
                         yearCounts[yr][dName]++;
