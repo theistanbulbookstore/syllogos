@@ -11,7 +11,6 @@ DISCIPLINE_MAP = {
     "Chronology": ["History"],
     "Genealogy": ["History"],
     "Biography": ["History"],
-    "Sports History": ["History", "Sports Science"],
     
     # --- HISTORY OF [X] ---
     "History of Architecture": ["History", "Architecture"],
@@ -115,21 +114,24 @@ DISCIPLINE_MAP = {
     "Women's Studies": ["Sociology", "Cultural Studies"],
     "Gender Studies": ["Sociology", "Cultural Studies"],
     
-    # --- LAW & POLITICAL SCIENCE (Administration removed) ---
+    # --- LAW & POLITICAL SCIENCE ---
     "Law": ["Law & Political Science"],
     "Political Science": ["Law & Political Science"],
     "International Relations": ["Law & Political Science"],
 
-    # --- EDUCATION ---
+    # --- EDUCATION & SPORTS ---
     "Physical Education": ["Education"],
+    "Sports Science": ["Education"],
+    "Sports History": ["History", "Sports Science", "Education"],
 
     # --- ECONOMICS ---
     "Metrology": ["Natural & Exact Science", "Economics"],
 
     # --- PUBLISHING / INFO ---
-    "Library Science": ["Publishing"],
-    "Bibliography": ["Library Science", "Publishing"],
-    "Journalism": ["Publishing"]
+    "Publishing": ["Education"],
+    "Library Science": ["Philology"],
+    "Bibliography": ["Library Science", "Philology"],
+    "Journalism": ["Literature"]
 }
 
 def expand_disciplines(discipline_str):
@@ -147,10 +149,8 @@ def expand_disciplines(discipline_str):
     return ", ".join(sorted(list(expanded_tags)))
 
 def apply_taxonomy():
-    # Read from the yedek folder
+    # Make sure this points to your specific "before mapping" file
     input_csv = 'yedek/philological_society_deduped_ai_additive-beforestep2-taxonomymapping.csv'
-    
-    # Save the output to the main folder (one level up from yedek)
     output_csv = 'philological_society_deduped_final.csv'
     
     print(f"Loading {input_csv}...")
