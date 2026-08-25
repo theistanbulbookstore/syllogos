@@ -52,6 +52,9 @@
         .suggestion-pill { background: #ffffff; border: 1px solid var(--border-light); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); border-radius: 2px; transition: 0.2s; }
         .suggestion-pill:hover { border-color: var(--border-dark); background: #f9fafb; }
 
+        /* Catalog Note */
+        #catalogNote { background-color: #f9fafb; border-left: 4px solid var(--accent-cyan); padding: 12px 16px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-color); display: none; line-height: 1.6; max-width: 1200px; }
+
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
         .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
         .tab-btn:hover { border-color: var(--border-dark); }
@@ -68,7 +71,7 @@
         .btn-small:hover { border-color: var(--border-dark); background: var(--border-dark); color: #ffffff; }
 
         /* Tag Pill UI Enhancements */
-        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; max-width: 250px; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px; }
         .tag-pill { background-color: #f3f4f6; border: 1px solid var(--border-light); padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; color: var(--text-color); white-space: nowrap; }
         .tag-pill.parent-tag { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
         .tag-more-btn { background: none; border: none; color: var(--accent-cyan); font-size: 0.7rem; cursor: pointer; padding: 2px 4px; font-family: var(--font-mono); text-decoration: underline; }
@@ -113,7 +116,7 @@
 
     <!-- Navigation Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('journalTab', this)">1. Journal & Special Pubs</button>
+        <button class="tab-btn active" onclick="openTab('journalTab', this)">1. Journal and Special Publications</button>
         <button class="tab-btn" onclick="openTab('lectureTab', this)">2. Public Lectures</button>
         <button class="tab-btn" onclick="openTab('semanticTab', this)">3. Semantic Search</button>
         <button class="tab-btn" onclick="openTab('analyticsTab', this)">4. Visual Analytics</button>
@@ -134,10 +137,16 @@
         </div>
     </div>
 
-    <!-- Suggestion Bar for Tabs 1 & 2 (8 Gerardos-style pills) -->
+    <!-- Suggestion Bar -->
     <div class="suggestion-bar" id="suggestionBar">
         <button class="suggestion-btn" onclick="refreshSuggestions()">🎲 Suggest Keywords</button>
         <div id="suggestionPills" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+    </div>
+
+    <!-- Archival Notes -->
+    <div id="catalogNote">
+        <p style="margin-top: 0; margin-bottom: 8px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em>, the scholarly periodical of the Hellenic Philological Society of Constantinople, gives author names primarily in the genitive form (Ζωγράφου/Zografou rather than Ζωγράφος/Zografos). The index for the Society's public lectures, on the other hand, largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both the nominative and the genitive across the two indices. If looking for Zografos/Ζωγράφος, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
+        <p style="margin: 0;">Also note that the <em>Syngramma Periodikon</em> frequently published documents pertaining to the internal workings of the Society (meeting reports, updates on donations, etc.) and book excerpts. These are included only selectively in the 1922 cumulative index of scholarly publications this project is based on. If researching such material, please refer to the actual volumes.</p>
     </div>
 
     <!-- TAB 1: Journal -->
@@ -284,14 +293,21 @@
     </div>
 
     <!-- TAB 8: About -->
-    <div id="aboutTab" class="tab-content" style="max-width: 900px;">
-        <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
-        <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
-        <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
-        <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%BD_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
-        <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
-        <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
-        <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
+    <div id="aboutTab" class="tab-content">
+        <div style="display: flex; gap: 40px; flex-wrap: wrap; max-width: 1100px;">
+            <div style="flex: 1; min-width: 400px;">
+                <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
+                <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
+                <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
+                <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%BD_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
+                <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
+                <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
+                <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
+            </div>
+            <div style="flex: 0 0 350px;">
+                <img src="about1.png" alt="Syllogos Building" style="width: 100%; border: 1px solid var(--border-light); padding: 5px; background: white;">
+            </div>
+        </div>
     </div>
 
     <!-- Scan Lightbox Modal -->
@@ -322,10 +338,17 @@
     let networkNodesData;
     const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
 
-    // --- Accent Agnostic Normalizer Helper for Greek & English ---
+    // --- Search Helper (Strips all accents for background search) ---
     function removeGreekAccents(str) {
         if (!str) return "";
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    // --- UI Helper (Converts Polytonic to clean Monotonic with Tonos) ---
+    function toMonotonic(str) {
+        if (!str) return "";
+        // Removes breathings (0313, 0314), circumflex (0342), grave (0300), diaeresis (0308) but preserves acute accents
+        return str.normalize("NFD").replace(/[\u0313\u0314\u0342\u0300\u0308]/g, "").normalize("NFC");
     }
 
     // --- Entity Resolution Engine (Streamlined) ---
@@ -412,51 +435,107 @@
         buildNetwork();
         setupCustomFilters();
         
-        refreshSuggestions();
+        // Ensure suggestion bar and note are visible immediately if on Tab 1 or 2
+        if ($('.tab-content.active').attr('id') === 'journalTab' || $('.tab-content.active').attr('id') === 'lectureTab') {
+            $('#suggestionBar').css('display', 'flex');
+            $('#catalogNote').show();
+            refreshSuggestions();
+        }
     }
 
-    // --- Keyword Suggestions Engine (8 pills, monotonized Greek pills, tab-specific) ---
+    // --- Dynamic Keyword Suggestions Engine (Draws strictly from the Active Tab to ensure results) ---
     function refreshSuggestions() {
+        // Master Expanded Dictionary of Top Dataset Concepts
+        const conceptDict = {
+            // Disciplines
+            "History": "Ιστορία", "Philology": "Φιλολογία", "Classics": "Κλασικές Σπουδές",
+            "Medicine": "Ιατρική", "Literature": "Λογοτεχνία", "Science": "Επιστήμη",
+            "Archaeology": "Αρχαιολογία", "Philosophy": "Φιλοσοφία", "Natural Sciences": "Φυσικές Επιστήμες",
+            "Religion": "Θρησκεία", "Education": "Εκπαίδευση", "Sociology": "Κοινωνιολογία",
+            "Geography": "Γεωγραφία", "Byzantine Studies": "Βυζαντινές Σπουδές", "Linguistics": "Γλωσσολογία",
+            "Public Health": "Δημόσια Υγεία", "Art": "Τέχνη", "Music": "Μουσική", "Law": "Νομική",
+            "Anthropology": "Ανθρωπολογία", "Epigraphy": "Επιγραφική", "Paleography": "Παλαιογραφία",
+            "Topography": "Τοπογραφία", "Biology": "Βιολογία", "Chemistry": "Χημεία", "Physics": "Φυσική",
+            
+            // Geography & Places
+            "Constantinople": "Κωνσταντινούπολη", "Athens": "Αθήνα", "Macedonia": "Μακεδονία",
+            "Thrace": "Θράκη", "Epirus": "Ήπειρος", "Cyprus": "Κύπρος", "Crete": "Κρήτη",
+            "Bosphorus": "Βόσπορος", "Smyrna": "Σμύρνη", "Chios": "Χίος", "Asia Minor": "Μικρά Ασία",
+            "Lesbos": "Λέσβος", "Pontus": "Πόντος", "Greece": "Ελλάδα", "Europe": "Ευρώπη",
+            "Orient": "Ανατολή", "Rome": "Ρώμη", "Byzantium": "Βυζάντιο", "Ottoman": "Οθωμανικός",
+            
+            // High-Frequency Academic Concepts
+            "Ancient": "Αρχαίος", "Modern": "Νεότερος", "Inscriptions": "Επιγραφές",
+            "Language": "Γλώσσα", "Greeks": "Έλληνες", "Poetry": "Ποίηση", "Songs": "Τραγούδια",
+            "Schools": "Σχολεία", "Century": "Αιώνας", "Hygiene": "Υγιεινή", "Woman": "Γυναίκα",
+            "Monuments": "Μνημεία", "Diseases": "Νοσήματα", "Influence": "Επιρροή", 
+            "Society": "Σύλλογος", "Teaching": "Διδασκαλία", "Monastery": "Μονή", "Homeric": "Ομηρικός",
+            "Excavations": "Ανασκαφές", "Tragedy": "Τραγωδία", "Grammar": "Γραμματική",
+            "Dictionary": "Λεξικό", "Manuscript": "Χειρόγραφο", "Text": "Κείμενο", 
+            "Church": "Εκκλησία", "Patriarchate": "Πατριαρχείο", "Customs": "Έθιμα", "Ruins": "Ερείπια",
+            "Coins": "Νομίσματα", "Myth": "Μύθος", "Antiquity": "Αρχαιότητα", "Epidemic": "Επιδημία",
+            "Cholera": "Χολέρα", "Health": "Υγεία", "Youth": "Νεολαία", "Public": "Δημόσιος",
+            "Teachers": "Δάσκαλοι", "Competition": "Διαγωνισμός", "Report": "Έκθεση", "Address": "Λόγος",
+            
+            // Core Historical Figures
+            "Homer": "Όμηρος", "Sophocles": "Σοφοκλής", "Euripides": "Ευριπίδης", 
+            "Plato": "Πλάτων", "Aristotle": "Αριστοτέλης", "Socrates": "Σωκράτης"
+        };
+        
+        // Target ONLY the data currently visible to the user
         let activeTab = $('.tab-content.active').attr('id');
         let poolSource = (activeTab === 'lectureTab') ? lectureDataGlobal : journalDataGlobal;
         if (!poolSource || poolSource.length === 0) poolSource = masterData;
 
-        let candidateTerms = new Set();
+        let candidateMap = new Map();
+
         poolSource.forEach(row => {
+            // 1. Safe Mapping: Disciplines
             if (row.disciplines && row.disciplines !== "N/A") {
                 row.disciplines.split(',').forEach(d => {
                     let cleanD = d.trim();
-                    if (cleanD) candidateTerms.add(cleanD);
+                    if (conceptDict[cleanD]) candidateMap.set(`disc_${cleanD}`, { en: cleanD, gr: conceptDict[cleanD], search: cleanD });
                 });
             }
-            if (row.title_english) {
-                row.title_english.replace(/[^a-zA-Z\s]/g, "").split(/\s+/).forEach(w => {
-                    if (w.length > 4 && !['about', 'their', 'which', 'other', 'these', 'first', 'study'].includes(w.toLowerCase())) {
-                        candidateTerms.add(w);
+            
+            // 2. Safe Mapping: Authors (Dynamically extract last name and pair English/Greek perfectly)
+            if (row.author_english && row.author_greek && row.author_english !== "N/A" && row.author_greek !== "N/A" && row.standard_author !== "Anonymous") {
+                let enParts = row.author_english.replace(/[^a-zA-Z\s]/g, "").trim().split(/\s+/);
+                let grParts = row.author_greek.trim().split(/\s+/);
+                if (enParts.length > 0 && grParts.length > 0) {
+                    let enLast = enParts[enParts.length - 1];
+                    let grLast = grParts[grParts.length - 1].replace(/[,.]/g, "");
+                    grLast = toMonotonic(grLast); // Convert Polytonic to Monotonic
+                    if (enLast.length > 3 && grLast.length > 3 && !enLast.includes('.') && !grLast.includes('.')) {
+                        candidateMap.set(`auth_${enLast}`, { en: enLast, gr: grLast, search: enLast });
                     }
-                });
+                }
             }
-            if (row.title_greek) {
-                row.title_greek.replace(/[^α-ωΑ-Ωἀ-ὗἈ-Ἇᾀ-ᾏḀ-ỿ\s]/g, "").split(/\s+/).forEach(w => {
-                    if (w.length > 3) {
-                        let monotonizedOnlyForPills = removeGreekAccents(w);
-                        candidateTerms.add(monotonizedOnlyForPills);
+
+            // 3. Safe Mapping: Title Concepts
+            if (row.title_english && row.title_english !== "N/A") {
+                let enTitleLower = row.title_english.toLowerCase();
+                for (let key in conceptDict) {
+                    // Check if the concept exists in the English title text
+                    if (enTitleLower.includes(key.toLowerCase())) {
+                        candidateMap.set(`title_${key}`, { en: key, gr: conceptDict[key], search: key });
                     }
-                });
+                }
             }
         });
 
-        let termsArray = Array.from(candidateTerms);
-        let shuffled = termsArray.sort(() => 0.5 - Math.random()).slice(0, 8); // 8 pills matching Gerardos
-
+        // Pull 8 random, guaranteed-to-match suggestions
+        let termsArray = Array.from(candidateMap.values());
+        let shuffled = termsArray.sort(() => 0.5 - Math.random()).slice(0, 8);
+        
         let container = document.getElementById('suggestionPills');
         container.innerHTML = '';
-        shuffled.forEach(term => {
+        shuffled.forEach(termObj => {
             let pill = document.createElement('div');
             pill.className = 'suggestion-pill';
-            pill.innerText = term;
+            pill.innerText = `${termObj.en} (${termObj.gr})`;
             pill.onclick = () => {
-                $('#globalSearch').val(term).trigger('keyup');
+                $('#globalSearch').val(termObj.search).trigger('keyup');
             };
             container.appendChild(pill);
         });
@@ -473,7 +552,6 @@
         let visibleTags = tags.slice(0, maxVisible);
         let hiddenTags = tags.slice(maxVisible);
         
-        // The definitive list of all 26 top-level parent domains
         const parentDomains = [
             'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
             'Cultural Studies', 'Economics', 'Education', 'Folklore', 'Geography', 
@@ -491,28 +569,28 @@
         
         if (hiddenTags.length > 0) {
             let uniqueId = 'tags_' + Math.random().toString(36).substr(2, 9);
-            html += `<span id="${uniqueId}_extra" style="display:none; display:contents;">`;
+            html += `<span id="${uniqueId}_extra" style="display:none;">`;
             hiddenTags.forEach(tag => {
                 let isParent = parentDomains.includes(tag);
                 let pillClass = isParent ? "tag-pill parent-tag" : "tag-pill";
                 html += `<span class="${pillClass}">${tag}</span>`;
             });
             html += `</span>`;
-            html += `<button class="tag-more-btn" onclick="toggleTags('${uniqueId}', this)">+${hiddenTags.length} more</button>`;
+            html += `<button class="tag-more-btn" onclick="toggleTags('${uniqueId}', this, ${hiddenTags.length})">+${hiddenTags.length} more</button>`;
         }
         
         html += `</div>`;
         return html;
     }
 
-    function toggleTags(id, btn) {
+    function toggleTags(id, btn, count) {
         let extraSpan = document.getElementById(id + '_extra');
-        if (extraSpan.style.display === 'none' || extraSpan.style.display === '') {
-            extraSpan.style.display = 'inline';
+        if (extraSpan.style.display === 'none') {
+            extraSpan.style.display = 'contents';
             btn.innerText = 'show less';
         } else {
             extraSpan.style.display = 'none';
-            btn.innerText = `+ more`;
+            btn.innerText = `+${count} more`;
         }
     }
 
@@ -798,7 +876,7 @@
         });
     }
 
-    // --- Tab 5: Stabilized Network Graph (Accent Cyan Highlighting & Toggle Deselect) ---
+    // --- Tab 5: Stabilized Network Graph ---
     function buildNetwork() {
         let edgesArr = [];
         windowNodesMap = new Map();
@@ -822,63 +900,29 @@
         let options = {
             nodes: { font: { face: 'Fira Code' } },
             groups: {
-                author: { color: {background: '#e0f2fe', border: '#0284c7', highlight: {background: '#e0f2fe', border: '#0284c7'}}, shape: 'dot', size: 9, font: {size: 11} },
-                discipline: { color: {background: '#111827', border: '#000', highlight: {background: '#0284c7', border: '#0284c7'}}, shape: 'box', font: {color: 'white', size: 12} }
+                author: { color: {background: '#e0f2fe', border: '#0284c7', highlight: {background: '#f3e8ff', border: '#7e22ce'}}, shape: 'dot', size: 9, font: {size: 11, color: '#111827'} },
+                discipline: { color: {background: '#111827', border: '#111827', highlight: {background: '#581c87', border: '#3b0764'}}, shape: 'box', font: {color: 'white', size: 12} }
             },
-            edges: { color: { color: '#9ca3af', highlight: '#0284c7' }, width: 1, selectionWidth: 3 },
-            physics: { enabled: true, barnesHut: { gravitationalConstant: -1800, centralGravity: 0.3, springLength: 95, damping: 0.09 }, stabilization: { iterations: 180 } }
+            edges: { color: { color: 'rgba(156, 163, 175, 0.35)', highlight: '#7e22ce' }, width: 1, selectionWidth: 3 },
+            interaction: { multiselect: true, hover: true },
+            physics: { enabled: true, barnesHut: { gravitationalConstant: -3000, centralGravity: 0.15, springLength: 120, damping: 0.09 }, stabilization: { iterations: 150 } }
         };
         
         network = new vis.Network(document.getElementById('networkContainer'), {nodes: networkNodesData, edges: edgesData}, options);
         network.on("stabilizationIterationsDone", function () { network.setOptions( { physics: false } ); });
 
-        network.on("click", function (params) {
+        network.on("selectNode", function (params) {
             if (params.nodes.length > 0) {
-                let clickedNodeId = params.nodes[0];
-                let currentSelection = network.getSelectedNodes();
-                
-                if (currentSelection.length === 1 && currentSelection[0] === clickedNodeId && network.getSelectedEdges().length === 0) {
-                    network.unselectAll();
-                    let resetArray = Array.from(windowNodesMap.values()).map(n => ({ 
-                        id: n.id, 
-                        font: { bold: false, size: n.group==='author'?11:12, color: n.group==='discipline'?'#ffffff':'#111827' },
-                        color: n.group==='author' ? {background: '#e0f2fe', border: '#0284c7'} : {background: '#111827', border: '#000'}
-                    }));
-                    networkNodesData.update(resetArray);
-                    document.getElementById('sidebarTitle').innerText = "Intellectual Hub";
-                    document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections.";
-                    document.getElementById('sidebarLinks').innerHTML = '';
-                    return;
-                }
-                
-                let neighbors = network.getConnectedNodes(clickedNodeId);
-                let updateArray = Array.from(windowNodesMap.values()).map(n => ({ 
-                    id: n.id, 
-                    font: { bold: false, size: n.group==='author'?11:12, color: n.group==='discipline'?'#ffffff':'#111827' },
-                    color: n.group==='author' ? {background: '#e0f2fe', border: '#0284c7'} : {background: '#111827', border: '#000'}
-                }));
-                networkNodesData.update(updateArray);
-
-                let highlightArray = neighbors.map(nId => ({ 
-                    id: nId, 
-                    font: { bold: true, size: 13, color: '#0284c7' },
-                    color: { background: '#bae6fd', border: '#0284c7' }
-                }));
-                highlightArray.push({ 
-                    id: clickedNodeId, 
-                    font: { bold: true, size: 16, color: '#0284c7' },
-                    color: { background: '#0284c7', border: '#000' }
-                });
-                networkNodesData.update(highlightArray);
-                updateSidebar(clickedNodeId, neighbors);
+                let nodeId = params.nodes[params.nodes.length - 1];
+                updateSidebar(nodeId, network.getConnectedNodes(nodeId));
+            }
+        });
+        
+        network.on("deselectNode", function (params) {
+            if (params.nodes.length > 0) {
+                let nodeId = params.nodes[params.nodes.length - 1];
+                updateSidebar(nodeId, network.getConnectedNodes(nodeId));
             } else {
-                network.unselectAll();
-                let resetArray = Array.from(windowNodesMap.values()).map(n => ({ 
-                    id: n.id, 
-                    font: { bold: false, size: n.group==='author'?11:12, color: n.group==='discipline'?'#ffffff':'#111827' },
-                    color: n.group==='author' ? {background: '#e0f2fe', border: '#0284c7'} : {background: '#111827', border: '#000'}
-                }));
-                networkNodesData.update(resetArray);
                 document.getElementById('sidebarTitle').innerText = "Intellectual Hub";
                 document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections.";
                 document.getElementById('sidebarLinks').innerHTML = '';
@@ -941,11 +985,13 @@
 
         if(tabId === 'journalTab' || tabId === 'lectureTab' || tabId === 'allTab') {
             $('#tableControls').show();
+            $('#catalogNote').show();
             $('#filterYearPubs').toggle(tabId === 'journalTab');
             $('#filterYearLecs').toggle(tabId === 'lectureTab');
             $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'allTab');
         } else {
             $('#tableControls').hide(); 
+            $('#catalogNote').hide();
         }
 
         if(tabId === 'journalTab' || tabId === 'lectureTab') {
