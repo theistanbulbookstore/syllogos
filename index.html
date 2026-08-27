@@ -21,9 +21,6 @@
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     
-    <!-- D3.js for True Circle Packing -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
 
@@ -394,32 +391,6 @@
             margin-bottom: 15px; 
             flex-wrap: wrap; 
         }
-        
-        /* D3 Circle Packing Styles */
-        .pack-svg {
-            width: 100%;
-            height: 400px;
-            display: block;
-            background: #ffffff;
-            border: 1px solid var(--border-light);
-        }
-        .node circle {
-            cursor: pointer;
-            stroke: #111827;
-            stroke-width: 1px;
-            transition: opacity 0.2s;
-        }
-        .node circle:hover {
-            stroke-width: 2px;
-            opacity: 0.85;
-        }
-        .node text {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            fill: #111827;
-            text-anchor: middle;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -463,7 +434,7 @@
 
     <!-- Archival Notes -->
     <div id="catalogNote">
-        <p style="margin-top: 0; margin-bottom: 6px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em>, the scholarly periodical of the Hellenic Philological Society of Constantinople, gives author names primarily in the genitive form (Ζωγράφου/Zografou rather than Ζωγράφος/Zografos). The index for the Society's public lectures, on the other hand, largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both the nominative and the genitive across the two indices. If looking for Zografos/Ζωγράφου, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
+        <p style="margin-top: 0; margin-bottom: 6px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em>, the scholarly periodical of the Hellenic Philological Society of Constantinople, gives author names primarily in the genitive form (Ζωγράφου/Zografou rather than Ζωγράφος/Zografos). The index for the Society's public lectures, on the other hand, largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both the nominative and the genitive across the two indices. If looking for Zografos/Ζωγράφος, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
         <p style="margin: 0;">Also note that the <em>Syngramma Periodikon</em> frequently published documents pertaining to the internal workings of the Society (meeting reports, updates on donations, etc.) and book excerpts. These are included only selectively in the 1922 cumulative index this project is based on. If researching such material, please refer to the actual volumes.</p>
     </div>
 
@@ -580,17 +551,17 @@
             </div>
         </div>
 
-        <!-- True Packed Circle Chart (D3.js Circle Packing) -->
-        <div class="section-header" style="margin-top: 60px;">3. Category Proportional View (True Packed Circle Chart)</div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Organic circle packing layout where circle surface area and radius scale proportionally to category record count. Click any bubble to view records.</p>
+        <!-- Category Proportional Bubble / Filled Circle View -->
+        <div class="section-header" style="margin-top: 60px;">3. Category Proportional View (Filled Circle Map)</div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Bubble size (radius) corresponds directly to the total number of records in each primary discipline. Click any circle to view records.</p>
         <div class="split-row">
-            <div class="split-item">
-                <div class="chart-title">Journal Categories Packed Circle Map</div>
-                <div id="d3PackPubs" class="pack-svg"></div>
+            <div class="split-item chart-wrapper" style="height: 400px;">
+                <div class="chart-title">Journal Categories Proportional Bubble Map</div>
+                <canvas id="bubbleChartPubs"></canvas>
             </div>
-            <div class="split-item">
-                <div class="chart-title">Lecture Categories Packed Circle Map</div>
-                <div id="d3PackLecs" class="pack-svg"></div>
+            <div class="split-item chart-wrapper" style="height: 400px;">
+                <div class="chart-title">Lecture Categories Proportional Bubble Map</div>
+                <canvas id="bubbleChartLecs"></canvas>
             </div>
         </div>
 
@@ -683,6 +654,7 @@
     let windowNodesMap = new Map();
     let networkNodesData;
     
+    // Expanded 25-color palette for the 25 top-level macro categories
     const colors = [
         '#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', 
         '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', 
@@ -690,6 +662,7 @@
         '#be185d', '#0f766e', '#c2410c', '#4338ca', '#a16207', '#1d4ed8', '#4d7c0f'
     ];
 
+    // Perfected 25 Parent Domains matching our final python script mapping
     const parentDomains = [
         'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
         'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
@@ -698,7 +671,14 @@
         'Philosophy', 'Psychology', 'Public Health', 'Religion', 'Sociology'
     ];
 
-    const topLevelDomains = parentDomains;
+    // Perfected 25 Top-Level Domains for mutually exclusive charts and network nodes
+    const topLevelDomains = [
+        'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
+        'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
+        'Folklore', 'Gender Studies', 'Geography', 'History', 'Law & Political Science', 
+        'Literature', 'Medicine', 'Music', 'Natural & Exact Science', 'Philology', 
+        'Philosophy', 'Psychology', 'Public Health', 'Religion', 'Sociology'
+    ];
 
     // --- Search Helper ---
     function removeGreekAccents(str) {
@@ -727,7 +707,7 @@
         return surname + ", " + parts.join(' ');
     }
 
-    // Explicitly pointing to philological_society_deduped_august28.csv
+    // Updated CSV File Name
     Papa.parse("philological_society_deduped_august28.csv", {
         download: true,
         header: true,
@@ -764,8 +744,7 @@
         const allData = masterData.slice();
         const yearsPubs = new Set();
         const yearsLecs = new Set();
-        const mothersSet = new Set();
-        const granularSet = new Set();
+        const disciplines = new Set();
 
         masterData.forEach(row => {
             if (!row.title_greek) return;
@@ -779,10 +758,7 @@
                 }
             }
             if (row.primary_disciplines && row.primary_disciplines !== "N/A" && row.primary_disciplines.toLowerCase() !== "uncategorized") {
-                row.primary_disciplines.split(',').forEach(d => mothersSet.add(d.trim()));
-            }
-            if (row.disciplines && row.disciplines !== "N/A" && row.disciplines.toLowerCase() !== "uncategorized") {
-                row.disciplines.split(',').forEach(d => granularSet.add(d.trim()));
+                row.primary_disciplines.split(',').forEach(d => disciplines.add(d.trim()));
             }
 
             if (row.entry_type === "Public Lecture") {
@@ -792,7 +768,7 @@
             }
         });
 
-        populateDropdowns(yearsPubs, yearsLecs, mothersSet, granularSet);
+        populateDropdowns(yearsPubs, yearsLecs, disciplines);
         buildTables(journalDataGlobal, lectureDataGlobal, allData);
         
         buildTimeline(journalDataGlobal, 'timelineChartPubs', '#111827');
@@ -800,7 +776,7 @@
         
         updateTopContributorsAnalytics();
         updatePieChartsAnalytics();
-        buildCirclePackingAnalytics();
+        buildBubbleChartsAnalytics();
         buildInteractiveLineCharts();
         
         buildNetwork();
@@ -818,6 +794,7 @@
     }
 
     function refreshSuggestions() {
+        // Expanded concept dictionary (over 85 terms with English/Greek pairs)
         const conceptDict = {
             "History": "Ιστορία", "Philology": "Φιλολογία", "Classics": "Κλασικές Σπουδές",
             "Medicine": "Ιατρική", "Literature": "Λογοτεχνία", "Science": "Επιστήμη",
@@ -1011,13 +988,7 @@
                 if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             }
             if ((tableId === 'journalTab' || tableId === 'allTab') && anonChecked && rowObj.standard_author !== "Anonymous") return false;
-            
-            if (discFilter) {
-                let inPrimary = rowObj.primary_disciplines && rowObj.primary_disciplines.split(',').map(x=>x.trim()).includes(discFilter);
-                let inGranular = rowObj.disciplines && rowObj.disciplines.split(',').map(x=>x.trim()).includes(discFilter);
-                if (!inPrimary && !inGranular) return false;
-            }
-
+            if (discFilter && (!rowObj.primary_disciplines || !rowObj.primary_disciplines.includes(discFilter))) return false;
             if (query && !removeGreekAccents(rowObj.search_text || "").includes(query)) return false;
             return true;
         });
@@ -1032,7 +1003,7 @@
         $('#localPiePubYear, #localPieLecYear').on('change', updatePieChartsAnalytics);
     }
 
-    function populateDropdowns(yearsPubs, yearsLecs, mothersSet, granularSet) {
+    function populateDropdowns(yearsPubs, yearsLecs, disciplines) {
         let yp = document.getElementById("filterYearPubs");
         let yl = document.getElementById("filterYearLecs");
         let d = document.getElementById("filterDiscipline");
@@ -1054,25 +1025,10 @@
             localPieL.add(new Option(y, y)); 
         });
         
-        // Populate global discipline dropdown with optgroups
-        d.innerHTML = '<option value="">All Disciplines</option>';
-        
-        let optGroupMothers = document.createElement('optgroup');
-        optGroupMothers.label = "--- Primary Categories (Mothers) ---";
-        Array.from(mothersSet).sort().forEach(m => {
-            optGroupMothers.add(new Option(m, m));
-            localTopD.add(new Option(m, m)); // also populate analytics filter dropdown
+        Array.from(disciplines).sort().forEach(y => { 
+            d.add(new Option(y, y)); 
+            localTopD.add(new Option(y, y)); 
         });
-        d.appendChild(optGroupMothers);
-
-        let optGroupSubs = document.createElement('optgroup');
-        optGroupSubs.label = "--- Specialized Subfields ---";
-        Array.from(granularSet).sort().forEach(sub => {
-            if (!mothersSet.has(sub)) {
-                optGroupSubs.add(new Option(sub, sub));
-            }
-        });
-        d.appendChild(optGroupSubs);
     }
 
     function renderChart(canvasId, type, configData, options) {
@@ -1096,11 +1052,7 @@
         
         masterData.forEach(row => {
             if (row.standard_author === "Anonymous") return;
-            if (discFilter) {
-                let inP = row.primary_disciplines && row.primary_disciplines.split(',').map(x=>x.trim()).includes(discFilter);
-                let inG = row.disciplines && row.disciplines.split(',').map(x=>x.trim()).includes(discFilter);
-                if (!inP && !inG) return;
-            }
+            if (discFilter && (!row.primary_disciplines || !row.primary_disciplines.includes(discFilter))) return;
             
             if (row.entry_type === "Public Lecture") {
                 if (!yrLec || row.volume_or_year_greek === yrLec) {
@@ -1145,7 +1097,9 @@
             row.primary_disciplines.split(',').forEach(d => {
                 let dName = d.trim();
                 if(!dName || dName.toLowerCase() === 'null') return;
+                
                 if (!topLevelDomains.includes(dName)) return; 
+                
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
@@ -1193,7 +1147,9 @@
             row.disciplines.split(',').forEach(d => {
                 let dName = d.trim();
                 if(!dName || dName.toLowerCase() === 'null') return;
+                
                 if (topLevelDomains.includes(dName)) return; 
+                
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
@@ -1231,13 +1187,12 @@
         chartInstances[canvasId] = chartObj;
     }
 
-    // --- True D3.js Circle Packing Implementation ---
-    function buildCirclePackingAnalytics() {
-        buildD3CirclePack(masterData.filter(r => r.entry_type !== "Public Lecture"), '#d3PackPubs', 'Journal');
-        buildD3CirclePack(masterData.filter(r => r.entry_type === "Public Lecture"), '#d3PackLecs', 'Lecture');
+    function buildBubbleChartsAnalytics() {
+        buildBubbleChart(masterData.filter(r => r.entry_type !== "Public Lecture"), 'bubbleChartPubs', 'Journal');
+        buildBubbleChart(masterData.filter(r => r.entry_type === "Public Lecture"), 'bubbleChartLecs', 'Lecture');
     }
 
-    function buildD3CirclePack(dataset, containerId, typeStr) {
+    function buildBubbleChart(dataset, canvasId, typeStr) {
         let counts = {};
         dataset.forEach(row => {
             if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
@@ -1249,61 +1204,66 @@
             });
         });
 
-        let childrenData = Object.entries(counts).map(([name, count]) => ({ name, value: count }));
-        let rootData = { name: "root", children: childrenData };
+        let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+        
+        // Arrange bubbles in a nice grid (x, y) with radius r proportional to count
+        let bubbleData = sorted.map((item, idx) => {
+            let [name, count] = item;
+            let col = idx % 5;
+            let row = Math.floor(idx / 5);
+            // Radius scaling based on count
+            let rVal = Math.max(8, Math.min(35, Math.sqrt(count) * 3.5));
+            return {
+                x: col * 2 + 1,
+                y: -row * 2 - 1,
+                r: rVal,
+                label: name,
+                count: count
+            };
+        });
 
-        const container = d3.select(containerId);
-        container.html(""); // clear previous
+        if(chartInstances[canvasId]) {
+            chartInstances[canvasId].destroy();
+        }
 
-        const width = container.node().getBoundingClientRect().width || 450;
-        const height = 400;
-
-        const svg = container.append("svg")
-            .attr("viewBox", `0 0 ${width} ${height}`)
-            .style("width", "100%")
-            .style("height", "100%");
-
-        const root = d3.hierarchy(rootData)
-            .sum(d => d.value)
-            .sort((a, b) => b.value - a.value);
-
-        const pack = d3.pack()
-            .size([width, height])
-            .padding(5);
-
-        pack(root);
-
-        const colorScale = d3.scaleOrdinal(colors);
-
-        const node = svg.selectAll("g")
-            .data(root.leaves())
-            .join("g")
-            .attr("transform", d => `translate(${d.x},${d.y})`)
-            .style("cursor", "pointer")
-            .on("click", (event, d) => {
-                openDisciplineModal(d.data.name, typeStr);
-            });
-
-        node.append("circle")
-            .attr("r", d => d.r)
-            .attr("fill", (d, i) => colorScale(i))
-            .attr("stroke", "#111827")
-            .attr("stroke-width", 1.5)
-            .append("title")
-            .text(d => `${d.data.name}: ${d.data.value} entries`);
-
-        node.append("text")
-            .attr("dy", "-0.3em")
-            .style("font-size", d => Math.max(9, Math.min(d.r / 2.5, 13)) + "px")
-            .style("font-weight", "600")
-            .style("fill", "#ffffff")
-            .text(d => d.r > 18 ? d.data.name : "");
-
-        node.append("text")
-            .attr("dy", "1.1em")
-            .style("font-size", d => Math.max(8, Math.min(d.r / 3, 11)) + "px")
-            .style("fill", "#f3f4f6")
-            .text(d => d.r > 24 ? `(${d.data.value})` : "");
+        let chartObj = new Chart(document.getElementById(canvasId), {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Categories',
+                    data: bubbleData,
+                    backgroundColor: bubbleData.map((d, i) => colors[i % colors.length]),
+                    borderColor: '#111827',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let raw = context.raw;
+                                return `${raw.label}: ${raw.count} entries`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false, min: -1, max: 10 },
+                    y: { display: false, min: -10, max: 1 }
+                },
+                onClick: (event, elements, chart) => {
+                    if(elements.length > 0) {
+                        let item = chart.data.datasets[elements[0].datasetIndex].data[elements[0].index];
+                        openDisciplineModal(item.label, typeStr);
+                    }
+                }
+            }
+        });
+        chartInstances[canvasId] = chartObj;
     }
 
     function buildInteractiveLineCharts() {
@@ -1655,11 +1615,7 @@
     }
     
     function openDisciplineModal(disc, type) {
-        let items = masterData.filter(r => {
-            let inP = r.primary_disciplines && r.primary_disciplines.split(',').map(x=>x.trim()).includes(disc);
-            let inG = r.disciplines && r.disciplines.split(',').map(x=>x.trim()).includes(disc);
-            return inP || inG;
-        });
+        let items = masterData.filter(r => r.disciplines && r.disciplines.split(',').map(x=>x.trim()).includes(disc));
         if(type === 'Journal') items = items.filter(r => r.entry_type !== "Public Lecture");
         if(type === 'Lecture') items = items.filter(r => r.entry_type === "Public Lecture");
         items.sort((a,b) => (getCleanYear(a) || "9999").localeCompare(getCleanYear(b) || "9999"));
