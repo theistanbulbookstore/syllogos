@@ -551,7 +551,21 @@
             </div>
         </div>
 
-        <div class="section-header" style="margin-top: 60px;">3. Disciplinary Output Over Time</div>
+        <!-- Category Proportional Bubble / Filled Circle View -->
+        <div class="section-header" style="margin-top: 60px;">3. Category Proportional View (Filled Circle Map)</div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Bubble size (radius) corresponds directly to the total number of records in each primary discipline. Click any circle to view records.</p>
+        <div class="split-row">
+            <div class="split-item chart-wrapper" style="height: 400px;">
+                <div class="chart-title">Journal Categories Proportional Bubble Map</div>
+                <canvas id="bubbleChartPubs"></canvas>
+            </div>
+            <div class="split-item chart-wrapper" style="height: 400px;">
+                <div class="chart-title">Lecture Categories Proportional Bubble Map</div>
+                <canvas id="bubbleChartLecs"></canvas>
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-top: 60px;">4. Disciplinary Output Over Time</div>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;"><strong>Interactive:</strong> Click and drag horizontally inside the graph to zoom into a specific year range. Double click to reset zoom. This chart tracks Primary Disciplines across all years.</p>
         <div class="dual-chart-container">
             <div class="chart-wrapper" style="height: 450px;">
@@ -639,26 +653,31 @@
     let network;
     let windowNodesMap = new Map();
     let networkNodesData;
-    const colors = ['#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', '#111827'];
-
-    // All domains that should light up blue in the table UI (32 tags)
-    const parentDomains = [
-        'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
-        'Astronomy', 'Biology', 'Cultural Studies', 'Economics', 'Education', 
-        'Engineering', 'Folklore', 'Geography & Earth Sciences', 'Health', 
-        'History', 'Law & Political Science', 'Library Science', 'Linguistics', 
-        'Literature', 'Mathematics', 'Medicine', 'Music', 'Natural & Exact Science', 
-        'Philology', 'Philosophy', 'Psychology', 'Public Health', 'Publishing', 
-        'Religion', 'Sociology', 'Sports Science', 'Theater Studies'
+    
+    // Expanded 25-color palette for the 25 top-level macro categories
+    const colors = [
+        '#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', 
+        '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', 
+        '#111827', '#0369a1', '#be123c', '#15803d', '#b45309', '#7e22ce',
+        '#be185d', '#0f766e', '#c2410c', '#4338ca', '#a16207', '#1d4ed8', '#4d7c0f'
     ];
 
-    // ONLY the absolute highest-level umbrella categories (Strictly mutually exclusive for charts - NOW 20 TAGS)
+    // Perfected 25 Parent Domains matching our final python script mapping
+    const parentDomains = [
+        'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
+        'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
+        'Folklore', 'Gender Studies', 'Geography', 'History', 'Law & Political Science', 
+        'Literature', 'Medicine', 'Music', 'Natural & Exact Science', 'Philology', 
+        'Philosophy', 'Psychology', 'Public Health', 'Religion', 'Sociology'
+    ];
+
+    // Perfected 25 Top-Level Domains for mutually exclusive charts and network nodes
     const topLevelDomains = [
         'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
-        'Cultural Studies', 'Economics', 'Education', 'Geography & Earth Sciences', 
-        'History', 'Law & Political Science', 'Literature', 'Medicine', 'Music', 
-        'Natural & Exact Science', 'Philology', 'Philosophy', 'Psychology', 
-        'Religion', 'Sociology'
+        'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
+        'Folklore', 'Gender Studies', 'Geography', 'History', 'Law & Political Science', 
+        'Literature', 'Medicine', 'Music', 'Natural & Exact Science', 'Philology', 
+        'Philosophy', 'Psychology', 'Public Health', 'Religion', 'Sociology'
     ];
 
     // --- Search Helper ---
@@ -688,7 +707,8 @@
         return surname + ", " + parts.join(' ');
     }
 
-    Papa.parse("philological_society_deduped_final.csv", {
+    // Updated CSV File Name
+    Papa.parse("philological_society_deduped_august28.csv", {
         download: true,
         header: true,
         skipEmptyLines: true,
@@ -756,6 +776,7 @@
         
         updateTopContributorsAnalytics();
         updatePieChartsAnalytics();
+        buildBubbleChartsAnalytics();
         buildInteractiveLineCharts();
         
         buildNetwork();
@@ -773,6 +794,7 @@
     }
 
     function refreshSuggestions() {
+        // Expanded concept dictionary (over 85 terms with English/Greek pairs)
         const conceptDict = {
             "History": "Ιστορία", "Philology": "Φιλολογία", "Classics": "Κλασικές Σπουδές",
             "Medicine": "Ιατρική", "Literature": "Λογοτεχνία", "Science": "Επιστήμη",
@@ -782,8 +804,26 @@
             "Public Health": "Δημόσια Υγεία", "Art": "Τέχνη", "Music": "Μουσική", "Law": "Νομική",
             "Anthropology": "Ανθρωπολογία", "Epigraphy": "Επιγραφική", "Paleography": "Παλαιογραφία",
             "Topography": "Τοπογραφία", "Biology": "Βιολογία", "Chemistry": "Χημεία", "Physics": "Φυσική",
-            "Constantinople": "Κωνσταντινούπολη", "Athens": "Αθήνα", "Macedonia": "Μακεδονία",
-            "Homer": "Όμηρος", "Sophocles": "Σοφοκλής", "Euripides": "Ευριπίδης" 
+            "Mythology": "Μυθολογία", "Constantinople": "Κωνσταντινούπολη", "Athens": "Αθήνα", 
+            "Macedonia": "Μακεδονία", "Homer": "Όμηρος", "Sophocles": "Σοφοκλής", "Euripides": "Ευριπίδης",
+            "Astronomy": "Αστρονομία", "Mathematics": "Μαθηματικά", "Statistics": "Στατιστική",
+            "Economics": "Οικονομικά", "Demography": "Δημογραφία", "Architecture": "Αρχιτεκτονική",
+            "Byzantine History": "Βυζαντινή Ιστορία", "Ottoman History": "Οθωμανική Ιστορία", "Numismatics": "Νομισματική",
+            "Sigillography": "Σιγιλλλογραφία", "Folklore": "Λαογραφία", "Dialectology": "Διαλεκτολογία",
+            "Rhetoric": "Ρητορική", "Ethics": "Ηθική", "Logic": "Λογική",
+            "Psychology": "Ψυχολογία", "Neuroscience": "Νευροεπιστήμη", "Agriculture": "Γεωργία",
+            "Botany": "Βοτανική", "Zoology": "Ζωολογία", "Geology": "Γεωλογία",
+            "Meteorology": "Μετεωρολογία", "Mineralogy": "Ορυκτολογία", "Seismology": "Σεισμολογία",
+            "Theater": "Θέατρο", "Poetry": "Ποίηση", "Drama": "Δράμα",
+            "Biography": "Βιογραφία", "Bibliography": "Βιβλιογραφία", "Journalism": "Δημοσιογραφία",
+            "Publishing": "Εκδοτική", "Library Science": "Βιβλιοθηκονομία", "Excavations": "Ανασκαφές",
+            "Inscriptions": "Επιγραφές", "Manuscripts": "Χειρόγραφα", "School": "Σχολή",
+            "Teacher": "Δάσκαλος", "Student": "Μαθητής", "Church": "Εκκλησία",
+            "Patriarchate": "Πατριαρχείο", "Smyrna": "Σμύρνη", "Trebizond": "Τραπεζούντα",
+            "Crete": "Κρήτη", "Cyprus": "Κύπρος", "Pontus": "Πόντος",
+            "Thrace": "Θράκη", "Epirus": "Ήπειρος", "Asia Minor": "Μικρά Ασία",
+            "Aristotle": "Αριστοτέλης", "Plato": "Πλάτων", "Thucydides": "Θουκυδίδης",
+            "Herodotus": "Ηρόδοτος", "Plutarch": "Πλούταρχος", "Lucian": "Λουκιανός", "Demosthenes": "Δημοσθένης"
         };
         
         let activeTab = $('.tab-content.active').attr('id');
@@ -1147,6 +1187,85 @@
         chartInstances[canvasId] = chartObj;
     }
 
+    function buildBubbleChartsAnalytics() {
+        buildBubbleChart(masterData.filter(r => r.entry_type !== "Public Lecture"), 'bubbleChartPubs', 'Journal');
+        buildBubbleChart(masterData.filter(r => r.entry_type === "Public Lecture"), 'bubbleChartLecs', 'Lecture');
+    }
+
+    function buildBubbleChart(dataset, canvasId, typeStr) {
+        let counts = {};
+        dataset.forEach(row => {
+            if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
+            row.primary_disciplines.split(',').forEach(d => {
+                let dName = d.trim();
+                if(!dName || dName.toLowerCase() === 'null') return;
+                if(!topLevelDomains.includes(dName)) return;
+                counts[dName] = (counts[dName] || 0) + 1;
+            });
+        });
+
+        let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+        
+        // Arrange bubbles in a nice grid (x, y) with radius r proportional to count
+        let bubbleData = sorted.map((item, idx) => {
+            let [name, count] = item;
+            let col = idx % 5;
+            let row = Math.floor(idx / 5);
+            // Radius scaling based on count
+            let rVal = Math.max(8, Math.min(35, Math.sqrt(count) * 3.5));
+            return {
+                x: col * 2 + 1,
+                y: -row * 2 - 1,
+                r: rVal,
+                label: name,
+                count: count
+            };
+        });
+
+        if(chartInstances[canvasId]) {
+            chartInstances[canvasId].destroy();
+        }
+
+        let chartObj = new Chart(document.getElementById(canvasId), {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Categories',
+                    data: bubbleData,
+                    backgroundColor: bubbleData.map((d, i) => colors[i % colors.length]),
+                    borderColor: '#111827',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let raw = context.raw;
+                                return `${raw.label}: ${raw.count} entries`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false, min: -1, max: 10 },
+                    y: { display: false, min: -10, max: 1 }
+                },
+                onClick: (event, elements, chart) => {
+                    if(elements.length > 0) {
+                        let item = chart.data.datasets[elements[0].datasetIndex].data[elements[0].index];
+                        openDisciplineModal(item.label, typeStr);
+                    }
+                }
+            }
+        });
+        chartInstances[canvasId] = chartObj;
+    }
+
     function buildInteractiveLineCharts() {
         renderInteractiveLineChart(masterData.filter(r => r.entry_type !== "Public Lecture"), 'lineChartPubs');
         renderInteractiveLineChart(masterData.filter(r => r.entry_type === "Public Lecture"), 'lineChartLecs');
@@ -1264,7 +1383,6 @@
         });
     }
 
-    // --- Stabilized Network Graph w/ Clear Hierarchical Rendering ---
     function buildNetwork() {
         let edgesArr = [];
         windowNodesMap = new Map();
