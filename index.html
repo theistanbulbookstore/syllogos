@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hellenic Philological Society of Constantinople</title>
     
-    <!-- Fira Code Font -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,13 +15,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
-    <!-- Chart.js, Zoom Plugin & D3.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
 
@@ -44,386 +41,88 @@
             padding: 20px 40px; 
             font-size: 0.85rem; 
         }
-        .header-container { 
-            display: flex; 
-            align-items: center; 
-            gap: 25px; 
-            margin-bottom: 20px; 
-            border-bottom: 2px solid var(--border-dark); 
-            padding-bottom: 15px; 
-        }
-        .header-logo { 
-            height: 90px; 
-            width: auto; 
-            object-fit: contain; 
-        }
-        .header-text h1 { 
-            margin: 0 0 5px 0; 
-            color: var(--text-color); 
-            font-size: 1.6rem; 
-            font-weight: 500; 
-        }
-        .header-text p { 
-            margin: 0; 
-            color: var(--text-muted); 
-            font-size: 0.9rem; 
-        }
         
-        .controls { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-            flex-wrap: wrap; 
-            align-items: center; 
-        }
-        input[type="text"], select { 
-            padding: 8px 12px; 
-            font-family: var(--font-mono); 
-            font-size: 0.85rem; 
-            border: 1px solid var(--border-dark); 
-            border-radius: 2px; 
-            outline: none; 
-        }
-        input[type="text"]:focus, select:focus { 
-            border-color: var(--accent-cyan); 
-        }
-        .checkbox-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: var(--text-muted); 
-        }
-        optgroup {
-            font-family: var(--font-mono);
-            font-weight: 600;
-            color: var(--text-color);
-        }
+        /* Layout */
+        .header-container { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 15px; }
+        .header-logo { height: 90px; width: auto; object-fit: contain; }
+        .header-text h1 { margin: 0 0 5px 0; color: var(--text-color); font-size: 1.6rem; font-weight: 500; }
+        .header-text p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
         
-        /* Keyword Suggestion Bar */
-        .suggestion-bar { 
-            display: none; 
-            gap: 8px; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-            align-items: center; 
-        }
-        .suggestion-btn { 
-            background: var(--border-dark); 
-            color: #ffffff; 
-            border: 1px solid var(--border-dark); 
-            padding: 6px 12px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            font-family: var(--font-mono); 
-            border-radius: 2px; 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-        }
-        .suggestion-pill { 
-            background: #ffffff; 
-            border: 1px solid var(--border-light); 
-            padding: 6px 12px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-            border-radius: 2px; 
-            transition: 0.2s; 
-        }
-        .suggestion-pill:hover { 
-            border-color: var(--border-dark); 
-            background: #f9fafb; 
-        }
+        /* Controls */
+        .controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        input[type="text"], select { padding: 8px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--border-dark); border-radius: 2px; outline: none; }
+        input[type="text"]:focus, select:focus { border-color: var(--accent-cyan); }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+        optgroup { font-family: var(--font-mono); font-weight: 600; color: var(--text-color); font-style: normal; }
+        
+        /* Suggestions */
+        .suggestion-bar { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .suggestion-btn { background: var(--border-dark); color: #ffffff; border: 1px solid var(--border-dark); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; font-family: var(--font-mono); border-radius: 2px; display: flex; align-items: center; gap: 5px; }
+        .suggestion-pill { background: #ffffff; border: 1px solid var(--border-light); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); border-radius: 2px; transition: 0.2s; }
+        .suggestion-pill:hover { border-color: var(--border-dark); background: #f9fafb; }
 
-        /* Catalog Note */
-        #catalogNote { 
-            background-color: #f9fafb; 
-            border-left: 4px solid var(--accent-cyan); 
-            padding: 10px 16px; 
-            margin-bottom: 20px; 
-            font-size: 0.8rem; 
-            color: var(--text-color); 
-            display: none; 
-            line-height: 1.5; 
-            width: 100%; 
-            box-sizing: border-box; 
-        }
+        /* Notes & Tabs */
+        #catalogNote { background-color: #f9fafb; border-left: 4px solid var(--accent-cyan); padding: 10px 16px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-color); display: none; line-height: 1.5; width: 100%; box-sizing: border-box; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
+        .tab-btn:hover { border-color: var(--border-dark); }
+        .tab-btn.active { background: var(--border-dark); color: #ffffff; border-color: var(--border-dark); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Tables */
+        .dataTables_wrapper .dataTables_filter { display: none !important; }
+        table.dataTable { font-family: var(--font-mono) !important; font-size: 0.85rem !important; border-collapse: collapse !important; width: 100% !important; }
+        table.dataTable thead th { background-color: #ffffff !important; border-bottom: 2px solid var(--border-dark) !important; padding: 10px !important; }
+        table.dataTable tbody td { border-bottom: 1px solid var(--border-light) !important; padding: 10px !important; vertical-align: top !important; }
+        .author-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; font-weight: 500; }
+        .btn-small { padding: 4px 10px; font-size: 0.75rem; cursor: pointer; background: #ffffff; color: var(--text-color); border: 1px solid var(--border-light); border-radius: 2px; font-family: var(--font-mono); }
+        .btn-small:hover { border-color: var(--border-dark); background: var(--border-dark); color: #ffffff; }
 
-        .tabs { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 20px; 
-        }
-        .tab-btn { 
-            background: transparent; 
-            border: 1px solid var(--border-light); 
-            padding: 8px 16px; 
-            font-size: 0.85rem; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-            transition: 0.2s; 
-            border-radius: 2px; 
-        }
-        .tab-btn:hover { 
-            border-color: var(--border-dark); 
-        }
-        .tab-btn.active { 
-            background: var(--border-dark); 
-            color: #ffffff; 
-            border-color: var(--border-dark); 
-        }
-        .tab-content { 
-            display: none; 
-        }
-        .tab-content.active { 
-            display: block; 
-        }
+        /* Tag Pills */
+        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px; }
+        .tag-pill { background-color: #f3f4f6; border: 1px solid var(--border-light); padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; color: var(--text-color); white-space: nowrap; }
+        .tag-pill.parent-tag { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1; font-weight: 600; }
+        .tag-more-btn { background: none; border: none; color: var(--accent-cyan); font-size: 0.7rem; cursor: pointer; padding: 2px 4px; font-family: var(--font-mono); text-decoration: underline; }
         
-        .dataTables_wrapper .dataTables_filter { 
-            display: none !important; 
-        }
-        table.dataTable { 
-            font-family: var(--font-mono) !important; 
-            font-size: 0.85rem !important; 
-            border-collapse: collapse !important; 
-            width: 100% !important; 
-        }
-        table.dataTable thead th { 
-            background-color: #ffffff !important; 
-            border-bottom: 2px solid var(--border-dark) !important; 
-            padding: 10px !important; 
-        }
-        table.dataTable tbody td { 
-            border-bottom: 1px solid var(--border-light) !important; 
-            padding: 10px !important; 
-            vertical-align: top !important; 
-        }
-        .author-link { 
-            color: var(--accent-cyan); 
-            cursor: pointer; 
-            text-decoration: underline; 
-            font-weight: 500; 
-        }
-        .btn-small { 
-            padding: 4px 10px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            background: #ffffff; 
-            color: var(--text-color); 
-            border: 1px solid var(--border-light); 
-            border-radius: 2px; 
-            font-family: var(--font-mono); 
-        }
-        .btn-small:hover { 
-            border-color: var(--border-dark); 
-            background: var(--border-dark); 
-            color: #ffffff; 
-        }
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border: 1px solid var(--border-dark); max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); }
+        #scanImage { max-width: 100%; display: block; margin: 0 auto; border: 1px solid var(--border-light); }
+        
+        /* Network Map */
+        #networkTab.active { display: flex; gap: 20px; }
+        #networkContainer { flex: 3; height: 650px; border: 1px solid var(--border-light); background: #ffffff; }
+        #networkSidebar { flex: 1; border-left: 2px solid var(--border-dark); padding-left: 20px; overflow-y: auto; height: 650px; }
+        .sidebar-header { font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; color: var(--accent-cyan); }
+        .sidebar-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; display: block; margin-bottom: 6px; font-weight: 500; }
+        .sidebar-link:hover { color: var(--border-dark); }
 
-        /* Tag Pill UI Enhancements */
-        .tag-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 4px; 
-            max-width: 320px; 
-        }
-        .tag-pill { 
-            background-color: #f3f4f6; 
-            border: 1px solid var(--border-light); 
-            padding: 2px 6px; 
-            font-size: 0.7rem; 
-            border-radius: 3px; 
-            color: var(--text-color); 
-            white-space: nowrap; 
-        }
-        .tag-pill.parent-tag { 
-            background-color: #e0f2fe; 
-            border-color: #bae6fd; 
-            color: #0369a1; 
-        }
-        .tag-more-btn { 
-            background: none; 
-            border: none; 
-            color: var(--accent-cyan); 
-            font-size: 0.7rem; 
-            cursor: pointer; 
-            padding: 2px 4px; 
-            font-family: var(--font-mono); 
-            text-decoration: underline; 
-        }
+        /* Analytics Layouts */
+        .chart-wrapper { width: 100%; height: 400px; margin-bottom: 20px; }
+        .chart-title { text-align: center; font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-light); }
+        .dual-chart-container { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; margin-bottom: 40px; }
+        .split-row { display: flex; flex-direction: row; gap: 40px; margin-bottom: 40px;}
+        .split-item { flex: 1; }
+        .section-header { margin-top: 40px; margin-bottom: 10px; font-size: 1.4rem; font-weight: 600; color: var(--text-color); border-bottom: 2px solid var(--border-dark); padding-bottom: 5px; }
         
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(255,255,255,0.95); 
-            z-index: 1000; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .modal-content { 
-            background: white; 
-            padding: 30px; 
-            border: 1px solid var(--border-dark); 
-            max-width: 800px; 
-            max-height: 90vh; 
-            overflow-y: auto; 
-            width: 90%; 
-            position: relative; 
-        }
-        .close-btn { 
-            position: absolute; 
-            top: 15px; 
-            right: 20px; 
-            font-size: 20px; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-        }
-        #scanImage { 
-            max-width: 100%; 
-            display: block; 
-            margin: 0 auto; 
-            border: 1px solid var(--border-light); 
-        }
+        /* Lists */
+        .top-list { list-style: none; padding: 0; margin: 0; }
+        .top-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+        .top-list li span:first-child { font-weight: 500; cursor: pointer; color: var(--accent-cyan); text-decoration: underline; }
+        .top-list li span:last-child { color: var(--text-muted); }
         
-        #networkTab.active { 
-            display: flex; 
-            gap: 20px; 
-        }
-        #networkContainer { 
-            flex: 3; 
-            height: 650px; 
-            border: 1px solid var(--border-light); 
-            background: #ffffff; 
-        }
-        #networkSidebar { 
-            flex: 1; 
-            border-left: 2px solid var(--border-dark); 
-            padding-left: 20px; 
-            overflow-y: auto; 
-            height: 650px; 
-        }
-        .sidebar-header { 
-            font-weight: 600; 
-            font-size: 1.1rem; 
-            margin-bottom: 5px; 
-            color: var(--accent-cyan); 
-        }
-        .sidebar-link { 
-            color: var(--accent-cyan); 
-            cursor: pointer; 
-            text-decoration: underline; 
-            display: block; 
-            margin-bottom: 6px; 
-            font-weight: 500; 
-        }
-        .sidebar-link:hover { 
-            color: var(--border-dark); 
-        }
-
-        .chart-wrapper { 
-            width: 100%; 
-            height: 400px; 
-            margin-bottom: 20px; 
-        }
-        .chart-title { 
-            text-align: center; 
-            font-size: 1.1rem; 
-            font-weight: 600; 
-            margin-bottom: 10px; 
-            padding-bottom: 5px; 
-            border-bottom: 1px solid var(--border-light);
-        }
-        .dual-chart-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 40px; 
-            margin-top: 20px; 
-            margin-bottom: 40px; 
-        }
-        .split-row { 
-            display: flex; 
-            flex-direction: row; 
-            gap: 40px; 
-        }
-        .split-item { 
-            flex: 1; 
-        }
-        .section-header { 
-            margin-top: 40px; 
-            margin-bottom: 10px; 
-            font-size: 1.4rem; 
-            font-weight: 600; 
-            color: var(--text-color); 
-            border-bottom: 2px solid var(--border-dark); 
-            padding-bottom: 5px; 
-        }
+        #aboutTab p { margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem; }
+        .local-controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         
-        .top-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0; 
-        }
-        .top-list li { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 8px 0; 
-            border-bottom: 1px solid var(--border-light); 
-        }
-        .top-list li span:first-child { 
-            font-weight: 500; 
-            cursor: pointer; 
-            color: var(--accent-cyan); 
-            text-decoration: underline; 
-        }
-        .top-list li span:last-child { 
-            color: var(--text-muted); 
-        }
+        /* D3 Packed Circle UI */
+        .pack-svg { width: 100%; height: 400px; display: block; background: #ffffff; border: 1px solid var(--border-light); border-radius: 4px; }
+        .node circle { cursor: pointer; stroke: #111827; stroke-width: 1px; transition: opacity 0.2s, stroke-width 0.2s; }
+        .node circle:hover { stroke-width: 2.5px; opacity: 0.85; }
+        .node text { font-family: var(--font-mono); font-size: 11px; fill: #111827; text-anchor: middle; pointer-events: none; }
         
-        #aboutTab p { 
-            margin-bottom: 15px; 
-            line-height: 1.6; 
-            font-size: 0.95rem; 
-        }
-        .local-controls { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-            flex-wrap: wrap; 
-        }
-        
-        /* D3 Circle Packing Styles */
-        .pack-svg {
-            width: 100%;
-            height: 400px;
-            display: block;
-            background: #ffffff;
-            border: 1px solid var(--border-light);
-            border-radius: 4px;
-        }
-        .node circle {
-            cursor: pointer;
-            stroke: #111827;
-            stroke-width: 1px;
-            transition: opacity 0.2s, stroke-width 0.2s;
-        }
-        .node circle:hover {
-            stroke-width: 2.5px;
-            opacity: 0.85;
-        }
-        .node text {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            fill: #111827;
-            text-anchor: middle;
-            pointer-events: none;
-        }
+        .methodology-note { background: #f9fafb; border: 1px dashed var(--border-dark); padding: 12px 18px; margin-top: 10px; margin-bottom: 30px; font-size: 0.85rem; color: var(--text-color); line-height: 1.6;}
     </style>
 </head>
 <body>
@@ -553,16 +252,17 @@
             </div>
         </div>
 
-        <div class="section-header" style="margin-top: 60px;">2. Thematic Breakdown</div>
+        <div class="section-header" style="margin-top: 60px;">2. Thematic & Proportional Breakdowns</div>
         <div class="local-controls">
             <select id="localPiePubYear"><option value="">All Journal Years</option></select>
             <select id="localPieLecYear"><option value="">All Lecture Years</option></select>
         </div>
         
-        <!-- NEW TEXT CLARIFYING PIE CHART VOLUME -->
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">The upper pie charts display the total occurrences of each <strong>Primary Discipline tag</strong>. Because individual texts often span multiple fields, the pie volume represents the total number of tags applied, not individual papers. The lower bar charts exclude these macro-categories to reveal <strong>Granular Subject Frequency</strong>. Click categories in the legends to toggle them on or off.</p>
+        <div class="methodology-note">
+            <strong>Methodology Note:</strong> The Pie Charts and Packed Circle maps below measure the <em>total occurrences of primary tags</em> assigned to the archive. Because 19th-century scholarly works were highly interdisciplinary (e.g. a single text might be tagged simultaneously as <em>History</em>, <em>Philology</em>, and <em>Classics</em>), individual papers frequently appear across multiple categories. Therefore, the visual volume accurately represents the overarching thematic balance of the society's output, rather than mutually exclusive paper counts.
+        </div>
         
-        <!-- Broad Row (Pie Charts) -->
+        <!-- Pie Charts -->
         <div class="split-row">
             <div class="split-item chart-wrapper" style="height: 350px;">
                 <div class="chart-title">Journal Publications by Primary Discipline</div>
@@ -574,8 +274,20 @@
             </div>
         </div>
 
-        <!-- Granular Row (Bar Charts) -->
-        <div class="split-row" style="margin-top: 50px;">
+        <!-- Packed Circle Charts -->
+        <div class="split-row" style="margin-top: 20px;">
+            <div class="split-item chart-wrapper" style="height: 400px;">
+                <div class="chart-title">Journal Categories (D3 Packed Circles)</div>
+                <div id="packedChartPubs" class="pack-svg"></div>
+            </div>
+            <div class="split-item chart-wrapper" style="height: 400px;">
+                <div class="chart-title">Lecture Categories (D3 Packed Circles)</div>
+                <div id="packedChartLecs" class="pack-svg"></div>
+            </div>
+        </div>
+
+        <!-- Specific Bar Charts -->
+        <div class="split-row" style="margin-top: 20px;">
             <div class="split-item chart-wrapper" style="height: 350px;">
                 <div class="chart-title">Top Specialized Subfields (Journal)</div>
                 <canvas id="barChartPubsSpecific"></canvas>
@@ -586,21 +298,7 @@
             </div>
         </div>
 
-        <!-- True Packed Circle Chart (D3.js Circle Packing) -->
-        <div class="section-header" style="margin-top: 60px;">3. Category Proportional View (Packed Circles)</div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Organic circle packing layout where circle surface area and radius scale proportionally to category record count. Click any bubble to view records.</p>
-        <div class="split-row">
-            <div class="split-item">
-                <div class="chart-title">Journal Categories Proportional Packed Circles</div>
-                <div id="d3PackPubs" class="pack-svg"></div>
-            </div>
-            <div class="split-item">
-                <div class="chart-title">Lecture Categories Proportional Packed Circles</div>
-                <div id="d3PackLecs" class="pack-svg"></div>
-            </div>
-        </div>
-
-        <div class="section-header" style="margin-top: 60px;">4. Disciplinary Output Over Time</div>
+        <div class="section-header" style="margin-top: 60px;">3. Disciplinary Output Over Time</div>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;"><strong>Interactive:</strong> Click and drag horizontally inside the graph to zoom into a specific year range. Double click to reset zoom. This chart tracks Primary Disciplines across all years.</p>
         <div class="dual-chart-container">
             <div class="chart-wrapper" style="height: 450px;">
@@ -623,7 +321,7 @@
                 <input type="text" id="networkSearch" placeholder="Find author or field..." style="width: 100%; padding: 6px; box-sizing: border-box; font-family: var(--font-mono); border: 1px solid var(--border-dark); outline: none;">
             </div>
             <div id="sidebarContent" style="margin-top: 5px;">
-                <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any node on the map, or use the search bar, to inspect connections. Large black hubs represent the Primary Disciplines.</p>
+                <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any node on the map, or use the search bar, to inspect connections.</p>
                 <div id="sidebarLinks"></div>
             </div>
         </div>
@@ -649,20 +347,13 @@
         <div style="display: flex; align-items: center; gap: 40px; flex-wrap: wrap; max-width: 1100px;">
             <div style="flex: 1; min-width: 400px;">
                 <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
-                <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
-                <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
-                <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
-                <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
-                <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
+                <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong>.</p>
                 <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
-            </div>
-            <div style="flex: 0 0 350px;">
-                <img src="about1.png" alt="Syllogos Building" style="width: 100%; border-radius: 2px;">
             </div>
         </div>
     </div>
 
-    <!-- Scan Lightbox Modal -->
+    <!-- Modals -->
     <div id="scanModal" class="modal">
         <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
             <span class="close-btn" onclick="closeModal('scanModal')" style="color: #111827; font-size: 30px; font-weight: bold;">[X]</span>
@@ -670,7 +361,6 @@
         </div>
     </div>
 
-    <!-- Reusable List Modal -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('profileModal')">[X]</span>
@@ -689,7 +379,6 @@
     let windowNodesMap = new Map();
     let networkNodesData;
     
-    // Expanded 25-color palette for the 25 top-level macro categories
     const colors = [
         '#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', 
         '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', 
@@ -697,7 +386,6 @@
         '#be185d', '#0f766e', '#c2410c', '#4338ca', '#a16207', '#1d4ed8', '#4d7c0f'
     ];
 
-    // Perfected 25 Parent Domains matching our final python script mapping
     const parentDomains = [
         'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
         'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
@@ -708,7 +396,6 @@
 
     const topLevelDomains = parentDomains;
 
-    // --- Search Helper ---
     function removeGreekAccents(str) {
         if (!str) return "";
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -735,7 +422,6 @@
         return surname + ", " + parts.join(' ');
     }
 
-    // Explicitly pointing to philological_society_deduped_august28.csv
     Papa.parse("philological_society_deduped_august28.csv", {
         download: true,
         header: true,
@@ -802,13 +488,11 @@
 
         populateDropdowns(yearsPubs, yearsLecs, mothersSet, granularSet);
         buildTables(journalDataGlobal, lectureDataGlobal, allData);
-        
         buildTimeline(journalDataGlobal, 'timelineChartPubs', '#111827');
         buildTimeline(lectureDataGlobal, 'timelineChartLecs', '#0284c7');
         
         updateTopContributorsAnalytics();
-        updatePieChartsAnalytics();
-        buildCirclePackingAnalytics();
+        updateVisualBreakdowns(); // Bootstraps Pie, Bar, and D3 Charts together
         buildInteractiveLineCharts();
         
         buildNetwork();
@@ -846,15 +530,7 @@
             "Botany": "Βοτανική", "Zoology": "Ζωολογία", "Geology": "Γεωλογία",
             "Meteorology": "Μετεωρολογία", "Mineralogy": "Ορυκτολογία", "Seismology": "Σεισμολογία",
             "Theater": "Θέατρο", "Poetry": "Ποίηση", "Drama": "Δράμα",
-            "Biography": "Βιογραφία", "Bibliography": "Βιβλιογραφία", "Journalism": "Δημοσιογραφία",
-            "Publishing": "Εκδοτική", "Library Science": "Βιβλιοθηκονομία", "Excavations": "Ανασκαφές",
-            "Inscriptions": "Επιγραφές", "Manuscripts": "Χειρόγραφα", "School": "Σχολή",
-            "Teacher": "Δάσκαλος", "Student": "Μαθητής", "Church": "Εκκλησία",
-            "Patriarchate": "Πατριαρχείο", "Smyrna": "Σμύρνη", "Trebizond": "Τραπεζούντα",
-            "Crete": "Κρήτη", "Cyprus": "Κύπρος", "Pontus": "Πόντος",
-            "Thrace": "Θράκη", "Epirus": "Ήπειρος", "Asia Minor": "Μικρά Ασία",
-            "Aristotle": "Αριστοτέλης", "Plato": "Πλάτων", "Thucydides": "Θουκυδίδης",
-            "Herodotus": "Ηρόδοτος", "Plutarch": "Πλούταρχος", "Lucian": "Λουκιανός", "Demosthenes": "Δημοσθένης"
+            "Biography": "Βιογραφία", "Bibliography": "Βιβλιογραφία", "Journalism": "Δημοσιογραφία"
         };
         
         let activeTab = $('.tab-content.active').attr('id');
@@ -1020,7 +696,6 @@
             }
             if ((tableId === 'journalTab' || tableId === 'allTab') && anonChecked && rowObj.standard_author !== "Anonymous") return false;
             
-            // Allow searching by both Primary and Specialized fields
             if (discFilter) {
                 let inPrimary = rowObj.primary_disciplines && rowObj.primary_disciplines.split(',').map(x=>x.trim()).includes(discFilter);
                 let inAll = rowObj.disciplines && rowObj.disciplines.split(',').map(x=>x.trim()).includes(discFilter);
@@ -1038,7 +713,9 @@
         });
 
         $('#localTopPubYear, #localTopLecYear, #localTopDiscipline').on('change', updateTopContributorsAnalytics);
-        $('#localPiePubYear, #localPieLecYear').on('change', updatePieChartsAnalytics);
+        
+        // Single central update command for all visual breakdowns based on years
+        $('#localPiePubYear, #localPieLecYear').on('change', updateVisualBreakdowns);
     }
 
     function populateDropdowns(yearsPubs, yearsLecs, mothersSet, granularSet) {
@@ -1063,9 +740,8 @@
             localPieL.add(new Option(y, y)); 
         });
         
-        // Structure disciplines into Groups
-        let allDiscs = Array.from(granularSet).concat(Array.from(mothersSet));
-        allDiscs = [...new Set(allDiscs)].filter(x => x).sort();
+        d.innerHTML = '<option value="">All Disciplines</option>';
+        localTopD.innerHTML = '<option value="">All Disciplines</option>';
         
         let primaryGroup = document.createElement('optgroup');
         primaryGroup.label = "--- Primary Categories (Mothers) ---";
@@ -1077,16 +753,15 @@
         let localSubGroup = document.createElement('optgroup');
         localSubGroup.label = "--- Specialized Subfields ---";
 
-        allDiscs.forEach(y => { 
-            if(y && y.toLowerCase() !== "uncategorized") {
-                let isTop = topLevelDomains.includes(y);
-                if (isTop) {
-                    primaryGroup.appendChild(new Option(y, y));
-                    localPrimaryGroup.appendChild(new Option(y, y));
-                } else {
-                    subGroup.appendChild(new Option(y, y));
-                    localSubGroup.appendChild(new Option(y, y));
-                }
+        Array.from(mothersSet).sort().forEach(m => {
+            primaryGroup.appendChild(new Option(m, m));
+            localPrimaryGroup.appendChild(new Option(m, m));
+        });
+        
+        Array.from(granularSet).sort().forEach(sub => {
+            if (!mothersSet.has(sub)) {
+                subGroup.appendChild(new Option(sub, sub));
+                localSubGroup.appendChild(new Option(sub, sub));
             }
         });
 
@@ -1146,29 +821,31 @@
         sortAndRender(speakCounts, 'topSpeakersList', 'Lecture');
     }
 
-    function updatePieChartsAnalytics() {
+    // Unified Engine to safely pass exact Year Filters down to all visual charts simultaneously
+    function updateVisualBreakdowns() {
         let yrPub = $('#localPiePubYear').val();
         let yrLec = $('#localPieLecYear').val();
         
         let pubsData = masterData.filter(r => r.entry_type !== "Public Lecture" && (!yrPub || r.volume_or_year_greek === yrPub));
         let lecsData = masterData.filter(r => r.entry_type === "Public Lecture" && (!yrLec || r.volume_or_year_greek === yrLec));
         
-        buildSmartPieChart(pubsData, 'pieChartPubsBroad');
-        buildSmartPieChart(lecsData, 'pieChartLecsBroad');
-        buildSpecificBarChart(pubsData, 'barChartPubsSpecific');
-        buildSpecificBarChart(lecsData, 'barChartLecsSpecific');
+        buildSmartPieChart(pubsData, 'pieChartPubsBroad', yrPub);
+        buildSmartPieChart(lecsData, 'pieChartLecsBroad', yrLec);
+        buildSpecificBarChart(pubsData, 'barChartPubsSpecific', yrPub);
+        buildSpecificBarChart(lecsData, 'barChartLecsSpecific', yrLec);
+        
+        buildD3CirclePack(pubsData, '#packedChartPubs', 'Journal', yrPub);
+        buildD3CirclePack(lecsData, '#packedChartLecs', 'Lecture', yrLec);
     }
 
-    function buildSmartPieChart(dataset, canvasId) {
+    function buildSmartPieChart(dataset, canvasId, yearFilter) {
         let counts = {};
         dataset.forEach(row => {
             if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
             row.primary_disciplines.split(',').forEach(d => {
                 let dName = d.trim();
                 if(!dName || dName.toLowerCase() === 'null') return;
-                
                 if (!topLevelDomains.includes(dName)) return; 
-                
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
@@ -1196,17 +873,15 @@
                 }, 
                 onClick: (event, elements, chart) => { 
                     if(elements.length > 0) {
-                        let currentYearFilter = canvasId.includes('Pubs') ? $('#localPiePubYear').val() : $('#localPieLecYear').val();
-                        openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture', currentYearFilter); 
+                        openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture', yearFilter); 
                     }
                 } 
             }
         });
-        
         chartInstances[canvasId] = chartObj;
     }
 
-    function buildSpecificBarChart(dataset, canvasId) {
+    function buildSpecificBarChart(dataset, canvasId, yearFilter) {
         let counts = {};
         dataset.forEach(row => {
             if(!row.disciplines || row.disciplines === "N/A") return;
@@ -1215,7 +890,6 @@
                 if(!dName || dName.toLowerCase() === 'null') return;
                 
                 if (topLevelDomains.includes(dName)) return; 
-                
                 counts[dName] = (counts[dName] || 0) + 1;
             });
         });
@@ -1244,22 +918,15 @@
                 scales: { y: { beginAtZero: true } },
                 onClick: (event, elements, chart) => { 
                     if(elements.length > 0) {
-                        let currentYearFilter = canvasId.includes('Pubs') ? $('#localPiePubYear').val() : $('#localPieLecYear').val();
-                        openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture', currentYearFilter); 
+                        openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture', yearFilter); 
                     }
                 } 
             }
         });
-        
         chartInstances[canvasId] = chartObj;
     }
 
-    function buildCirclePackingAnalytics() {
-        buildD3CirclePack(masterData.filter(r => r.entry_type !== "Public Lecture"), '#d3PackPubs', 'Journal');
-        buildD3CirclePack(masterData.filter(r => r.entry_type === "Public Lecture"), '#d3PackLecs', 'Lecture');
-    }
-
-    function buildD3CirclePack(dataset, containerId, typeStr) {
+    function buildD3CirclePack(dataset, containerId, typeStr, yearFilter) {
         let counts = {};
         dataset.forEach(row => {
             if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
@@ -1271,11 +938,11 @@
             });
         });
 
-        let childrenData = Object.entries(counts).map(([name, count]) => ({ name, value: count }));
+        let childrenData = Object.entries(counts).map(([name, count]) => ({ id: name, value: count }));
         let rootData = { name: "root", children: childrenData };
 
         const container = d3.select(containerId);
-        container.html(""); // clear previous
+        container.html(""); 
 
         const width = container.node().getBoundingClientRect().width || 450;
         const height = 400;
@@ -1303,7 +970,7 @@
             .attr("transform", d => `translate(${d.x},${d.y})`)
             .style("cursor", "pointer")
             .on("click", (event, d) => {
-                openDisciplineModal(d.data.name, typeStr);
+                openDisciplineModal(d.data.id, typeStr, yearFilter);
             });
 
         node.append("circle")
@@ -1312,14 +979,14 @@
             .attr("stroke", "#111827")
             .attr("stroke-width", 1.5)
             .append("title")
-            .text(d => `${d.data.name}: ${d.data.value} entries`);
+            .text(d => `${d.data.id}: ${d.data.value} entries`);
 
         node.append("text")
             .attr("dy", "-0.3em")
             .style("font-size", d => Math.max(9, Math.min(d.r / 2.5, 13)) + "px")
             .style("font-weight", "600")
             .style("fill", "#ffffff")
-            .text(d => d.r > 18 ? d.data.name : "");
+            .text(d => d.r > 18 ? d.data.id : "");
 
         node.append("text")
             .attr("dy", "1.1em")
@@ -1676,19 +1343,18 @@
         openListModal(`Output for Year: ${year}`, `Total Records (${type}): ${items.length}`, items);
     }
     
-    // UPDATED to accept yearFilter argument dynamically from charts
     function openDisciplineModal(disc, type, yearFilter = "") {
         let items = masterData.filter(r => {
-            let inP = r.primary_disciplines && r.primary_disciplines.split(',').map(x=>x.trim()).includes(disc);
-            let inG = r.disciplines && r.disciplines.split(',').map(x=>x.trim()).includes(disc);
-            return inP || inG;
+            let primArr = r.primary_disciplines ? r.primary_disciplines.split(',').map(x=>x.trim()) : [];
+            let allArr = r.disciplines ? r.disciplines.split(',').map(x=>x.trim()) : [];
+            return primArr.includes(disc) || allArr.includes(disc);
         });
         
         if(type === 'Journal') items = items.filter(r => r.entry_type !== "Public Lecture");
         if(type === 'Lecture') items = items.filter(r => r.entry_type === "Public Lecture");
         
-        // Ensure lists adapt to local year selection
-        if(yearFilter) items = items.filter(r => getCleanYear(r) === yearFilter);
+        // Match explicit exact string, absolutely no Regex, to ensure it doesn't fail on ranges like "1878 - 1879"
+        if(yearFilter) items = items.filter(r => r.volume_or_year_greek === yearFilter);
         
         items.sort((a,b) => (getCleanYear(a) || "9999").localeCompare(getCleanYear(b) || "9999"));
         
