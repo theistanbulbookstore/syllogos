@@ -5,392 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hellenic Philological Society of Constantinople</title>
     
-    <!-- Fira Code Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
-    <!-- Chart.js & Zoom Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
 
     <style>
-        :root { 
-            --bg-color: #ffffff;
-            --text-color: #111827;
-            --text-muted: #6b7280;
-            --accent-cyan: #0284c7;
-            --border-light: #e5e7eb;
-            --border-dark: #111827;
-            --font-mono: 'Fira Code', 'Consolas', monospace;
-        }
-        
-        body { 
-            font-family: var(--font-mono); 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 20px 40px; 
-            font-size: 0.85rem; 
-        }
-        .header-container { 
-            display: flex; 
-            align-items: center; 
-            gap: 25px; 
-            margin-bottom: 20px; 
-            border-bottom: 2px solid var(--border-dark); 
-            padding-bottom: 15px; 
-        }
-        .header-logo { 
-            height: 90px; 
-            width: auto; 
-            object-fit: contain; 
-        }
-        .header-text h1 { 
-            margin: 0 0 5px 0; 
-            color: var(--text-color); 
-            font-size: 1.6rem; 
-            font-weight: 500; 
-        }
-        .header-text p { 
-            margin: 0; 
-            color: var(--text-muted); 
-            font-size: 0.9rem; 
-        }
-        
-        .controls { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-            flex-wrap: wrap; 
-            align-items: center; 
-        }
-        input[type="text"], select { 
-            padding: 8px 12px; 
-            font-family: var(--font-mono); 
-            font-size: 0.85rem; 
-            border: 1px solid var(--border-dark); 
-            border-radius: 2px; 
-            outline: none; 
-        }
-        input[type="text"]:focus, select:focus { 
-            border-color: var(--accent-cyan); 
-        }
-        .checkbox-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: var(--text-muted); 
-        }
-        
-        /* Keyword Suggestion Bar */
-        .suggestion-bar { 
-            display: none; 
-            gap: 8px; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-            align-items: center; 
-        }
-        .suggestion-btn { 
-            background: var(--border-dark); 
-            color: #ffffff; 
-            border: 1px solid var(--border-dark); 
-            padding: 6px 12px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            font-family: var(--font-mono); 
-            border-radius: 2px; 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-        }
-        .suggestion-pill { 
-            background: #ffffff; 
-            border: 1px solid var(--border-light); 
-            padding: 6px 12px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-            border-radius: 2px; 
-            transition: 0.2s; 
-        }
-        .suggestion-pill:hover { 
-            border-color: var(--border-dark); 
-            background: #f9fafb; 
-        }
-
-        /* Catalog Note */
-        #catalogNote { 
-            background-color: #f9fafb; 
-            border-left: 4px solid var(--accent-cyan); 
-            padding: 10px 16px; 
-            margin-bottom: 20px; 
-            font-size: 0.8rem; 
-            color: var(--text-color); 
-            display: none; 
-            line-height: 1.5; 
-            width: 100%; 
-            box-sizing: border-box; 
-        }
-
-        .tabs { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 20px; 
-        }
-        .tab-btn { 
-            background: transparent; 
-            border: 1px solid var(--border-light); 
-            padding: 8px 16px; 
-            font-size: 0.85rem; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-            transition: 0.2s; 
-            border-radius: 2px; 
-        }
-        .tab-btn:hover { 
-            border-color: var(--border-dark); 
-        }
-        .tab-btn.active { 
-            background: var(--border-dark); 
-            color: #ffffff; 
-            border-color: var(--border-dark); 
-        }
-        .tab-content { 
-            display: none; 
-        }
-        .tab-content.active { 
-            display: block; 
-        }
-        
-        .dataTables_wrapper .dataTables_filter { 
-            display: none !important; 
-        }
-        table.dataTable { 
-            font-family: var(--font-mono) !important; 
-            font-size: 0.85rem !important; 
-            border-collapse: collapse !important; 
-            width: 100% !important; 
-        }
-        table.dataTable thead th { 
-            background-color: #ffffff !important; 
-            border-bottom: 2px solid var(--border-dark) !important; 
-            padding: 10px !important; 
-        }
-        table.dataTable tbody td { 
-            border-bottom: 1px solid var(--border-light) !important; 
-            padding: 10px !important; 
-            vertical-align: top !important; 
-        }
-        .author-link { 
-            color: var(--accent-cyan); 
-            cursor: pointer; 
-            text-decoration: underline; 
-            font-weight: 500; 
-        }
-        .btn-small { 
-            padding: 4px 10px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            background: #ffffff; 
-            color: var(--text-color); 
-            border: 1px solid var(--border-light); 
-            border-radius: 2px; 
-            font-family: var(--font-mono); 
-        }
-        .btn-small:hover { 
-            border-color: var(--border-dark); 
-            background: var(--border-dark); 
-            color: #ffffff; 
-        }
-
-        /* Tag Pill UI Enhancements */
-        .tag-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 4px; 
-            max-width: 320px; 
-        }
-        .tag-pill { 
-            background-color: #f3f4f6; 
-            border: 1px solid var(--border-light); 
-            padding: 2px 6px; 
-            font-size: 0.7rem; 
-            border-radius: 3px; 
-            color: var(--text-color); 
-            white-space: nowrap; 
-        }
-        .tag-pill.parent-tag { 
-            background-color: #e0f2fe; 
-            border-color: #bae6fd; 
-            color: #0369a1; 
-        }
-        .tag-more-btn { 
-            background: none; 
-            border: none; 
-            color: var(--accent-cyan); 
-            font-size: 0.7rem; 
-            cursor: pointer; 
-            padding: 2px 4px; 
-            font-family: var(--font-mono); 
-            text-decoration: underline; 
-        }
-        
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(255,255,255,0.95); 
-            z-index: 1000; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .modal-content { 
-            background: white; 
-            padding: 30px; 
-            border: 1px solid var(--border-dark); 
-            max-width: 800px; 
-            max-height: 90vh; 
-            overflow-y: auto; 
-            width: 90%; 
-            position: relative; 
-        }
-        .close-btn { 
-            position: absolute; 
-            top: 15px; 
-            right: 20px; 
-            font-size: 20px; 
-            cursor: pointer; 
-            color: var(--text-color); 
-            font-family: var(--font-mono); 
-        }
-        #scanImage { 
-            max-width: 100%; 
-            display: block; 
-            margin: 0 auto; 
-            border: 1px solid var(--border-light); 
-        }
-        
-        #networkTab.active { 
-            display: flex; 
-            gap: 20px; 
-        }
-        #networkContainer { 
-            flex: 3; 
-            height: 650px; 
-            border: 1px solid var(--border-light); 
-            background: #ffffff; 
-        }
-        #networkSidebar { 
-            flex: 1; 
-            border-left: 2px solid var(--border-dark); 
-            padding-left: 20px; 
-            overflow-y: auto; 
-            height: 650px; 
-        }
-        .sidebar-header { 
-            font-weight: 600; 
-            font-size: 1.1rem; 
-            margin-bottom: 5px; 
-            color: var(--accent-cyan); 
-        }
-        .sidebar-link { 
-            color: var(--accent-cyan); 
-            cursor: pointer; 
-            text-decoration: underline; 
-            display: block; 
-            margin-bottom: 6px; 
-            font-weight: 500; 
-        }
-        .sidebar-link:hover { 
-            color: var(--border-dark); 
-        }
-
-        .chart-wrapper { 
-            width: 100%; 
-            height: 400px; 
-            margin-bottom: 20px; 
-        }
-        .chart-title { 
-            text-align: center; 
-            font-size: 1.1rem; 
-            font-weight: 600; 
-            margin-bottom: 10px; 
-            padding-bottom: 5px; 
-            border-bottom: 1px solid var(--border-light);
-        }
-        .dual-chart-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 40px; 
-            margin-top: 20px; 
-            margin-bottom: 40px; 
-        }
-        .split-row { 
-            display: flex; 
-            flex-direction: row; 
-            gap: 40px; 
-        }
-        .split-item { 
-            flex: 1; 
-        }
-        .section-header { 
-            margin-top: 40px; 
-            margin-bottom: 10px; 
-            font-size: 1.4rem; 
-            font-weight: 600; 
-            color: var(--text-color); 
-            border-bottom: 2px solid var(--border-dark); 
-            padding-bottom: 5px; 
-        }
-        
-        .top-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0; 
-        }
-        .top-list li { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 8px 0; 
-            border-bottom: 1px solid var(--border-light); 
-        }
-        .top-list li span:first-child { 
-            font-weight: 500; 
-            cursor: pointer; 
-            color: var(--accent-cyan); 
-            text-decoration: underline; 
-        }
-        .top-list li span:last-child { 
-            color: var(--text-muted); 
-        }
-        
-        #aboutTab p { 
-            margin-bottom: 15px; 
-            line-height: 1.6; 
-            font-size: 0.95rem; 
-        }
-        .local-controls { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-            flex-wrap: wrap; 
-        }
+        :root { --bg-color: #ffffff; --text-color: #111827; --text-muted: #6b7280; --accent-cyan: #0284c7; --border-light: #e5e7eb; --border-dark: #111827; --font-mono: 'Fira Code', 'Consolas', monospace; }
+        body { font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px 40px; font-size: 0.85rem; }
+        .header-container { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 15px; }
+        .header-logo { height: 90px; width: auto; object-fit: contain; }
+        .header-text h1 { margin: 0 0 5px 0; color: var(--text-color); font-size: 1.6rem; font-weight: 500; }
+        .header-text p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+        .controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        input[type="text"], select { padding: 8px 12px; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid var(--border-dark); border-radius: 2px; outline: none; }
+        input[type="text"]:focus, select:focus { border-color: var(--accent-cyan); }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+        optgroup { font-family: var(--font-mono); font-weight: 600; color: var(--text-color); }
+        .suggestion-bar { display: none; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .suggestion-btn { background: var(--border-dark); color: #ffffff; border: 1px solid var(--border-dark); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; font-family: var(--font-mono); border-radius: 2px; display: flex; align-items: center; gap: 5px; }
+        .suggestion-pill { background: #ffffff; border: 1px solid var(--border-light); padding: 6px 12px; font-size: 0.75rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); border-radius: 2px; transition: 0.2s; }
+        .suggestion-pill:hover { border-color: var(--border-dark); background: #f9fafb; }
+        #catalogNote { background-color: #f9fafb; border-left: 4px solid var(--accent-cyan); padding: 10px 16px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-color); display: none; line-height: 1.5; width: 100%; box-sizing: border-box; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { background: transparent; border: 1px solid var(--border-light); padding: 8px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); transition: 0.2s; border-radius: 2px; }
+        .tab-btn:hover { border-color: var(--border-dark); }
+        .tab-btn.active { background: var(--border-dark); color: #ffffff; border-color: var(--border-dark); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .dataTables_wrapper .dataTables_filter { display: none !important; }
+        table.dataTable { font-family: var(--font-mono) !important; font-size: 0.85rem !important; border-collapse: collapse !important; width: 100% !important; }
+        table.dataTable thead th { background-color: #ffffff !important; border-bottom: 2px solid var(--border-dark) !important; padding: 10px !important; }
+        table.dataTable tbody td { border-bottom: 1px solid var(--border-light) !important; padding: 10px !important; vertical-align: top !important; }
+        .author-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; font-weight: 500; }
+        .btn-small { padding: 4px 10px; font-size: 0.75rem; cursor: pointer; background: #ffffff; color: var(--text-color); border: 1px solid var(--border-light); border-radius: 2px; font-family: var(--font-mono); }
+        .btn-small:hover { border-color: var(--border-dark); background: var(--border-dark); color: #ffffff; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px; }
+        .tag-pill { background-color: #f3f4f6; border: 1px solid var(--border-light); padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; color: var(--text-color); white-space: nowrap; }
+        .tag-pill.parent-tag { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
+        .tag-more-btn { background: none; border: none; color: var(--accent-cyan); font-size: 0.7rem; cursor: pointer; padding: 2px 4px; font-family: var(--font-mono); text-decoration: underline; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border: 1px solid var(--border-dark); max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: var(--text-color); font-family: var(--font-mono); }
+        #scanImage { max-width: 100%; display: block; margin: 0 auto; border: 1px solid var(--border-light); }
+        #networkTab.active { display: flex; gap: 20px; }
+        #networkContainer { flex: 3; height: 650px; border: 1px solid var(--border-light); background: #ffffff; }
+        #networkSidebar { flex: 1; border-left: 2px solid var(--border-dark); padding-left: 20px; overflow-y: auto; height: 650px; }
+        .sidebar-header { font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; color: var(--accent-cyan); }
+        .sidebar-link { color: var(--accent-cyan); cursor: pointer; text-decoration: underline; display: block; margin-bottom: 6px; font-weight: 500; }
+        .sidebar-link:hover { color: var(--border-dark); }
+        .chart-wrapper { width: 100%; height: 400px; margin-bottom: 20px; }
+        .chart-title { text-align: center; font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-light); }
+        .dual-chart-container { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; margin-bottom: 40px; }
+        .split-row { display: flex; flex-direction: row; gap: 40px; }
+        .split-item { flex: 1; }
+        .section-header { margin-top: 40px; margin-bottom: 10px; font-size: 1.4rem; font-weight: 600; color: var(--text-color); border-bottom: 2px solid var(--border-dark); padding-bottom: 5px; }
+        .top-list { list-style: none; padding: 0; margin: 0; }
+        .top-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+        .top-list li span:first-child { font-weight: 500; cursor: pointer; color: var(--accent-cyan); text-decoration: underline; }
+        .top-list li span:last-child { color: var(--text-muted); }
+        #aboutTab p { margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem; }
+        .local-controls { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -434,23 +119,13 @@
 
     <!-- Archival Notes -->
     <div id="catalogNote">
-        <p style="margin-top: 0; margin-bottom: 6px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em>, the scholarly periodical of the Hellenic Philological Society of Constantinople, gives author names primarily in the genitive form (Ζωγράφου/Zografou rather than Ζωγράφος/Zografos). The index for the Society's public lectures, on the other hand, largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both the nominative and the genitive across the two indices. If looking for Zografos/Ζωγράφος, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
-        <p style="margin: 0;">Also note that the <em>Syngramma Periodikon</em> frequently published documents pertaining to the internal workings of the Society (meeting reports, updates on donations, etc.) and book excerpts. These are included only selectively in the 1922 cumulative index this project is based on. If researching such material, please refer to the actual volumes.</p>
+        <p style="margin-top: 0; margin-bottom: 6px;"><strong>Note:</strong> The original index for <em>Syngramma Periodikon</em> gives author names primarily in the genitive form (Ζωγράφου/Zografou). The index for public lectures largely employs the nominative. The catalog below normalises names to the nominative only when they appear in both. If looking for Zografos/Ζωγράφος, it is easiest to search for the stem Zograf/Ζωγράφ. The Greek-language search is agnostic to accent marks.</p>
     </div>
 
     <!-- TAB 1: Journal -->
     <div id="journalTab" class="tab-content active">
         <table id="journalTable" class="display nowrap" style="width:100%">
-            <thead><tr>
-                <th>Year</th>
-                <th>Author</th>
-                <th>Title</th>
-                <th>Subsection</th>
-                <th>Pages</th>
-                <th>Disciplines</th>
-                <th>Scan</th>
-                <th>Action</th>
-            </tr></thead>
+            <thead><tr><th>Year</th><th>Author</th><th>Title</th><th>Subsection</th><th>Pages</th><th>Disciplines</th><th>Scan</th><th>Action</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
@@ -458,32 +133,15 @@
     <!-- TAB 2: Lectures -->
     <div id="lectureTab" class="tab-content">
         <table id="lectureTable" class="display nowrap" style="width:100%">
-            <thead><tr>
-                <th>Year</th>
-                <th>Speaker</th>
-                <th>Title</th>
-                <th>Lectures</th>
-                <th>Disciplines</th>
-                <th>Scan</th>
-                <th>Action</th>
-            </tr></thead>
+            <thead><tr><th>Year</th><th>Speaker</th><th>Title</th><th>Lectures</th><th>Disciplines</th><th>Scan</th><th>Action</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <!-- TAB 7: All Entries (Review) -->
+    <!-- TAB 7: All Entries -->
     <div id="allTab" class="tab-content">
-        <p style="color: var(--text-muted); margin-bottom: 15px;">This tab combines all Journal and Lecture entries. Authors are formatted as "Last Name, First Name" to assist with alphabetized sorting and deduplication review.</p>
         <table id="allTable" class="display nowrap" style="width:100%">
-            <thead><tr>
-                <th>Year</th>
-                <th>Author (Last, First)</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Disciplines</th>
-                <th>Scan</th>
-                <th>Action</th>
-            </tr></thead>
+            <thead><tr><th>Year</th><th>Author (Last, First)</th><th>Title</th><th>Type</th><th>Disciplines</th><th>Scan</th><th>Action</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
@@ -491,18 +149,13 @@
     <!-- TAB 3: Semantic Search -->
     <div id="semanticTab" class="tab-content">
         <h2 style="font-weight: 500;">AI Semantic Concept Search</h2>
-        <p style="color: var(--text-muted);">Search by concept or theme (e.g., "public health", "ancient philosophy") rather than exact keywords. This module requires the generation of vector embeddings.</p>
         <input type="text" placeholder="Enter a conceptual search..." style="width: 400px;">
         <button class="btn-small" style="padding: 8px 16px;">Search Concept</button>
-        <div style="margin-top: 20px; padding: 20px; border: 1px dashed var(--border-light); text-align: center; color: var(--text-muted);">
-            [ Semantic Vector Results will appear here ]
-        </div>
+        <div style="margin-top: 20px; padding: 20px; border: 1px dashed var(--border-light); text-align: center; color: var(--text-muted);">[ Semantic Vector Results will appear here ]</div>
     </div>
 
     <!-- TAB 4: Visual Analytics -->
     <div id="analyticsTab" class="tab-content">
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Comprehensive breakdown of society output. The modules below are decoupled and feature their own dedicated controls.</p>
-        
         <div class="section-header">1. Top Contributors</div>
         <div class="local-controls">
             <select id="localTopPubYear"><option value="">All Journal Years</option></select>
@@ -510,14 +163,8 @@
             <select id="localTopDiscipline"><option value="">All Disciplines</option></select>
         </div>
         <div class="split-row">
-            <div class="split-item">
-                <div class="chart-title">Most Published Authors (Journal)</div>
-                <ul class="top-list" id="topAuthorsList"></ul>
-            </div>
-            <div class="split-item">
-                <div class="chart-title">Most Frequent Speakers (Lectures)</div>
-                <ul class="top-list" id="topSpeakersList"></ul>
-            </div>
+            <div class="split-item"><div class="chart-title">Most Published Authors (Journal)</div><ul class="top-list" id="topAuthorsList"></ul></div>
+            <div class="split-item"><div class="chart-title">Most Frequent Speakers (Lectures)</div><ul class="top-list" id="topSpeakersList"></ul></div>
         </div>
 
         <div class="section-header" style="margin-top: 60px;">2. Thematic Breakdown</div>
@@ -525,57 +172,27 @@
             <select id="localPiePubYear"><option value="">All Journal Years</option></select>
             <select id="localPieLecYear"><option value="">All Lecture Years</option></select>
         </div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">The upper pie charts show mutually exclusive <strong>Primary Disciplines</strong>. The lower bar charts strip those away to show the <strong>Granular Subject Frequency</strong>. Click categories in the legends to toggle them on or off.</p>
         
-        <!-- Broad Row (Pie Charts) -->
         <div class="split-row">
-            <div class="split-item chart-wrapper" style="height: 350px;">
-                <div class="chart-title">Journal Publications by Primary Discipline</div>
-                <canvas id="pieChartPubsBroad"></canvas>
-            </div>
-            <div class="split-item chart-wrapper" style="height: 350px;">
-                <div class="chart-title">Public Lectures by Primary Discipline</div>
-                <canvas id="pieChartLecsBroad"></canvas>
-            </div>
+            <div class="split-item chart-wrapper" style="height: 350px;"><div class="chart-title">Journal Publications by Primary Discipline</div><canvas id="pieChartPubsBroad"></canvas></div>
+            <div class="split-item chart-wrapper" style="height: 350px;"><div class="chart-title">Public Lectures by Primary Discipline</div><canvas id="pieChartLecsBroad"></canvas></div>
         </div>
 
-        <!-- Granular Row (Bar Charts) -->
         <div class="split-row" style="margin-top: 50px;">
-            <div class="split-item chart-wrapper" style="height: 350px;">
-                <div class="chart-title">Top Specialized Subfields (Journal)</div>
-                <canvas id="barChartPubsSpecific"></canvas>
-            </div>
-            <div class="split-item chart-wrapper" style="height: 350px;">
-                <div class="chart-title">Top Specialized Subfields (Lectures)</div>
-                <canvas id="barChartLecsSpecific"></canvas>
-            </div>
+            <div class="split-item chart-wrapper" style="height: 350px;"><div class="chart-title">Top Specialized Subfields (Journal)</div><canvas id="barChartPubsSpecific"></canvas></div>
+            <div class="split-item chart-wrapper" style="height: 350px;"><div class="chart-title">Top Specialized Subfields (Lectures)</div><canvas id="barChartLecsSpecific"></canvas></div>
         </div>
 
-        <!-- Category Proportional Bubble / Filled Circle View -->
-        <div class="section-header" style="margin-top: 60px;">3. Category Proportional View (Filled Circle Map)</div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Bubble size (radius) corresponds directly to the total number of records in each primary discipline. Click any circle to view records.</p>
+        <div class="section-header" style="margin-top: 60px;">3. Category Proportional View (Packed Circles)</div>
         <div class="split-row">
-            <div class="split-item chart-wrapper" style="height: 400px;">
-                <div class="chart-title">Journal Categories Proportional Bubble Map</div>
-                <canvas id="bubbleChartPubs"></canvas>
-            </div>
-            <div class="split-item chart-wrapper" style="height: 400px;">
-                <div class="chart-title">Lecture Categories Proportional Bubble Map</div>
-                <canvas id="bubbleChartLecs"></canvas>
-            </div>
+            <div class="split-item chart-wrapper" style="height: 400px;"><div class="chart-title">Journal Categories Proportional Packed Circles</div><div id="packedChartPubs" style="height:100%; width:100%;"></div></div>
+            <div class="split-item chart-wrapper" style="height: 400px;"><div class="chart-title">Lecture Categories Proportional Packed Circles</div><div id="packedChartLecs" style="height:100%; width:100%;"></div></div>
         </div>
 
         <div class="section-header" style="margin-top: 60px;">4. Disciplinary Output Over Time</div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;"><strong>Interactive:</strong> Click and drag horizontally inside the graph to zoom into a specific year range. Double click to reset zoom. This chart tracks Primary Disciplines across all years.</p>
         <div class="dual-chart-container">
-            <div class="chart-wrapper" style="height: 450px;">
-                <div class="chart-title">Journal Publications Over Time</div>
-                <canvas id="lineChartPubs"></canvas>
-            </div>
-            <div class="chart-wrapper" style="height: 450px;">
-                <div class="chart-title">Public Lectures Over Time</div>
-                <canvas id="lineChartLecs"></canvas>
-            </div>
+            <div class="chart-wrapper" style="height: 450px;"><div class="chart-title">Journal Publications Over Time</div><canvas id="lineChartPubs"></canvas></div>
+            <div class="chart-wrapper" style="height: 450px;"><div class="chart-title">Public Lectures Over Time</div><canvas id="lineChartLecs"></canvas></div>
         </div>
     </div>
 
@@ -588,7 +205,7 @@
                 <input type="text" id="networkSearch" placeholder="Find author or field..." style="width: 100%; padding: 6px; box-sizing: border-box; font-family: var(--font-mono); border: 1px solid var(--border-dark); outline: none;">
             </div>
             <div id="sidebarContent" style="margin-top: 5px;">
-                <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any node on the map, or use the search bar, to inspect connections. Large black hubs represent the Primary Disciplines.</p>
+                <p id="sidebarDesc" style="color: var(--text-muted); margin-bottom: 15px;">Click any node on the map, or use the search bar, to inspect connections.</p>
                 <div id="sidebarLinks"></div>
             </div>
         </div>
@@ -596,16 +213,9 @@
 
     <!-- TAB 6: Timeline -->
     <div id="timelineTab" class="tab-content">
-        <p style="color: var(--text-muted);">Total output of publications and public lectures per year. Click any bar to view the records.</p>
         <div class="dual-chart-container">
-            <div class="chart-wrapper">
-                <div class="chart-title">Journal Publications Output</div>
-                <canvas id="timelineChartPubs"></canvas>
-            </div>
-            <div class="chart-wrapper">
-                <div class="chart-title">Public Lectures Output</div>
-                <canvas id="timelineChartLecs"></canvas>
-            </div>
+            <div class="chart-wrapper"><div class="chart-title">Journal Publications Output</div><canvas id="timelineChartPubs"></canvas></div>
+            <div class="chart-wrapper"><div class="chart-title">Public Lectures Output</div><canvas id="timelineChartLecs"></canvas></div>
         </div>
     </div>
 
@@ -614,20 +224,13 @@
         <div style="display: flex; align-items: center; gap: 40px; flex-wrap: wrap; max-width: 1100px;">
             <div style="flex: 1; min-width: 400px;">
                 <h2 style="font-weight: 500; margin-top: 0;">About the Project</h2>
-                <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong> (Hellenikos Philologikos Syllogos Konstantinoupoleos). Founded in 1861, the Syllogos was the most significant learned society in the Ottoman Empire. It has been called “the Ministry of Education of the Unredeemed Greeks” in the Eastern Mediterranean.</p>
-                <p>Amongst its many activities, the Syllogos published a journal and organized public lectures on issues of scholarly and popular interest. The present repository includes a searchable catalogue of both the journal and the public lectures. It also offers various tools to organise, visualise, and analyse this data in ways that were not previously possible.</p>
-                <p>The journal articles catalogued here (from 1864 to 1914) are available in hard copy, across thirty-three volumes. Digitized versions of some may be accessed <a href="https://el.wikisource.org/wiki/%CE%9F_%CE%B5%CE%_%CE%9A%CF%89%CE%BD%CF%83%CF%84%CE%B1%CE%BD%CF%84%CE%B9%CE%BD%CE%BF%CF%85%CF%80%CF%8C%CE%BB%CE%B5%CE%B9_%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CF%86%CE%B9%CE%BB%CE%BF%CE%BB%CE%BF%CE%B3%CE%B9%CE%BA%CF%8C%CF%82_%CF%83%CF%8D%CE%BB%CE%BB%CE%BF%CE%B3%CE%BF%CF%82._%CE%A3%CF%8D%CE%B3%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1_%CF%80%CE%B5%CF%81%CE%B9%CE%BF%CE%B4%CE%B9%CE%BA%CF%8C%CE%BD" target="_blank" style="color:var(--accent-cyan);">here</a>. The ultimate hope of this project is to fully integrate the text of each article into the repository.</p>
-                <p>The texts of the public lectures are lost. In some cases, the speakers developed these into subsequent journal articles, or published them independently. The titles alone give many insights into intellectual and social life in late Ottoman Istanbul, and amongst Ottoman Greeks.</p>
-                <p>For each entry, a photograph of the original hard-copy catalog page is also available (under 'SCAN' to the far right of the metadata table). This project is still in development, please do confirm your findings against these as necessary.</p>
+                <p>Welcome to the digital repository of the <strong>Hellenic Philological Society of Constantinople</strong>.</p>
                 <p>Curated and maintained by Kutay Onaylı. Contact at <a href="mailto:kutay.onayli@magd.ox.ac.uk" style="color:var(--accent-cyan);">kutay.onayli@magd.ox.ac.uk</a>. Καλή αντάμωση.</p>
-            </div>
-            <div style="flex: 0 0 350px;">
-                <img src="about1.png" alt="Syllogos Building" style="width: 100%; border-radius: 2px;">
             </div>
         </div>
     </div>
 
-    <!-- Scan Lightbox Modal -->
+    <!-- Modals -->
     <div id="scanModal" class="modal">
         <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
             <span class="close-btn" onclick="closeModal('scanModal')" style="color: #111827; font-size: 30px; font-weight: bold;">[X]</span>
@@ -635,7 +238,6 @@
         </div>
     </div>
 
-    <!-- Reusable List Modal -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('profileModal')">[X]</span>
@@ -654,7 +256,6 @@
     let windowNodesMap = new Map();
     let networkNodesData;
     
-    // Expanded 25-color palette for the 25 top-level macro categories
     const colors = [
         '#0284c7', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', 
         '#0d9488', '#ea580c', '#4f46e5', '#ca8a04', '#2563eb', '#65a30d', 
@@ -662,7 +263,6 @@
         '#be185d', '#0f766e', '#c2410c', '#4338ca', '#a16207', '#1d4ed8', '#4d7c0f'
     ];
 
-    // Perfected 25 Parent Domains matching our final python script mapping
     const parentDomains = [
         'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
         'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
@@ -670,44 +270,21 @@
         'Literature', 'Medicine', 'Music', 'Natural & Exact Science', 'Philology', 
         'Philosophy', 'Psychology', 'Public Health', 'Religion', 'Sociology'
     ];
+    const topLevelDomains = parentDomains;
 
-    // Perfected 25 Top-Level Domains for mutually exclusive charts and network nodes
-    const topLevelDomains = [
-        'Administration', 'Anthropology', 'Archaeology', 'Architecture', 'Art', 
-        'Byzantine Studies', 'Classics', 'Earth Sciences', 'Economics', 'Education', 
-        'Folklore', 'Gender Studies', 'Geography', 'History', 'Law & Political Science', 
-        'Literature', 'Medicine', 'Music', 'Natural & Exact Science', 'Philology', 
-        'Philosophy', 'Psychology', 'Public Health', 'Religion', 'Sociology'
-    ];
-
-    // --- Search Helper ---
-    function removeGreekAccents(str) {
-        if (!str) return "";
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
-
-    function toMonotonic(str) {
-        if (!str) return "";
-        return str.normalize("NFD").replace(/[\u0313\u0314\u0342\u0300\u0308]/g, "").normalize("NFC");
-    }
-
-    function getStandardAuthor(row) {
-        return row.normalized_author || "Anonymous";
-    }
-
+    function removeGreekAccents(str) { return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
+    function toMonotonic(str) { return str ? str.normalize("NFD").replace(/[\u0313\u0314\u0342\u0300\u0308]/g, "").normalize("NFC") : ""; }
+    function getStandardAuthor(row) { return row.normalized_author || "Anonymous"; }
     function flipName(name) {
         if (!name || name === "Anonymous" || name === "N/A" || name.trim() === "") return name;
         let cleanName = name.trim();
         if (cleanName.toLowerCase().includes(' and ') || cleanName.toLowerCase().includes(' καὶ ')) return cleanName;
-        
         let parts = cleanName.split(' ');
         if (parts.length <= 1) return cleanName;
-        
         let surname = parts.pop().replace(/,$/, '');
         return surname + ", " + parts.join(' ');
     }
 
-    // Updated CSV File Name
     Papa.parse("philological_society_deduped_august28.csv", {
         download: true,
         header: true,
@@ -724,7 +301,6 @@
     function getCleanYear(row) {
         let rawYear = row.volume_or_year_greek || "";
         let subYear = row.subsection_greek || "";
-        
         if (rawYear.includes("ΕΙΚΟΣΙΠΕΝΤΑΕΤΗΡΙΣ")) return "1888";
         if (rawYear.includes("Παράρτημα")) return "1888";
         if (rawYear.includes("ΖΩΓΡΑΦΕΙΟΣ ΑΓΩΝ")) {
@@ -733,7 +309,6 @@
             return "1891";
         }
         if (rawYear.includes("ΖΩΓΡΑΦΕΙΟΣ ΕΛΛΗΝΙΚΗ ΒΙΒΛΙΟΘΗΚΗ")) return "ΖΩΓΡΑΦΕΙΟΣ ΕΛΛΗΝΙΚΗ ΒΙΒΛΙΟΘΗΚΗ";
-        
         let m = rawYear.match(/\d{4}/);
         return m ? m[0] : rawYear;
     }
@@ -744,57 +319,49 @@
         const allData = masterData.slice();
         const yearsPubs = new Set();
         const yearsLecs = new Set();
-        const disciplines = new Set();
+        const mothersSet = new Set();
+        const granularSet = new Set();
 
         masterData.forEach(row => {
             if (!row.title_greek) return;
             row.search_text = `${row.author_greek || ''} ${row.title_greek} ${row.title_english || ''} ${row.standard_author || ''}`;
 
             if (row.volume_or_year_greek && row.volume_or_year_greek !== "N/A") {
-                if(row.entry_type === "Public Lecture") {
-                    yearsLecs.add(row.volume_or_year_greek);
-                } else {
-                    yearsPubs.add(row.volume_or_year_greek);
-                }
+                if(row.entry_type === "Public Lecture") yearsLecs.add(row.volume_or_year_greek);
+                else yearsPubs.add(row.volume_or_year_greek);
             }
             if (row.primary_disciplines && row.primary_disciplines !== "N/A" && row.primary_disciplines.toLowerCase() !== "uncategorized") {
-                row.primary_disciplines.split(',').forEach(d => disciplines.add(d.trim()));
+                row.primary_disciplines.split(',').forEach(d => mothersSet.add(d.trim()));
+            }
+            if (row.disciplines && row.disciplines !== "N/A" && row.disciplines.toLowerCase() !== "uncategorized") {
+                row.disciplines.split(',').forEach(d => granularSet.add(d.trim()));
             }
 
-            if (row.entry_type === "Public Lecture") {
-                lectureDataGlobal.push(row);
-            } else {
-                journalDataGlobal.push(row);
-            }
+            if (row.entry_type === "Public Lecture") lectureDataGlobal.push(row);
+            else journalDataGlobal.push(row);
         });
 
-        populateDropdowns(yearsPubs, yearsLecs, disciplines);
+        populateDropdowns(yearsPubs, yearsLecs, mothersSet, granularSet);
         buildTables(journalDataGlobal, lectureDataGlobal, allData);
-        
         buildTimeline(journalDataGlobal, 'timelineChartPubs', '#111827');
         buildTimeline(lectureDataGlobal, 'timelineChartLecs', '#0284c7');
         
         updateTopContributorsAnalytics();
         updatePieChartsAnalytics();
-        buildBubbleChartsAnalytics();
+        buildPackedCircleChartsAnalytics();
         buildInteractiveLineCharts();
-        
         buildNetwork();
         setupCustomFilters();
         
         if ($('.tab-content.active').attr('id') === 'journalTab' || $('.tab-content.active').attr('id') === 'lectureTab') {
             $('#suggestionBar').css('display', 'flex');
-            if($('.tab-content.active').attr('id') === 'journalTab') { 
-                $('#catalogNote').show(); 
-            } else { 
-                $('#catalogNote').hide(); 
-            }
+            if($('.tab-content.active').attr('id') === 'journalTab') $('#catalogNote').show();
+            else $('#catalogNote').hide();
             refreshSuggestions();
         }
     }
 
     function refreshSuggestions() {
-        // Expanded concept dictionary (over 85 terms with English/Greek pairs)
         const conceptDict = {
             "History": "Ιστορία", "Philology": "Φιλολογία", "Classics": "Κλασικές Σπουδές",
             "Medicine": "Ιατρική", "Literature": "Λογοτεχνία", "Science": "Επιστήμη",
@@ -815,15 +382,7 @@
             "Botany": "Βοτανική", "Zoology": "Ζωολογία", "Geology": "Γεωλογία",
             "Meteorology": "Μετεωρολογία", "Mineralogy": "Ορυκτολογία", "Seismology": "Σεισμολογία",
             "Theater": "Θέατρο", "Poetry": "Ποίηση", "Drama": "Δράμα",
-            "Biography": "Βιογραφία", "Bibliography": "Βιβλιογραφία", "Journalism": "Δημοσιογραφία",
-            "Publishing": "Εκδοτική", "Library Science": "Βιβλιοθηκονομία", "Excavations": "Ανασκαφές",
-            "Inscriptions": "Επιγραφές", "Manuscripts": "Χειρόγραφα", "School": "Σχολή",
-            "Teacher": "Δάσκαλος", "Student": "Μαθητής", "Church": "Εκκλησία",
-            "Patriarchate": "Πατριαρχείο", "Smyrna": "Σμύρνη", "Trebizond": "Τραπεζούντα",
-            "Crete": "Κρήτη", "Cyprus": "Κύπρος", "Pontus": "Πόντος",
-            "Thrace": "Θράκη", "Epirus": "Ήπειρος", "Asia Minor": "Μικρά Ασία",
-            "Aristotle": "Αριστοτέλης", "Plato": "Πλάτων", "Thucydides": "Θουκυδίδης",
-            "Herodotus": "Ηρόδοτος", "Plutarch": "Πλούταρχος", "Lucian": "Λουκιανός", "Demosthenes": "Δημοσθένης"
+            "Biography": "Βιογραφία", "Bibliography": "Βιβλιογραφία", "Journalism": "Δημοσιογραφία"
         };
         
         let activeTab = $('.tab-content.active').attr('id');
@@ -831,7 +390,6 @@
         if (!poolSource || poolSource.length === 0) poolSource = masterData;
 
         let candidateMap = new Map();
-
         poolSource.forEach(row => {
             if (row.disciplines && row.disciplines !== "N/A") {
                 row.disciplines.split(',').forEach(d => {
@@ -842,15 +400,13 @@
             if (row.title_english && row.title_english !== "N/A") {
                 let enTitleLower = row.title_english.toLowerCase();
                 for (let key in conceptDict) {
-                    if (enTitleLower.includes(key.toLowerCase())) {
-                        candidateMap.set(`title_${key}`, { en: key, gr: conceptDict[key], search: key });
-                    }
+                    if (enTitleLower.includes(key.toLowerCase())) candidateMap.set(`title_${key}`, { en: key, gr: conceptDict[key], search: key });
                 }
             }
         });
 
         let termsArray = Array.from(candidateMap.values());
-        let shuffled = termsArray.sort(() => 0.5 - Math.random()).slice(0, 8);
+        let shuffled = termsArray.sort(() => 0.5 - Math.random()).slice(0, 7);
         
         let container = document.getElementById('suggestionPills');
         container.innerHTML = '';
@@ -858,9 +414,7 @@
             let pill = document.createElement('div');
             pill.className = 'suggestion-pill';
             pill.innerText = `${termObj.en} (${termObj.gr})`;
-            pill.onclick = () => { 
-                $('#globalSearch').val(termObj.search).trigger('keyup'); 
-            };
+            pill.onclick = () => { $('#globalSearch').val(termObj.search).trigger('keyup'); };
             container.appendChild(pill);
         });
     }
@@ -896,31 +450,16 @@
 
     function toggleTags(id, btn, count) {
         let extraSpan = document.getElementById(id + '_extra');
-        if (extraSpan.style.display === 'none') {
-            extraSpan.style.display = 'contents';
-            btn.innerText = 'show less';
-        } else {
-            extraSpan.style.display = 'none';
-            btn.innerText = `+${count} more`;
-        }
+        if (extraSpan.style.display === 'none') { extraSpan.style.display = 'contents'; btn.innerText = 'show less'; } 
+        else { extraSpan.style.display = 'none'; btn.innerText = `+${count} more`; }
     }
 
     function buildTables(journal, lecture, all) {
         const renderScanBtn = (data, type, row) => `<button class="btn-small" onclick="viewScan('${row.source_image}')">Scan</button>`;
         const renderCiteBtn = (data, type, row) => `<button class="btn-small" onclick="generateCitation('${escapeQuote(row.author_greek)}', '${escapeQuote(row.title_greek)}', '${escapeQuote(row.volume_or_year_greek)}')">Cite</button>`;
-        
-        const renderAuthor = (data, type, row) => {
-            return `<span class="author-link" onclick="openProfile('${escapeQuote(row.standard_author)}', 'All')">${row.standard_author}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${row.author_greek && row.author_greek !== "N/A" ? row.author_greek : ""}</span>`;
-        };
-        
-        const renderFlippedAuthor = (data, type, row) => {
-            return `<span class="author-link" onclick="openProfile('${escapeQuote(row.standard_author)}', 'All')">${flipName(row.standard_author)}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${flipName(row.author_greek && row.author_greek !== "N/A" ? row.author_greek : "")}</span>`;
-        };
-
-        const renderTitle = (data, type, row) => {
-            return `<span>${row.title_english || row.title_greek || ''}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${row.title_english ? (row.title_greek || '') : ''}</span>`;
-        };
-
+        const renderAuthor = (data, type, row) => `<span class="author-link" onclick="openProfile('${escapeQuote(row.standard_author)}', 'All')">${row.standard_author}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${row.author_greek && row.author_greek !== "N/A" ? row.author_greek : ""}</span>`;
+        const renderFlippedAuthor = (data, type, row) => `<span class="author-link" onclick="openProfile('${escapeQuote(row.standard_author)}', 'All')">${flipName(row.standard_author)}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${flipName(row.author_greek && row.author_greek !== "N/A" ? row.author_greek : "")}</span>`;
+        const renderTitle = (data, type, row) => `<span>${row.title_english || row.title_greek || ''}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">${row.title_english ? (row.title_greek || '') : ''}</span>`;
         const renderCombinedDisciplines = (data, type, row) => {
             let base = row.disciplines && row.disciplines !== "N/A" ? row.disciplines.split(',').map(t=>t.trim()) : [];
             let prim = row.primary_disciplines && row.primary_disciplines !== "N/A" ? row.primary_disciplines.split(',').map(t=>t.trim()) : [];
@@ -928,51 +467,9 @@
             return renderDisciplines(combined, type, row);
         };
 
-        window.jt = $('#journalTable').DataTable({ 
-            data: journal, 
-            pageLength: 25, 
-            scrollX: true, 
-            columns: [ 
-                { data: 'volume_or_year_greek' }, 
-                { data: null, render: renderAuthor }, 
-                { data: null, render: renderTitle }, 
-                { data: 'subsection_greek' }, 
-                { data: 'page_numbers' }, 
-                { data: null, render: renderCombinedDisciplines }, 
-                { data: null, render: renderScanBtn, orderable: false }, 
-                { data: null, render: renderCiteBtn, orderable: false } 
-            ] 
-        });
-
-        window.lt = $('#lectureTable').DataTable({ 
-            data: lecture, 
-            pageLength: 25, 
-            scrollX: true, 
-            columns: [ 
-                { data: 'volume_or_year_greek' }, 
-                { data: null, render: renderAuthor }, 
-                { data: null, render: renderTitle }, 
-                { data: 'lecture_count' }, 
-                { data: null, render: renderCombinedDisciplines }, 
-                { data: null, render: renderScanBtn, orderable: false }, 
-                { data: null, render: renderCiteBtn, orderable: false } 
-            ] 
-        });
-
-        window.at = $('#allTable').DataTable({ 
-            data: all, 
-            pageLength: 50, 
-            scrollX: true, 
-            columns: [ 
-                { data: 'volume_or_year_greek' }, 
-                { data: null, render: renderFlippedAuthor }, 
-                { data: null, render: renderTitle }, 
-                { data: 'entry_type' }, 
-                { data: null, render: renderCombinedDisciplines }, 
-                { data: null, render: renderScanBtn, orderable: false }, 
-                { data: null, render: renderCiteBtn, orderable: false } 
-            ] 
-        });
+        window.jt = $('#journalTable').DataTable({ data: journal, pageLength: 25, scrollX: true, columns: [ { data: 'volume_or_year_greek' }, { data: null, render: renderAuthor }, { data: null, render: renderTitle }, { data: 'subsection_greek' }, { data: 'page_numbers' }, { data: null, render: renderCombinedDisciplines }, { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false } ] });
+        window.lt = $('#lectureTable').DataTable({ data: lecture, pageLength: 25, scrollX: true, columns: [ { data: 'volume_or_year_greek' }, { data: null, render: renderAuthor }, { data: null, render: renderTitle }, { data: 'lecture_count' }, { data: null, render: renderCombinedDisciplines }, { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false } ] });
+        window.at = $('#allTable').DataTable({ data: all, pageLength: 50, scrollX: true, columns: [ { data: 'volume_or_year_greek' }, { data: null, render: renderFlippedAuthor }, { data: null, render: renderTitle }, { data: 'entry_type' }, { data: null, render: renderCombinedDisciplines }, { data: null, render: renderScanBtn, orderable: false }, { data: null, render: renderCiteBtn, orderable: false } ] });
     }
 
     function setupCustomFilters() {
@@ -988,22 +485,25 @@
                 if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             }
             if ((tableId === 'journalTab' || tableId === 'allTab') && anonChecked && rowObj.standard_author !== "Anonymous") return false;
-            if (discFilter && (!rowObj.primary_disciplines || !rowObj.primary_disciplines.includes(discFilter))) return false;
+            
+            if (discFilter) {
+                let inPrimary = rowObj.primary_disciplines && rowObj.primary_disciplines.includes(discFilter);
+                let inAll = rowObj.disciplines && rowObj.disciplines.includes(discFilter);
+                if (!inPrimary && !inAll) return false;
+            }
+            
             if (query && !removeGreekAccents(rowObj.search_text || "").includes(query)) return false;
             return true;
         });
 
         $('#globalSearch, #anonFilter, #filterDiscipline, #filterYearPubs, #filterYearLecs').on('keyup change', function() {
-            window.jt.draw(); 
-            window.lt.draw(); 
-            window.at.draw();
+            window.jt.draw(); window.lt.draw(); window.at.draw();
         });
-
         $('#localTopPubYear, #localTopLecYear, #localTopDiscipline').on('change', updateTopContributorsAnalytics);
         $('#localPiePubYear, #localPieLecYear').on('change', updatePieChartsAnalytics);
     }
 
-    function populateDropdowns(yearsPubs, yearsLecs, disciplines) {
+    function populateDropdowns(yearsPubs, yearsLecs, mothersSet, granularSet) {
         let yp = document.getElementById("filterYearPubs");
         let yl = document.getElementById("filterYearLecs");
         let d = document.getElementById("filterDiscipline");
@@ -1013,55 +513,56 @@
         let localPieP = document.getElementById("localPiePubYear");
         let localPieL = document.getElementById("localPieLecYear");
         
-        Array.from(yearsPubs).sort().forEach(y => { 
-            yp.add(new Option(y, y)); 
-            localTopP.add(new Option(y, y)); 
-            localPieP.add(new Option(y, y)); 
-        });
+        Array.from(yearsPubs).sort().forEach(y => { yp.add(new Option(y, y)); localTopP.add(new Option(y, y)); localPieP.add(new Option(y, y)); });
+        Array.from(yearsLecs).sort().forEach(y => { yl.add(new Option(y, y)); localTopL.add(new Option(y, y)); localPieL.add(new Option(y, y)); });
         
-        Array.from(yearsLecs).sort().forEach(y => { 
-            yl.add(new Option(y, y)); 
-            localTopL.add(new Option(y, y)); 
-            localPieL.add(new Option(y, y)); 
-        });
+        d.innerHTML = '<option value="">All Disciplines</option>';
+        localTopD.innerHTML = '<option value="">All Disciplines</option>';
         
-        Array.from(disciplines).sort().forEach(y => { 
-            d.add(new Option(y, y)); 
-            localTopD.add(new Option(y, y)); 
+        let primaryGroup = document.createElement('optgroup'); primaryGroup.label = "--- Primary Categories (Mothers) ---";
+        let subGroup = document.createElement('optgroup'); subGroup.label = "--- Specialized Subfields ---";
+        let localPrimaryGroup = document.createElement('optgroup'); localPrimaryGroup.label = "--- Primary Categories (Mothers) ---";
+        let localSubGroup = document.createElement('optgroup'); localSubGroup.label = "--- Specialized Subfields ---";
+
+        Array.from(mothersSet).sort().forEach(m => {
+            primaryGroup.appendChild(new Option(m, m));
+            localPrimaryGroup.appendChild(new Option(m, m));
         });
+        Array.from(granularSet).sort().forEach(sub => {
+            if (!mothersSet.has(sub)) {
+                subGroup.appendChild(new Option(sub, sub));
+                localSubGroup.appendChild(new Option(sub, sub));
+            }
+        });
+
+        d.appendChild(primaryGroup);
+        d.appendChild(subGroup);
+        localTopD.appendChild(localPrimaryGroup);
+        localTopD.appendChild(localSubGroup);
     }
 
     function renderChart(canvasId, type, configData, options) {
-        if(chartInstances[canvasId]) {
-            chartInstances[canvasId].destroy();
-        }
-        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { 
-            type: type, 
-            data: configData, 
-            options: options 
-        });
+        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { type: type, data: configData, options: options });
     }
 
     function updateTopContributorsAnalytics() {
         let yrPub = $('#localTopPubYear').val();
         let yrLec = $('#localTopLecYear').val();
         let discFilter = $('#localTopDiscipline').val();
-        
-        let authCounts = {};
-        let speakCounts = {};
+        let authCounts = {}; let speakCounts = {};
         
         masterData.forEach(row => {
             if (row.standard_author === "Anonymous") return;
-            if (discFilter && (!row.primary_disciplines || !row.primary_disciplines.includes(discFilter))) return;
-            
+            if (discFilter) {
+                let inP = row.primary_disciplines && row.primary_disciplines.includes(discFilter);
+                let inG = row.disciplines && row.disciplines.includes(discFilter);
+                if (!inP && !inG) return;
+            }
             if (row.entry_type === "Public Lecture") {
-                if (!yrLec || row.volume_or_year_greek === yrLec) {
-                    speakCounts[row.standard_author] = (speakCounts[row.standard_author] || 0) + 1;
-                }
+                if (!yrLec || row.volume_or_year_greek === yrLec) speakCounts[row.standard_author] = (speakCounts[row.standard_author] || 0) + 1;
             } else {
-                if (!yrPub || row.volume_or_year_greek === yrPub) {
-                    authCounts[row.standard_author] = (authCounts[row.standard_author] || 0) + 1;
-                }
+                if (!yrPub || row.volume_or_year_greek === yrPub) authCounts[row.standard_author] = (authCounts[row.standard_author] || 0) + 1;
             }
         });
 
@@ -1080,7 +581,6 @@
     function updatePieChartsAnalytics() {
         let yrPub = $('#localPiePubYear').val();
         let yrLec = $('#localPieLecYear').val();
-        
         let pubsData = masterData.filter(r => r.entry_type !== "Public Lecture" && (!yrPub || r.volume_or_year_greek === yrPub));
         let lecsData = masterData.filter(r => r.entry_type === "Public Lecture" && (!yrLec || r.volume_or_year_greek === yrLec));
         
@@ -1096,48 +596,21 @@
             if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
             row.primary_disciplines.split(',').forEach(d => {
                 let dName = d.trim();
-                if(!dName || dName.toLowerCase() === 'null') return;
-                
-                if (!topLevelDomains.includes(dName)) return; 
-                
-                counts[dName] = (counts[dName] || 0) + 1;
+                if(dName && dName.toLowerCase() !== 'null' && topLevelDomains.includes(dName)) counts[dName] = (counts[dName] || 0) + 1;
             });
         });
         
         let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
-        if(chartInstances[canvasId]) { 
-            chartInstances[canvasId].destroy(); 
-        }
+        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
         
-        let chartObj = new Chart(document.getElementById(canvasId), {
+        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
             type: 'pie', 
-            data: { 
-                labels: sorted.map(i => i[0]), 
-                datasets: [{ 
-                    data: sorted.map(i => i[1]), 
-                    backgroundColor: colors, 
-                    borderWidth: 1 
-                }] 
-            },
+            data: { labels: sorted.map(i => i[0]), datasets: [{ data: sorted.map(i => i[1]), backgroundColor: colors, borderWidth: 1 }] },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { position: 'right' } 
-                }, 
-                onClick: (event, elements, chart) => { 
-                    if(elements.length > 0) {
-                        openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture'); 
-                    }
-                } 
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } }, 
+                onClick: (event, elements, chart) => { if(elements.length > 0) openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture'); } 
             }
         });
-        
-        sorted.forEach((item, index) => { 
-            if (index > 11) chartObj.toggleDataVisibility(index); 
-        });
-        chartObj.update();
-        chartInstances[canvasId] = chartObj;
     }
 
     function buildSpecificBarChart(dataset, canvasId) {
@@ -1146,124 +619,83 @@
             if(!row.disciplines || row.disciplines === "N/A") return;
             row.disciplines.split(',').forEach(d => {
                 let dName = d.trim();
-                if(!dName || dName.toLowerCase() === 'null') return;
-                
-                if (topLevelDomains.includes(dName)) return; 
-                
-                counts[dName] = (counts[dName] || 0) + 1;
+                if(dName && dName.toLowerCase() !== 'null' && !topLevelDomains.includes(dName)) counts[dName] = (counts[dName] || 0) + 1;
             });
         });
         
         let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 15);
-        if(chartInstances[canvasId]) { 
-            chartInstances[canvasId].destroy(); 
-        }
+        if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
         
-        let chartObj = new Chart(document.getElementById(canvasId), {
+        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
             type: 'bar', 
-            data: { 
-                labels: sorted.map(i => i[0]), 
-                datasets: [{ 
-                    label: 'Entries',
-                    data: sorted.map(i => i[1]), 
-                    backgroundColor: 'rgba(2, 132, 199, 0.8)', 
-                    borderColor: '#0284c7', 
-                    borderWidth: 1 
-                }] 
-            },
+            data: { labels: sorted.map(i => i[0]), datasets: [{ label: 'Entries', data: sorted.map(i => i[1]), backgroundColor: 'rgba(2, 132, 199, 0.8)', borderColor: '#0284c7', borderWidth: 1 }] },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { y: { beginAtZero: true } },
-                onClick: (event, elements, chart) => { 
-                    if(elements.length > 0) {
-                        openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture'); 
-                    }
-                } 
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } },
+                onClick: (event, elements, chart) => { if(elements.length > 0) openDisciplineModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture'); } 
             }
         });
-        
-        chartInstances[canvasId] = chartObj;
     }
 
-    function buildBubbleChartsAnalytics() {
-        buildBubbleChart(masterData.filter(r => r.entry_type !== "Public Lecture"), 'bubbleChartPubs', 'Journal');
-        buildBubbleChart(masterData.filter(r => r.entry_type === "Public Lecture"), 'bubbleChartLecs', 'Lecture');
+    function buildPackedCircleChartsAnalytics() {
+        buildD3CirclePack(masterData.filter(r => r.entry_type !== "Public Lecture"), '#packedChartPubs', 'Journal');
+        buildD3CirclePack(masterData.filter(r => r.entry_type === "Public Lecture"), '#packedChartLecs', 'Lecture');
     }
 
-    function buildBubbleChart(dataset, canvasId, typeStr) {
+    function buildD3CirclePack(dataset, containerId, typeStr) {
         let counts = {};
         dataset.forEach(row => {
             if(!row.primary_disciplines || row.primary_disciplines === "N/A") return;
             row.primary_disciplines.split(',').forEach(d => {
                 let dName = d.trim();
-                if(!dName || dName.toLowerCase() === 'null') return;
-                if(!topLevelDomains.includes(dName)) return;
-                counts[dName] = (counts[dName] || 0) + 1;
+                if(dName && dName.toLowerCase() !== 'null' && topLevelDomains.includes(dName)) counts[dName] = (counts[dName] || 0) + 1;
             });
         });
 
-        let sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+        let dataArr = Object.entries(counts).map(([name, count]) => ({ id: name, value: count }));
+        let container = document.querySelector(containerId);
+        container.innerHTML = ""; 
         
-        // Arrange bubbles in a nice grid (x, y) with radius r proportional to count
-        let bubbleData = sorted.map((item, idx) => {
-            let [name, count] = item;
-            let col = idx % 5;
-            let row = Math.floor(idx / 5);
-            // Radius scaling based on count
-            let rVal = Math.max(8, Math.min(35, Math.sqrt(count) * 3.5));
-            return {
-                x: col * 2 + 1,
-                y: -row * 2 - 1,
-                r: rVal,
-                label: name,
-                count: count
-            };
-        });
+        let width = container.clientWidth || 400;
+        let height = container.clientHeight || 350;
 
-        if(chartInstances[canvasId]) {
-            chartInstances[canvasId].destroy();
-        }
+        let pack = d3.pack().size([width, height]).padding(3);
+        let root = d3.hierarchy({children: dataArr}).sum(d => d.value);
+        let nodes = pack(root).leaves();
 
-        let chartObj = new Chart(document.getElementById(canvasId), {
-            type: 'bubble',
-            data: {
-                datasets: [{
-                    label: 'Categories',
-                    data: bubbleData,
-                    backgroundColor: bubbleData.map((d, i) => colors[i % colors.length]),
-                    borderColor: '#111827',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let raw = context.raw;
-                                return `${raw.label}: ${raw.count} entries`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: { display: false, min: -1, max: 10 },
-                    y: { display: false, min: -10, max: 1 }
-                },
-                onClick: (event, elements, chart) => {
-                    if(elements.length > 0) {
-                        let item = chart.data.datasets[elements[0].datasetIndex].data[elements[0].index];
-                        openDisciplineModal(item.label, typeStr);
-                    }
-                }
-            }
-        });
-        chartInstances[canvasId] = chartObj;
+        let svg = d3.select(containerId).append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("max-width", "100%")
+            .style("height", "auto")
+            .style("font-family", "var(--font-mono)");
+
+        let node = svg.selectAll("g")
+            .data(nodes)
+            .enter().append("g")
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+
+        node.append("circle")
+            .attr("r", d => d.r)
+            .attr("fill", (d, i) => colors[i % colors.length])
+            .attr("stroke", "#111827")
+            .attr("stroke-width", 1)
+            .style("cursor", "pointer")
+            .on("click", (event, d) => { openDisciplineModal(d.data.id, typeStr); })
+            .append("title")
+            .text(d => `${d.data.id}: ${d.data.value} entries`);
+
+        node.append("text")
+            .selectAll("tspan")
+            .data(d => d.data.id.split(/(?=[A-Z][^A-Z])/g))
+            .enter().append("tspan")
+            .attr("x", 0)
+            .attr("y", (d, i, nodes) => `${i - nodes.length / 2 + 0.8}em`)
+            .attr("text-anchor", "middle")
+            .style("font-size", d => Math.max(10, Math.min(d.r/2.5, 14)) + "px")
+            .style("fill", "#fff")
+            .style("pointer-events", "none")
+            .style("text-shadow", "1px 1px 2px rgba(0,0,0,0.8)")
+            .text(d => d);
     }
 
     function buildInteractiveLineCharts() {
@@ -1277,9 +709,7 @@
             if(row.primary_disciplines && row.primary_disciplines !== "N/A") {
                 row.primary_disciplines.split(',').forEach(d => {
                     let dName = d.trim();
-                    if(dName && dName.toLowerCase() !== 'null' && topLevelDomains.includes(dName)) { 
-                        discCounts[dName] = (discCounts[dName] || 0) + 1; 
-                    }
+                    if(dName && dName.toLowerCase() !== 'null' && topLevelDomains.includes(dName)) discCounts[dName] = (discCounts[dName] || 0) + 1; 
                 });
             }
         });
@@ -1290,97 +720,33 @@
         dataset.forEach(row => {
             let yr = getCleanYear(row);
             if(!yr) return;
-            if(!yearCounts[yr]) { 
-                yearCounts[yr] = { "Total Output": 0 }; 
-                allDiscs.forEach(d => yearCounts[yr][d] = 0); 
-            }
+            if(!yearCounts[yr]) { yearCounts[yr] = { "Total Output": 0 }; allDiscs.forEach(d => yearCounts[yr][d] = 0); }
             yearCounts[yr]["Total Output"]++;
             
             if(row.primary_disciplines && row.primary_disciplines !== "N/A") {
                 row.primary_disciplines.split(',').forEach(d => {
                     let dName = d.trim();
-                    if(dName && yearCounts[yr][dName] !== undefined) {
-                        yearCounts[yr][dName]++;
-                    }
+                    if(dName && yearCounts[yr][dName] !== undefined) yearCounts[yr][dName]++;
                 });
             }
         });
         
         let years = Object.keys(yearCounts).sort();
-        let datasets = [{ 
-            label: "TOTAL OUTPUT", 
-            data: years.map(y => yearCounts[y]["Total Output"]), 
-            borderColor: '#000000', 
-            backgroundColor: '#000000', 
-            borderWidth: 3, 
-            borderDash: [5, 5], 
-            fill: false, 
-            tension: 0.3 
-        }];
+        let datasets = [{ label: "TOTAL OUTPUT", data: years.map(y => yearCounts[y]["Total Output"]), borderColor: '#000000', backgroundColor: '#000000', borderWidth: 3, borderDash: [5, 5], fill: false, tension: 0.3 }];
         
         allDiscs.forEach((dName, idx) => { 
-            datasets.push({ 
-                label: dName, 
-                data: years.map(y => yearCounts[y][dName]), 
-                borderColor: colors[idx % colors.length], 
-                backgroundColor: colors[idx % colors.length], 
-                borderWidth: 2, 
-                fill: false, 
-                tension: 0.3, 
-                hidden: idx >= 12 
-            }); 
+            datasets.push({ label: dName, data: years.map(y => yearCounts[y][dName]), borderColor: colors[idx % colors.length], backgroundColor: colors[idx % colors.length], borderWidth: 2, fill: false, tension: 0.3, hidden: idx >= 12 }); 
         });
         
-        renderChart(canvasId, 'line', { 
-            labels: years, 
-            datasets: datasets 
-        }, { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { position: 'right' }, 
-                zoom: { 
-                    pan: { enabled: true, mode: 'x' }, 
-                    zoom: { 
-                        drag: { enabled: true, backgroundColor: 'rgba(2,132,199,0.2)' }, 
-                        wheel: { enabled: true }, 
-                        pinch: { enabled: true }, 
-                        mode: 'x' 
-                    } 
-                } 
-            } 
-        });
-        
-        document.getElementById(canvasId).ondblclick = function() { 
-            chartInstances[canvasId].resetZoom(); 
-        };
+        renderChart(canvasId, 'line', { labels: years, datasets: datasets }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' }, zoom: { pan: { enabled: true, mode: 'x' }, zoom: { drag: { enabled: true, backgroundColor: 'rgba(2,132,199,0.2)' }, wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' } } } });
+        document.getElementById(canvasId).ondblclick = function() { chartInstances[canvasId].resetZoom(); };
     }
 
     function buildTimeline(dataset, canvasId, colorHex) {
         let counts = {};
-        dataset.forEach(row => { 
-            let yr = getCleanYear(row); 
-            if(yr) counts[yr] = (counts[yr] || 0) + 1; 
-        });
-        
+        dataset.forEach(row => { let yr = getCleanYear(row); if(yr) counts[yr] = (counts[yr] || 0) + 1; });
         let labels = Object.keys(counts).sort();
-        
-        renderChart(canvasId, 'bar', { 
-            labels: labels, 
-            datasets: [{ 
-                label: 'Total Records', 
-                data: labels.map(l => counts[l]), 
-                backgroundColor: colorHex 
-            }] 
-        }, { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            onClick: (event, elements, chart) => { 
-                if(elements.length > 0) {
-                    openYearModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture'); 
-                }
-            } 
-        });
+        renderChart(canvasId, 'bar', { labels: labels, datasets: [{ label: 'Total Records', data: labels.map(l => counts[l]), backgroundColor: colorHex }] }, { responsive: true, maintainAspectRatio: false, onClick: (event, elements, chart) => { if(elements.length > 0) openYearModal(chart.data.labels[elements[0].index], canvasId.includes('Pubs') ? 'Journal' : 'Lecture'); } });
     }
 
     function buildNetwork() {
@@ -1388,25 +754,12 @@
         windowNodesMap = new Map();
         
         masterData.forEach(row => {
-            let author = row.standard_author;
-            let disc = row.disciplines;
+            let author = row.standard_author; let disc = row.disciplines;
             if(!author || author === "N/A" || !disc || disc === "N/A" || author === "Anonymous") return;
-
-            if(!windowNodesMap.has(author)) {
-                windowNodesMap.set(author, {id: author, label: author, group: 'author'});
-            }
-            
+            if(!windowNodesMap.has(author)) windowNodesMap.set(author, {id: author, label: author, group: 'author'});
             disc.split(',').forEach(d => {
-                let dName = d.trim();
-                let isTopLevel = topLevelDomains.includes(dName);
-                
-                if(!windowNodesMap.has(dName)) {
-                    windowNodesMap.set(dName, {
-                        id: dName, 
-                        label: dName, 
-                        group: isTopLevel ? 'mother' : 'discipline'
-                    });
-                }
+                let dName = d.trim(); let isTopLevel = topLevelDomains.includes(dName);
+                if(!windowNodesMap.has(dName)) windowNodesMap.set(dName, { id: dName, label: dName, group: isTopLevel ? 'mother' : 'discipline' });
                 edgesArr.push({from: author, to: dName});
             });
         });
@@ -1427,116 +780,54 @@
         };
         
         network = new vis.Network(document.getElementById('networkContainer'), {nodes: networkNodesData, edges: edgesData}, options);
-        
-        network.on("stabilizationIterationsDone", function () { 
-            network.setOptions( { physics: false } ); 
-        });
-
-        network.on("selectNode", function (params) { 
-            if (params.nodes.length > 0) {
-                updateSidebar(params.nodes[params.nodes.length - 1], network.getConnectedNodes(params.nodes[params.nodes.length - 1])); 
-            }
-        });
-        
+        network.on("stabilizationIterationsDone", function () { network.setOptions( { physics: false } ); });
+        network.on("selectNode", function (params) { if (params.nodes.length > 0) updateSidebar(params.nodes[params.nodes.length - 1], network.getConnectedNodes(params.nodes[params.nodes.length - 1])); });
         network.on("deselectNode", function (params) {
-            if (params.nodes.length > 0) {
-                updateSidebar(params.nodes[params.nodes.length - 1], network.getConnectedNodes(params.nodes[params.nodes.length - 1]));
-            } else { 
-                document.getElementById('sidebarTitle').innerText = "Intellectual Hub"; 
-                document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections. Large black hubs represent the Primary Disciplines."; 
-                document.getElementById('sidebarLinks').innerHTML = ''; 
-            }
+            if (params.nodes.length > 0) updateSidebar(params.nodes[params.nodes.length - 1], network.getConnectedNodes(params.nodes[params.nodes.length - 1]));
+            else { document.getElementById('sidebarTitle').innerText = "Intellectual Hub"; document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections."; document.getElementById('sidebarLinks').innerHTML = ''; }
         });
         
         $('#networkSearch').on('input', function() {
-            let val = $(this).val().toLowerCase().trim();
-            if(!val) return;
-            let foundId = null;
-            for(let key of windowNodesMap.keys()) { 
-                if(key.toLowerCase().includes(val)) { foundId = key; break; } 
-            }
-            if(foundId) { 
-                network.selectNodes([foundId]); 
-                network.focus(foundId, { scale: 1.2, animation: true }); 
-                updateSidebar(foundId, network.getConnectedNodes(foundId)); 
-            }
+            let val = $(this).val().toLowerCase().trim(); if(!val) return;
+            let foundId = null; for(let key of windowNodesMap.keys()) { if(key.toLowerCase().includes(val)) { foundId = key; break; } }
+            if(foundId) { network.selectNodes([foundId]); network.focus(foundId, { scale: 1.2, animation: true }); updateSidebar(foundId, network.getConnectedNodes(foundId)); }
         });
     }
 
     function updateSidebar(nodeId, neighbors) {
         document.getElementById('sidebarTitle').innerText = nodeId;
         document.getElementById('sidebarDesc').innerText = `Connected nodes (${neighbors.length}): Click any link below to jump directly to it on the map.`;
-        let sidebar = document.getElementById('sidebarLinks');
-        sidebar.innerHTML = '';
-        
+        let sidebar = document.getElementById('sidebarLinks'); sidebar.innerHTML = '';
         let nodeObj = windowNodesMap.get(nodeId);
         if (nodeObj && nodeObj.group === 'author') {
-            let profileLink = document.createElement('a');
-            profileLink.innerText = "[ View Publications & Lectures ]";
-            profileLink.style.display = 'block'; 
-            profileLink.style.marginBottom = '15px'; 
-            profileLink.style.cursor = 'pointer'; 
-            profileLink.style.color = 'var(--text-color)'; 
-            profileLink.style.fontWeight = 'bold';
-            profileLink.onclick = () => openProfile(nodeId, "All");
+            let profileLink = document.createElement('a'); profileLink.innerText = "[ View Publications & Lectures ]"; profileLink.style.display = 'block'; profileLink.style.marginBottom = '15px'; profileLink.style.cursor = 'pointer'; profileLink.style.color = 'var(--text-color)'; profileLink.style.fontWeight = 'bold'; profileLink.onclick = () => openProfile(nodeId, "All");
             sidebar.appendChild(profileLink);
         }
-        
         neighbors.forEach(n => {
-            let link = document.createElement('span'); 
-            link.className = 'sidebar-link'; 
-            link.innerText = n;
-            link.onclick = () => { 
-                network.selectNodes([n]); 
-                network.focus(n, { scale: 1.2, animation: true }); 
-                updateSidebar(n, network.getConnectedNodes(n)); 
-            };
+            let link = document.createElement('span'); link.className = 'sidebar-link'; link.innerText = n;
+            link.onclick = () => { network.selectNodes([n]); network.focus(n, { scale: 1.2, animation: true }); updateSidebar(n, network.getConnectedNodes(n)); };
             sidebar.appendChild(link);
         });
     }
 
     function openTab(tabId, element) {
-        $('.tab-content').removeClass('active'); 
-        $('.tab-btn').removeClass('active'); 
-        $('#' + tabId).addClass('active'); 
-        $(element).addClass('active');
-        
+        $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); $('#' + tabId).addClass('active'); $(element).addClass('active');
         if(tabId === 'journalTab' || tabId === 'lectureTab' || tabId === 'allTab') {
             $('#tableControls').show();
-            if(tabId === 'journalTab') { 
-                $('#catalogNote').show(); 
-            } else { 
-                $('#catalogNote').hide(); 
-            }
-            $('#filterYearPubs').toggle(tabId === 'journalTab'); 
-            $('#filterYearLecs').toggle(tabId === 'lectureTab'); 
-            $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'allTab');
-        } else { 
-            $('#tableControls').hide(); 
-            $('#catalogNote').hide(); 
-        }
-        
-        if(tabId === 'journalTab' || tabId === 'lectureTab') { 
-            $('#suggestionBar').css('display', 'flex'); 
-            refreshSuggestions(); 
-        } else { 
-            $('#suggestionBar').hide(); 
-        }
+            if(tabId === 'journalTab') $('#catalogNote').show(); else $('#catalogNote').hide();
+            $('#filterYearPubs').toggle(tabId === 'journalTab'); $('#filterYearLecs').toggle(tabId === 'lectureTab'); $('#anonFilterGroup').toggle(tabId === 'journalTab' || tabId === 'allTab');
+        } else { $('#tableControls').hide(); $('#catalogNote').hide(); }
+        if(tabId === 'journalTab' || tabId === 'lectureTab') { $('#suggestionBar').css('display', 'flex'); refreshSuggestions(); } else { $('#suggestionBar').hide(); }
     }
 
     let currentModalData = { type: '', title: '', subtitle: '', items: [] };
 
     function renderFlatList(items, query = "") {
-        let list = document.getElementById('profItems'); 
-        list.innerHTML = '';
+        let list = document.getElementById('profItems'); list.innerHTML = '';
         let filtered = items.filter(i => (i.search_text || "").toLowerCase().includes(query.toLowerCase()));
-        if (filtered.length === 0) { 
-            list.innerHTML = "<li>No matching records found.</li>"; 
-            return; 
-        }
+        if (filtered.length === 0) { list.innerHTML = "<li>No matching records found.</li>"; return; }
         filtered.forEach(item => {
-            let li = document.createElement('li'); 
-            li.style.marginBottom = '8px';
+            let li = document.createElement('li'); li.style.marginBottom = '8px';
             let typeTag = item.entry_type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
             li.innerHTML = `<strong>${getCleanYear(item) || 'n.d.'}</strong>: ${item.title_english || item.title_greek || ''} - <em>${item.standard_author}</em>${typeTag}`;
             list.appendChild(li);
@@ -1544,33 +835,18 @@
     }
 
     function renderGroupedList(items, query = "") {
-        let list = document.getElementById('profItems'); 
-        list.innerHTML = '';
+        let list = document.getElementById('profItems'); list.innerHTML = '';
         let filtered = items.filter(i => (i.search_text || "").toLowerCase().includes(query.toLowerCase()));
-        if (filtered.length === 0) { 
-            list.innerHTML = "<li>No matching records found.</li>"; 
-            return; 
-        }
-        
+        if (filtered.length === 0) { list.innerHTML = "<li>No matching records found.</li>"; return; }
         let grouped = {};
         filtered.forEach(item => {
             let discs = item.disciplines && item.disciplines !== "N/A" ? item.disciplines.split(',').map(d => d.trim()) : ["Uncategorized"];
-            discs.forEach(d => { 
-                if(!grouped[d]) grouped[d] = []; 
-                grouped[d].push(item); 
-            });
+            discs.forEach(d => { if(!grouped[d]) grouped[d] = []; grouped[d].push(item); });
         });
-
         for (const [disc, works] of Object.entries(grouped).sort()) {
-            let discHeader = document.createElement('div'); 
-            discHeader.innerHTML = `<h3 style="color: var(--accent-cyan); margin-bottom: 5px; margin-top: 20px;">${disc}</h3>`; 
-            list.appendChild(discHeader);
-            
+            let discHeader = document.createElement('div'); discHeader.innerHTML = `<h3 style="color: var(--accent-cyan); margin-bottom: 5px; margin-top: 20px;">${disc}</h3>`; list.appendChild(discHeader);
             works.sort((a,b) => (getCleanYear(a) || "9999").localeCompare(getCleanYear(b) || "9999")).forEach(item => {
-                let li = document.createElement('li'); 
-                li.style.marginBottom = '5px'; 
-                li.style.listStyleType = 'square'; 
-                li.style.marginLeft = '20px';
+                let li = document.createElement('li'); li.style.marginBottom = '5px'; li.style.listStyleType = 'square'; li.style.marginLeft = '20px';
                 let typeTag = item.entry_type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
                 li.innerHTML = `<strong>${getCleanYear(item) || 'n.d.'}</strong>: ${item.title_english || item.title_greek || ''}${typeTag}`;
                 list.appendChild(li);
@@ -1578,14 +854,7 @@
         }
     }
 
-    $(document).on('input', '#modalSearch', function() { 
-        let val = $(this).val(); 
-        if (currentModalData.type === 'profile') {
-            renderGroupedList(currentModalData.items, val); 
-        } else {
-            renderFlatList(currentModalData.items, val); 
-        }
-    });
+    $(document).on('input', '#modalSearch', function() { if (currentModalData.type === 'profile') { renderGroupedList(currentModalData.items, $(this).val()); } else { renderFlatList(currentModalData.items, $(this).val()); } });
 
     function setupModalHeader(title, subtitle, type, items) {
         currentModalData = { type, title, subtitle, items };
@@ -1594,17 +863,13 @@
         document.getElementById('profileModal').style.display = 'flex';
     }
 
-    function openListModal(title, subtitle, items) { 
-        setupModalHeader(title, subtitle, 'list', items); 
-        renderFlatList(items); 
-    }
+    function openListModal(title, subtitle, items) { setupModalHeader(title, subtitle, 'list', items); renderFlatList(items); }
 
     function openProfile(authorName, entryTypeFilter = "All") {
         let items = masterData.filter(r => r.standard_author === authorName);
         if (entryTypeFilter === "Journal") items = items.filter(r => r.entry_type !== "Public Lecture");
         if (entryTypeFilter === "Lecture") items = items.filter(r => r.entry_type === "Public Lecture");
-        setupModalHeader(authorName, `Total Contributions (${entryTypeFilter}): ${items.length}`, 'profile', items); 
-        renderGroupedList(items);
+        setupModalHeader(authorName, `Total Contributions (${entryTypeFilter}): ${items.length}`, 'profile', items); renderGroupedList(items);
     }
     
     function openYearModal(year, type) {
@@ -1615,27 +880,20 @@
     }
     
     function openDisciplineModal(disc, type) {
-        let items = masterData.filter(r => r.disciplines && r.disciplines.split(',').map(x=>x.trim()).includes(disc));
+        let items = masterData.filter(r => { let inP = r.primary_disciplines && r.primary_disciplines.includes(disc); let inG = r.disciplines && r.disciplines.includes(disc); return inP || inG; });
         if(type === 'Journal') items = items.filter(r => r.entry_type !== "Public Lecture");
         if(type === 'Lecture') items = items.filter(r => r.entry_type === "Public Lecture");
         items.sort((a,b) => (getCleanYear(a) || "9999").localeCompare(getCleanYear(b) || "9999"));
         openListModal(`Discipline: ${disc}`, `Total Records (${type}): ${items.length}`, items);
     }
 
-    function viewScan(imageName) { 
-        document.getElementById('scanImage').src = "split_pages/" + imageName; 
-        document.getElementById('scanModal').style.display = 'flex'; 
-    }
-    function closeModal(id) { 
-        document.getElementById(id).style.display = 'none'; 
-    }
+    function viewScan(imageName) { document.getElementById('scanImage').src = "split_pages/" + imageName; document.getElementById('scanModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function generateCitation(author, title, year) {
         const citation = `${author && author !== "N/A" ? author : "Ανώνυμος"}. "${title}". Εν Κωνσταντινουπόλει Ελληνικός Φιλολογικός Σύλλογος, ${year && year !== "N/A" ? year : "n.d."}.`;
         navigator.clipboard.writeText(citation).then(() => alert("Citation copied:\n\n" + citation));
     }
-    function escapeQuote(str) { 
-        return str ? str.replace(/'/g, "\\'").replace(/"/g, "&quot;") : ""; 
-    }
+    function escapeQuote(str) { return str ? str.replace(/'/g, "\\'").replace(/"/g, "&quot;") : ""; }
 </script>
 </body>
 </html>
