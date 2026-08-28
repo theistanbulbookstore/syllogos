@@ -221,13 +221,21 @@
     </div>
 
     <!-- TAB 3: Semantic Search -->
+     <!-- TAB 3: Semantic Search -->
     <div id="semanticTab" class="tab-content">
         <h2 style="font-weight: 500;">AI Semantic Concept Search</h2>
-        <p style="color: var(--text-muted);">Search by concept or theme (e.g., "public health", "ancient philosophy") rather than exact keywords. This module requires the generation of vector embeddings.</p>
-        <input type="text" placeholder="Enter a conceptual search..." style="width: 400px;">
-        <button class="btn-small" style="padding: 8px 16px;">Search Concept</button>
-        <div style="margin-top: 20px; padding: 20px; border: 1px dashed var(--border-light); text-align: center; color: var(--text-muted);">
-            [ Semantic Vector Results will appear here ]
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Search by concept or theme (e.g., "public health", "ancient philosophy") rather than exact keywords. (e.g., "infectious diseases", "ancient greek poetry", "bureaucracy").</p>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="semanticInput" placeholder="Enter a conceptual search..." style="width: 400px; padding: 10px; font-family: var(--font-mono);">
+            <button id="semanticBtn" class="btn-small" style="padding: 10px 20px; font-weight: bold;">Search Archive</button>
+        </div>
+        <div id="semanticStatus" style="color: #d97706; font-size: 0.85rem; margin-top: 10px; font-weight: 600;"></div>
+        
+        <div id="semanticResults" style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
+            <div style="padding: 30px; border: 1px dashed var(--border-light); text-align: center; color: var(--text-muted);">
+                [ Semantic Vector Results will appear here ]
+            </div>
         </div>
     </div>
 
@@ -1376,6 +1384,90 @@
     function escapeQuote(str) { 
         return str ? str.replace(/'/g, "\\'").replace(/"/g, "&quot;") : ""; 
     }
+</script>
+<!-- Transformer.js Semantic Search Module -->
+<script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.16.0';
+
+    let corpusData = null;
+    let embedder = null;
+
+    // Fast vector dot product = cosine similarity (since vectors are normalized)
+    function dotProduct(vecA, vecB) {
+        let result = 0;
+        for (let i = 0; i < vecA.length; i++) {
+            result += vecA[i] * vecB[i];
+        }
+        return result;
+    }
+
+    document.getElementById('semanticBtn').addEventListener('click', async () => {
+        const query = document.getElementById('semanticInput').value.trim();
+        const statusEl = document.getElementById('semanticStatus');
+        const resultsEl = document.getElementById('semanticResults');
+
+        if (!query) return;
+
+        resultsEl.innerHTML = "";
+        
+        try {
+            // 1. LAZY LOAD: Fetch the JSON database ONLY when the user searches for the first time
+            if (!corpusData) {
+                statusEl.innerText = "Fetching semantic database...";
+                const res = await fetch('corpus_embeddings.json');
+                corpusData = await res.json();
+            }
+
+            // 2. Load the Neural Network to the browser cache (only happens once)
+            if (!embedder) {
+                statusEl.innerText = "Loading Multilingual AI Model (Downloading to browser cache on first run. Please wait...)";
+                embedder = await pipeline('feature-extraction', 'Xenova/paraphrase-multilingual-MiniLM-L12-v2');
+            }
+
+            statusEl.innerText = "Embedding query & calculating multidimensional distances...";
+            
+            // 3. Embed the user's search query live in the browser
+            const output = await embedder(query, { pooling: 'mean', normalize: true });
+            const queryVector = Array.from(output.data);
+
+            // 4. Calculate Vector Distance against all rows
+            let scoredDocs = corpusData.map(doc => {
+                return { ...doc, score: dotProduct(queryVector, doc.embedding) };
+            });
+
+            // 5. Sort by highest mathematical similarity
+            scoredDocs.sort((a, b) => b.score - a.score);
+            let topMatches = scoredDocs.slice(0, 15);
+
+            statusEl.innerText = `Top 15 conceptual matches for: "${query}"`;
+            
+            // 6. Render the results
+            topMatches.forEach(item => {
+                let typeTag = item.type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
+                resultsEl.innerHTML += `
+                    <div style="padding: 15px; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-cyan); background: #ffffff; border-radius: 3px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="font-size: 1rem; font-weight: 500; color: var(--text-color);">${item.title}</div>
+                            <div style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">Relevance: ${(item.score * 100).toFixed(1)}%</div>
+                        </div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">
+                            <em>${item.author}</em> &nbsp;|&nbsp; <strong>${item.year}</strong> ${typeTag}
+                        </div>
+                        <div style="font-size: 0.75rem; color: #4b5563;"><strong>Macro Categories:</strong> ${item.disciplines}</div>
+                    </div>
+                `;
+            });
+
+        } catch (error) {
+            console.error(error);
+            statusEl.innerText = "An error occurred during semantic search initialization. Please ensure corpus_embeddings.json has been generated.";
+        }
+    });
+
+    // Let 'Enter' key trigger the search
+    document.getElementById('semanticInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') { document.getElementById('semanticBtn').click(); }
+    });
 </script>
 </body>
 </html>
