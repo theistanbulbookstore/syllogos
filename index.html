@@ -33,14 +33,7 @@
             --font-mono: 'Fira Code', 'Consolas', monospace;
         }
         
-        body { 
-            font-family: var(--font-mono); 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 20px 40px; 
-            font-size: 0.85rem; 
-        }
+        body { font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px 40px; font-size: 0.85rem; }
         
         /* Layout */
         .header-container { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 15px; }
@@ -142,9 +135,8 @@
         <button class="tab-btn" onclick="openTab('semanticTab', this)">3. Semantic Search</button>
         <button class="tab-btn" onclick="openTab('analyticsTab', this)">4. Visual Analytics</button>
         <button class="tab-btn" onclick="openTab('networkTab', this)">5. Intellectual Network</button>
-        <button class="tab-btn" onclick="openTab('timelineTab', this)">6. Timeline</button>
-        <button class="tab-btn" onclick="openTab('allTab', this)">7. All Entries (Review)</button>
-        <button class="tab-btn" onclick="openTab('aboutTab', this)">8. About</button>
+        <button class="tab-btn" onclick="openTab('allTab', this)">6. All Entries (Review)</button>
+        <button class="tab-btn" onclick="openTab('aboutTab', this)">7. About</button>
     </div>
 
     <!-- Global Filters -->
@@ -203,25 +195,7 @@
         </table>
     </div>
 
-    <!-- TAB 7: All Entries (Review) -->
-    <div id="allTab" class="tab-content">
-        <p style="color: var(--text-muted); margin-bottom: 15px;">This tab combines all Journal and Lecture entries. Authors are formatted as "Last Name, First Name" to assist with alphabetized sorting and deduplication review.</p>
-        <table id="allTable" class="display nowrap" style="width:100%">
-            <thead><tr>
-                <th>Year</th>
-                <th>Author (Last, First)</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Disciplines</th>
-                <th>Scan</th>
-                <th>Action</th>
-            </tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
     <!-- TAB 3: Semantic Search -->
-     <!-- TAB 3: Semantic Search -->
     <div id="semanticTab" class="tab-content">
         <h2 style="font-weight: 500;">AI Semantic Concept Search</h2>
         <p style="color: var(--text-muted); margin-bottom: 20px;">Search by concept or theme (e.g., "public health", "ancient philosophy") rather than exact keywords. (e.g., "infectious diseases", "ancient greek poetry", "bureaucracy").</p>
@@ -306,7 +280,21 @@
             </div>
         </div>
 
-        <div class="section-header" style="margin-top: 60px;">3. Disciplinary Output Over Time</div>
+        <!-- NEW MOVED TIMELINE SECTION -->
+        <div class="section-header" style="margin-top: 60px;">3. Timeline of Output</div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;">Total output of publications and public lectures per year. Click any bar to view the records.</p>
+        <div class="dual-chart-container">
+            <div class="chart-wrapper">
+                <div class="chart-title">Journal Publications Output</div>
+                <canvas id="timelineChartPubs"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <div class="chart-title">Public Lectures Output</div>
+                <canvas id="timelineChartLecs"></canvas>
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-top: 60px;">4. Disciplinary Output Over Time</div>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: -10px;"><strong>Interactive:</strong> Click and drag horizontally inside the graph to zoom into a specific year range. Double click to reset zoom. This chart tracks Primary Disciplines across all years.</p>
         <div class="dual-chart-container">
             <div class="chart-wrapper" style="height: 450px;">
@@ -335,22 +323,24 @@
         </div>
     </div>
 
-    <!-- TAB 6: Timeline -->
-    <div id="timelineTab" class="tab-content">
-        <p style="color: var(--text-muted);">Total output of publications and public lectures per year. Click any bar to view the records.</p>
-        <div class="dual-chart-container">
-            <div class="chart-wrapper">
-                <div class="chart-title">Journal Publications Output</div>
-                <canvas id="timelineChartPubs"></canvas>
-            </div>
-            <div class="chart-wrapper">
-                <div class="chart-title">Public Lectures Output</div>
-                <canvas id="timelineChartLecs"></canvas>
-            </div>
-        </div>
+    <!-- TAB 6: All Entries (Review) -->
+    <div id="allTab" class="tab-content">
+        <p style="color: var(--text-muted); margin-bottom: 15px;">This tab combines all Journal and Lecture entries. Authors are formatted as "Last Name, First Name" to assist with alphabetized sorting and deduplication review.</p>
+        <table id="allTable" class="display nowrap" style="width:100%">
+            <thead><tr>
+                <th>Year</th>
+                <th>Author (Last, First)</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Disciplines</th>
+                <th>Scan</th>
+                <th>Action</th>
+            </tr></thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-    <!-- TAB 8: About -->
+    <!-- TAB 7: About -->
     <div id="aboutTab" class="tab-content">
         <div style="display: flex; align-items: center; gap: 40px; flex-wrap: wrap; max-width: 1100px;">
             <div style="flex: 1; min-width: 400px;">
@@ -829,7 +819,6 @@
         sortAndRender(speakCounts, 'topSpeakersList', 'Lecture');
     }
 
-    // Unified Engine to safely pass exact Year Filters down to all visual charts simultaneously
     function updateVisualBreakdowns() {
         let yrPub = $('#localPiePubYear').val();
         let yrLec = $('#localPieLecYear').val();
@@ -1180,7 +1169,7 @@
                 updateSidebar(params.nodes[params.nodes.length - 1], network.getConnectedNodes(params.nodes[params.nodes.length - 1]));
             } else { 
                 document.getElementById('sidebarTitle').innerText = "Intellectual Hub"; 
-                document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections. Large black hubs represent the Primary Disciplines."; 
+                document.getElementById('sidebarDesc').innerText = "Click any node on the map, or use the search bar, to inspect connections."; 
                 document.getElementById('sidebarLinks').innerHTML = ''; 
             }
         });
@@ -1385,6 +1374,7 @@
         return str ? str.replace(/'/g, "\\'").replace(/"/g, "&quot;") : ""; 
     }
 </script>
+
 <!-- Transformer.js Semantic Search Module -->
 <script type="module">
     import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.16.0';
@@ -1435,20 +1425,43 @@
                 return { ...doc, score: dotProduct(queryVector, doc.embedding) };
             });
 
-            // 5. Sort by highest mathematical similarity
-            scoredDocs.sort((a, b) => b.score - a.score);
-            let topMatches = scoredDocs.slice(0, 15);
+            // 5. Filter by 10% relevance threshold and allow ALL generated results (no upper cap)
+            let relevantDocs = scoredDocs.filter(d => d.score >= 0.10);
+            relevantDocs.sort((a, b) => b.score - a.score);
+            let topMatches = relevantDocs; 
 
-            statusEl.innerText = `Top 15 conceptual matches for: "${query}"`;
+            if (topMatches.length === 0) {
+                statusEl.innerText = `No conceptual matches found for: "${query}"`;
+                return;
+            }
+
+            statusEl.innerText = `Found ${topMatches.length} conceptual matches for: "${query}"`;
             
-            // 6. Render the results
+            // 6. Render the results with BOTH English and Greek titles
             topMatches.forEach(item => {
                 let typeTag = item.type === "Public Lecture" ? " <strong>[Lecture]</strong>" : "";
+                
+                // Cross-reference our in-memory CSV to fetch both languages
+                let originalRow = masterData.find(r => r.title_english === item.title || r.title_greek === item.title);
+                
+                let displayTitle = item.title;
+                let subTitle = "";
+                
+                if (originalRow) {
+                    displayTitle = originalRow.title_english || originalRow.title_greek;
+                    subTitle = originalRow.title_english ? originalRow.title_greek : "";
+                }
+
+                let titleHTML = `<div style="font-size: 1rem; font-weight: 500; color: var(--text-color);">${displayTitle}</div>`;
+                if (subTitle && subTitle !== "N/A") {
+                    titleHTML += `<div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">${subTitle}</div>`;
+                }
+
                 resultsEl.innerHTML += `
-                    <div style="padding: 15px; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-cyan); background: #ffffff; border-radius: 3px;">
+                    <div style="padding: 15px; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-cyan); background: #ffffff; border-radius: 3px; margin-bottom: 10px;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <div style="font-size: 1rem; font-weight: 500; color: var(--text-color);">${item.title}</div>
-                            <div style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">Relevance: ${(item.score * 100).toFixed(1)}%</div>
+                            <div>${titleHTML}</div>
+                            <div style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; margin-left: 15px;">Relevance: ${(item.score * 100).toFixed(1)}%</div>
                         </div>
                         <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">
                             <em>${item.author}</em> &nbsp;|&nbsp; <strong>${item.year}</strong> ${typeTag}
