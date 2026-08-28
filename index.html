@@ -690,24 +690,30 @@
     function setupCustomFilters() {
         $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
             const rowObj = settings.aoData[dataIndex]._aData;
-            const tableId = settings.nTable.id;
+            const tableId = settings.nTable.id; // This is 'journalTable', 'lectureTable', or 'allTable'
             const query = removeGreekAccents($('#globalSearch').val());
             const anonChecked = $('#anonFilter').is(':checked');
             const discFilter = $('#filterDiscipline').val();
             
-            if (tableId === 'journalTab' || tableId === 'lectureTab') {
-                let yrFilter = tableId === 'journalTab' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
+            // 1. Year Filter
+            if (tableId === 'journalTable' || tableId === 'lectureTable') {
+                let yrFilter = tableId === 'journalTable' ? $('#filterYearPubs').val() : $('#filterYearLecs').val();
                 if (yrFilter && rowObj.volume_or_year_greek !== yrFilter) return false;
             }
-            if ((tableId === 'journalTab' || tableId === 'allTab') && anonChecked && rowObj.standard_author !== "Anonymous") return false;
             
+            // 2. Anonymous Filter (Applies to Journal and All entries)
+            if ((tableId === 'journalTable' || tableId === 'allTable') && anonChecked && rowObj.standard_author !== "Anonymous") return false;
+            
+            // 3. Discipline Filter (Applies to all tables)
             if (discFilter) {
                 let inPrimary = rowObj.primary_disciplines && rowObj.primary_disciplines.split(',').map(x=>x.trim()).includes(discFilter);
                 let inAll = rowObj.disciplines && rowObj.disciplines.split(',').map(x=>x.trim()).includes(discFilter);
                 if (!inPrimary && !inAll) return false;
             }
             
+            // 4. Global Fuzzy Search
             if (query && !removeGreekAccents(rowObj.search_text || "").includes(query)) return false;
+            
             return true;
         });
 
@@ -718,8 +724,6 @@
         });
 
         $('#localTopPubYear, #localTopLecYear, #localTopDiscipline').on('change', updateTopContributorsAnalytics);
-        
-        // Single central update command for all visual breakdowns based on years
         $('#localPiePubYear, #localPieLecYear').on('change', updateVisualBreakdowns);
     }
 
